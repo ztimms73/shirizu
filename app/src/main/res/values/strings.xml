@@ -59,4 +59,13 @@
     <string name="information_no_manga_category">No manga in this category</string>
     <string name="readme">README</string>
     <string name="readme_desc">Check the Gitea repository and the README</string>
+    <string name="manga_cover">Manga cover</string>
+    <string name="unknown_title">Unknown title</string>
+    <string name="unknown_author">Unknown author</string>
+    <string name="ongoing">Ongoing</string>
+    <string name="finished">Finished</string>
+    <string name="abandoned">Abandoned</string>
+    <string name="paused">Paused</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="unknown">Unknown</string>
 </resources>

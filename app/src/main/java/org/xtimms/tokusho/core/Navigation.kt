@@ -17,6 +17,8 @@ import coil.ImageLoader
 import org.xtimms.tokusho.core.model.ShelfCategory
 import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
 import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
+import org.xtimms.tokusho.sections.details.DETAILS_DESTINATION
+import org.xtimms.tokusho.sections.details.DetailsView
 import org.xtimms.tokusho.sections.explore.ExploreView
 import org.xtimms.tokusho.sections.history.HistoryView
 import org.xtimms.tokusho.sections.list.LIST_DESTINATION
@@ -154,6 +156,7 @@ fun Navigation(
             MangaListView(
                 sourceName = "Source",
                 navigateBack = navigateBack,
+                navigateToDetails = { navController.navigate(DETAILS_DESTINATION) }
             )
         }
 
@@ -166,6 +169,12 @@ fun Navigation(
 
         composable(UPDATES_DESTINATION) {
             UpdateView(
+                navigateBack = navigateBack,
+            )
+        }
+
+        composable(DETAILS_DESTINATION) {
+            DetailsView(
                 navigateBack = navigateBack,
             )
         }
