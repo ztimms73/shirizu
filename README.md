@@ -8,8 +8,8 @@ No, nothing works.
 
 ## Acknowledgements
 
-[Kotatsu](https://github.com/KotatsuApp/Kotatsu) - UI and parsers
-[Seal](https://github.com/JunkFood02/Seal) - UI
+- [Kotatsu](https://github.com/KotatsuApp/Kotatsu) - UI and parsers
+- [Seal](https://github.com/JunkFood02/Seal) - UI
 
 ## License
 
