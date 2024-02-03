@@ -44,6 +44,7 @@ import org.xtimms.tokusho.core.Navigation
 import org.xtimms.tokusho.core.components.BottomNavBar
 import org.xtimms.tokusho.core.components.TopAppBar
 import org.xtimms.tokusho.ui.theme.TokushoTheme
+import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -83,7 +84,7 @@ class MainActivity : ComponentActivity() {
             val localeListCompat =
                 if (locale.isEmpty()) LocaleListCompat.getEmptyLocaleList()
                 else LocaleListCompat.forLanguageTags(locale)
-            App.applicationScope.launch(Dispatchers.Main) {
+            processLifecycleScope.launch(Dispatchers.Main) {
                 AppCompatDelegate.setApplicationLocales(localeListCompat)
             }
         }

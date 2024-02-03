@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.xtimms.shiki.ui.theme.SEED
-import org.xtimms.tokusho.App.Companion.applicationScope
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.ui.monet.PaletteStyle
+import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import org.xtimms.tokusho.utils.system.languageMap
 
 private const val DYNAMIC_COLOR = "dynamic_color"
@@ -85,7 +85,7 @@ object AppSettings {
     fun encodeString(key: String, string: String) = key.updateString(string)
     fun containsKey(key: String) = kv.containsKey(key)
 
-    fun isAutoUpdateEnabled() = AUTO_UPDATE.getBoolean(true)
+    fun isAutoUpdateEnabled() = AUTO_UPDATE.getBoolean(false)
 
     fun getLanguageConfiguration(languageNumber: Int = kv.decodeInt(LANGUAGE)) =
         languageMap.getOrElse(languageNumber) { "" }
@@ -129,7 +129,7 @@ object AppSettings {
         darkThemeValue: Int = AppSettingsStateFlow.value.darkTheme.darkThemeValue,
         isHighContrastModeEnabled: Boolean = AppSettingsStateFlow.value.darkTheme.isHighContrastModeEnabled
     ) {
-        applicationScope.launch(Dispatchers.IO) {
+        processLifecycleScope.launch(Dispatchers.IO) {
             mutableAppSettingsStateFlow.update {
                 it.copy(
                     darkTheme = AppSettingsStateFlow.value.darkTheme.copy(
@@ -144,7 +144,7 @@ object AppSettings {
     }
 
     fun modifyThemeSeedColor(colorArgb: Int, paletteStyleIndex: Int) {
-        applicationScope.launch(Dispatchers.IO) {
+        processLifecycleScope.launch(Dispatchers.IO) {
             mutableAppSettingsStateFlow.update {
                 it.copy(seedColor = colorArgb, paletteStyleIndex = paletteStyleIndex)
             }
@@ -154,7 +154,7 @@ object AppSettings {
     }
 
     fun switchDynamicColor(enabled: Boolean = !mutableAppSettingsStateFlow.value.isDynamicColorEnabled) {
-        applicationScope.launch(Dispatchers.IO) {
+        processLifecycleScope.launch(Dispatchers.IO) {
             mutableAppSettingsStateFlow.update {
                 it.copy(isDynamicColorEnabled = enabled)
             }

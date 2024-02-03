@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.xtimms.tokusho.App.Companion.applicationScope
+import org.xtimms.tokusho.utils.lang.processLifecycleScope
 
 fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -16,7 +16,7 @@ fun Context.toast(@StringRes stringRes: Int) {
 }
 
 fun Context.suspendToast(@StringRes stringRes: Int) {
-    applicationScope.launch(Dispatchers.Main) {
+    processLifecycleScope.launch(Dispatchers.Main) {
         toast(getString(stringRes))
     }
 }
