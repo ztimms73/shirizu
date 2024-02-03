@@ -131,7 +131,7 @@ fun UpdateView(
                                 runCatching {
                                     isLoading = true
                                     withContext(Dispatchers.IO) {
-                                        Updater.checkForUpdate()?.let {
+                                        Updater.checkForUpdate(context)?.let {
                                             latestRelease = it
                                             showUpdateDialog = true
                                         }

@@ -58,7 +58,7 @@ object Updater {
             latestRelease
         }
 
-    suspend fun checkForUpdate(context: Context = App.context): LatestRelease? {
+    suspend fun checkForUpdate(context: Context): LatestRelease? {
         val currentVersion = context.getCurrentVersion()
         val latestRelease = getLatestRelease()
         val latestVersion = latestRelease.name.toVersion()
@@ -80,7 +80,7 @@ object Updater {
     private fun Context.getLatestApk() =
         File(getExternalFilesDir("apk"), "latest.apk")
 
-    fun installLatestApk(context: Context = App.context) = context.run {
+    fun installLatestApk(context: Context) = context.run {
         kotlin.runCatching {
             val contentUri = FileProvider.getUriForFile(this, getFileProvider(), getLatestApk())
             val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -96,7 +96,7 @@ object Updater {
     }
 
     suspend fun deleteOutdatedApk(
-        context: Context = App.context,
+        context: Context,
     ) = context.runCatching {
         val apkFile = getLatestApk()
         if (apkFile.exists()) {
@@ -110,7 +110,7 @@ object Updater {
     }
 
     suspend fun downloadApk(
-        context: Context = App.context,
+        context: Context,
         latestRelease: LatestRelease
     ): Flow<DownloadStatus> = withContext(Dispatchers.IO) {
         val apkVersion = context.packageManager.getPackageArchiveInfo(

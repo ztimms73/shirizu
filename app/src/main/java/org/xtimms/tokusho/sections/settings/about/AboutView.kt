@@ -3,8 +3,10 @@ package org.xtimms.tokusho.sections.settings.about
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Update
+import androidx.compose.material.icons.outlined.UpdateDisabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import org.xtimms.tokusho.App
@@ -27,6 +30,7 @@ import org.xtimms.tokusho.utils.system.toast
 
 const val ABOUT_DESTINATION = "about"
 
+private const val repoUrl = "https://git.kotatsu.app/Xtimms/Tokusho"
 const val weblate = "https://hosted.weblate.org/engage/tokusho/"
 
 @Composable
@@ -42,6 +46,11 @@ fun AboutView(
     val info = App.getVersionReport()
     val versionName = packageInfo.versionName
 
+    val uriHandler = LocalUriHandler.current
+    fun openUrl(url: String) {
+        uriHandler.openUri(url)
+    }
+
     ScaffoldWithTopAppBar(
         title = stringResource(R.string.about),
         navigateBack = navigateBack
@@ -51,12 +60,18 @@ fun AboutView(
                 .padding(padding)
         ) {
             item {
+                PreferenceItem(
+                    title = stringResource(R.string.readme),
+                    description = stringResource(R.string.readme_desc),
+                    icon = Icons.Outlined.Description,
+                ) { openUrl(repoUrl) }
+            }
+            item {
                 PreferenceSwitchWithDivider(
                     title = stringResource(R.string.auto_update),
                     description = stringResource(R.string.check_for_updates_desc),
-                    icon = Icons.Outlined.Update,
+                    icon = if (isAutoUpdateEnabled) Icons.Outlined.Update else Icons.Outlined.UpdateDisabled,
                     isChecked = isAutoUpdateEnabled,
-                    isSwitchEnabled = true,
                     onClick = navigateToUpdatePage,
                     onChecked = {
                         isAutoUpdateEnabled = !isAutoUpdateEnabled

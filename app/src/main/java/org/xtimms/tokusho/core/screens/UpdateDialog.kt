@@ -39,11 +39,14 @@ fun UpdateDialog(
         onConfirmUpdate = {
             scope.launch(Dispatchers.IO) {
                 runCatching {
-                    Updater.downloadApk(latestRelease = latestRelease)
+                    Updater.downloadApk(
+                        context = context,
+                        latestRelease = latestRelease
+                    )
                         .collect { downloadStatus ->
                             currentDownloadStatus = downloadStatus
                             if (downloadStatus is Updater.DownloadStatus.Finished) {
-                                Updater.installLatestApk()
+                                Updater.installLatestApk(context)
                             }
                         }
                 }.onFailure {
