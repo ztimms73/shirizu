@@ -8,8 +8,9 @@ No, nothing works.
 
 ## Acknowledgements
 
-- [Kotatsu](https://github.com/KotatsuApp/Kotatsu) - UI and parsers
+- [Kotatsu](https://github.com/KotatsuApp/Kotatsu) - UI, parsers, under the hood
 - [Seal](https://github.com/JunkFood02/Seal) - UI
+- [MoeList](https://github.com/axiel7/MoeList) - Under the hood
 
 ## License
 
