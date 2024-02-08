@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import org.xtimms.tokusho.core.AsyncImageImpl
 
 enum class MangaCover(val ratio: Float) {
     Square(1f / 1f),
@@ -20,14 +23,16 @@ enum class MangaCover(val ratio: Float) {
 
     @Composable
     operator fun invoke(
-        data: Painter,
+        coil: ImageLoader,
+        data: String,
         modifier: Modifier = Modifier,
         contentDescription: String = "",
         shape: Shape = MaterialTheme.shapes.small,
         onClick: (() -> Unit)? = null,
     ) {
-        Image(
-            painter = data,
+        AsyncImageImpl(
+            coil = coil,
+            model = data,
             contentDescription = contentDescription,
             modifier = modifier
                 .aspectRatio(ratio)

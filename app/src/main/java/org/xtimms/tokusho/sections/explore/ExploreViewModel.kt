@@ -22,7 +22,7 @@ class ExploreViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchJob(Dispatchers.Default) {
             val result = mangaSourcesRepository.allMangaSources
             mutableUiState.update {
                 it.copy(

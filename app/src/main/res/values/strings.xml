@@ -68,4 +68,9 @@
     <string name="paused">Paused</string>
     <string name="upcoming">Upcoming</string>
     <string name="unknown">Unknown</string>
+    <string name="open_in_browser">Open in browser</string>
+    <string name="manga_info_collapse">Less</string>
+    <string name="manga_info_expand">More</string>
+    <string name="action_copy_to_clipboard">Copy to clipboard</string>
+    <string name="description_placeholder">No description</string>
 </resources>

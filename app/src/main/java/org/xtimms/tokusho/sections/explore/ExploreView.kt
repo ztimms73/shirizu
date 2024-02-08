@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.collapsable
 import org.xtimms.tokusho.core.components.ExploreButton
@@ -50,7 +51,7 @@ const val EXPLORE_DESTINATION = "explore"
 @Composable
 fun ExploreView(
     coil: ImageLoader,
-    navController: NavController,
+    navigateToSource: (MangaSource) -> Unit,
     topBarHeightPx: Float,
     topBarOffsetY: Animatable<Float, AnimationVector1D>,
     padding: PaddingValues,
@@ -60,7 +61,7 @@ fun ExploreView(
 
     ExploreViewContent(
         coil = coil,
-        navController = navController,
+        navigateToSource = navigateToSource,
         uiState = uiState,
         event = viewModel,
         topBarHeightPx = topBarHeightPx,
@@ -72,7 +73,7 @@ fun ExploreView(
 @Composable
 fun ExploreViewContent(
     coil: ImageLoader,
-    navController: NavController,
+    navigateToSource: (MangaSource) -> Unit,
     uiState: ExploreUiState,
     event: ExploreEvent?,
     nestedScrollConnection: NestedScrollConnection? = null,
@@ -166,7 +167,7 @@ fun ExploreViewContent(
             }
             items(
                 items = uiState.sources,
-                key = { it.ordinal },
+                key = { it.name },
                 contentType = { it }
             ) { item ->
                 Box(
@@ -176,11 +177,10 @@ fun ExploreViewContent(
                     SourceItem(
                         coil = coil,
                         faviconUrl = item.faviconUri(),
-                        title = item.title,
-                        onClick = {
-                            navController.navigate(LIST_DESTINATION)
-                        }
-                    )
+                        title = item.title
+                    ) {
+                        navigateToSource(item)
+                    }
                 }
             }
         }

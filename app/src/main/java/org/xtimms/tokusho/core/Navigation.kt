@@ -11,18 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.core.model.ShelfCategory
 import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
 import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
 import org.xtimms.tokusho.sections.details.DETAILS_DESTINATION
 import org.xtimms.tokusho.sections.details.DetailsView
+import org.xtimms.tokusho.sections.details.MANGA_ID_ARGUMENT
 import org.xtimms.tokusho.sections.explore.ExploreView
 import org.xtimms.tokusho.sections.history.HistoryView
 import org.xtimms.tokusho.sections.list.LIST_DESTINATION
 import org.xtimms.tokusho.sections.list.MangaListView
+import org.xtimms.tokusho.sections.list.PROVIDER_ARGUMENT
 import org.xtimms.tokusho.sections.search.SEARCH_DESTINATION
 import org.xtimms.tokusho.sections.search.SearchHostView
 import org.xtimms.tokusho.sections.settings.SETTINGS_DESTINATION
@@ -39,6 +44,7 @@ import org.xtimms.tokusho.sections.settings.appearance.LANGUAGES_DESTINATION
 import org.xtimms.tokusho.sections.settings.appearance.LanguagesView
 import org.xtimms.tokusho.sections.shelf.ShelfMap
 import org.xtimms.tokusho.sections.shelf.ShelfView
+import org.xtimms.tokusho.utils.lang.removeFirstAndLast
 
 const val DURATION_ENTER = 400
 const val DURATION_EXIT = 200
@@ -88,7 +94,10 @@ fun Navigation(
         composable(BottomNavDestination.Shelf.route) {
             val library: ShelfMap = emptyMap()
             ShelfView(
-                categories = listOf(ShelfCategory(1, "Test 1", 1L, 1L), ShelfCategory(2, "Test 2", 2L, 2L)),
+                categories = listOf(
+                    ShelfCategory(1, "Test 1", 1L, 1L),
+                    ShelfCategory(2, "Test 2", 2L, 2L)
+                ),
                 currentPage = { 0 },
                 showPageTabs = true,
                 getNumberOfMangaForCategory = { 2 },
@@ -108,7 +117,11 @@ fun Navigation(
         composable(BottomNavDestination.Explore.route) {
             ExploreView(
                 coil = coil,
-                navController = navController,
+                navigateToSource = {
+                    navController.navigate(
+                        LIST_DESTINATION.replace(PROVIDER_ARGUMENT, it.name)
+                    )
+                },
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
                 topBarOffsetY = topBarOffsetY
@@ -152,11 +165,26 @@ fun Navigation(
             )
         }
 
-        composable(LIST_DESTINATION) {
+        composable(
+            route = LIST_DESTINATION,
+            arguments = listOf(
+                navArgument(PROVIDER_ARGUMENT.removeFirstAndLast()) {
+                    type = NavType.StringType
+                }
+            )
+        ) { navEntry ->
             MangaListView(
-                sourceName = "Source",
+                coil = coil,
+                source = navEntry.arguments?.getString(PROVIDER_ARGUMENT.removeFirstAndLast())
+                    ?.let { source -> MangaSource.valueOf(source) } ?: MangaSource.DUMMY,
                 navigateBack = navigateBack,
-                navigateToDetails = { navController.navigate(DETAILS_DESTINATION) }
+                navigateToDetails = {
+                    navController.navigate(
+                        DETAILS_DESTINATION.replace(
+                            MANGA_ID_ARGUMENT, it.toString()
+                        )
+                    )
+                }
             )
         }
 
@@ -173,8 +201,13 @@ fun Navigation(
             )
         }
 
-        composable(DETAILS_DESTINATION) {
+        // TODO
+        composable(
+            route = DETAILS_DESTINATION
+        ) { navEntry ->
             DetailsView(
+                coil = coil,
+                mangaId = 0L,
                 navigateBack = navigateBack,
             )
         }

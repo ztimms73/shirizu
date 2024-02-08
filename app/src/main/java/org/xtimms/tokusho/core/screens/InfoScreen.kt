@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import org.xtimms.tokusho.utils.secondaryItemAlpha
+import org.xtimms.tokusho.utils.composable.secondaryItemAlpha
 
 @Composable
 fun InfoScreen(

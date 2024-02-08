@@ -20,7 +20,7 @@ import org.xtimms.tokusho.core.collapsable
 import org.xtimms.tokusho.core.model.ShelfCategory
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 
-const val SHELF_DESTINATION = "stub"
+const val SHELF_DESTINATION = "shelf"
 
 @Composable
 fun ShelfView(
@@ -100,8 +100,11 @@ fun ShelfPreview() {
     TokushoTheme {
         Surface {
             ShelfViewContent(
-                categories = emptyList(),
-                currentPage = { 2 },
+                categories = listOf(
+                    ShelfCategory(1, "Test 1", 1L, 1L),
+                    ShelfCategory(2, "Test 2", 2L, 2L)
+                ),
+                currentPage = { 0 },
                 showPageTabs = true,
                 getNumberOfMangaForCategory = { 2 },
                 getLibraryForPage = { library.values.toTypedArray().getOrNull(0).orEmpty() },

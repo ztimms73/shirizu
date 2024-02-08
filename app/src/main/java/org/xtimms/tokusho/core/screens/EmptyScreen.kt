@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import kotlinx.collections.immutable.ImmutableList
 import org.xtimms.tokusho.core.components.ActionButton
-import org.xtimms.tokusho.utils.secondaryItemAlpha
+import org.xtimms.tokusho.utils.composable.secondaryItemAlpha
 import kotlin.random.Random
 
 data class EmptyScreenAction(

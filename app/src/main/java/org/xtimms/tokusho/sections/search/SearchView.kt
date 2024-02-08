@@ -25,6 +25,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,8 +46,9 @@ fun SearchHostView(
     var query by remember { mutableStateOf("") }
     val performSearch = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(focusRequester) {
         focusRequester.requestFocus()
     }
 
@@ -68,7 +70,9 @@ fun SearchHostView(
                 if (isCompactScreen) BackIconButton(onClick = navigateBack)
             },
             keyboardActions = KeyboardActions(
-                onSearch = { performSearch.value = true }
+                onSearch = {
+                    keyboardController?.hide()
+                }
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             singleLine = true,

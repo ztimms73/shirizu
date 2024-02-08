@@ -33,4 +33,4 @@ object FixedAccentColors {
         @Composable get() = 30.a3
 }
 
-const val SEED = 0x0057c9
+const val SEED = 0x1978D2

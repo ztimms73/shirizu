@@ -1,8 +1,10 @@
 package org.xtimms.tokusho
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
@@ -22,6 +24,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -43,6 +46,7 @@ import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.Navigation
 import org.xtimms.tokusho.core.components.BottomNavBar
 import org.xtimms.tokusho.core.components.TopAppBar
+import org.xtimms.tokusho.sections.list.LIST_DESTINATION
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import javax.inject.Inject
@@ -74,10 +78,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        putDataToExtras(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        putDataToExtras(intent)
+        super.onNewIntent(intent)
+    }
+
+    private fun putDataToExtras(intent: Intent?) {
+        intent?.putExtra(EXTRA_DATA, intent.data)
     }
 
     companion object {
         private const val TAG = "MainActivity"
+        const val EXTRA_DATA = "data"
 
         fun setLanguage(locale: String) {
             Log.d(TAG, "setLanguage: $locale")
@@ -122,6 +137,7 @@ fun MainView(
                 BottomNavBar(
                     navController = navController,
                     bottomBarState = bottomBarState,
+                    topBarOffsetY = topBarOffsetY
                 )
             }
         },

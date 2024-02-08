@@ -36,7 +36,7 @@ class App : Application() {
         }
         DynamicColors.applyToActivitiesIfAvailable(this)
 
-        processLifecycleScope.launch((Dispatchers.IO)) {
+        processLifecycleScope.launch(Dispatchers.IO) {
             try {
                 Updater.deleteOutdatedApk(this@App)
             } catch (_: Throwable) {

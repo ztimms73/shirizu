@@ -5,9 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.xtimms.tokusho.core.database.TABLE_SOURCES
 
-@Entity(
-    tableName = TABLE_SOURCES,
-)
+@Entity(tableName = TABLE_SOURCES)
 data class MangaSourceEntity(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "source")

@@ -10,6 +10,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.currentCoroutineContext
 import okhttp3.Interceptor
 import okhttp3.Response
+import org.koitharu.kotatsu.parsers.InternalParsersApi
 import org.koitharu.kotatsu.parsers.MangaParser
 import org.koitharu.kotatsu.parsers.exception.ParseException
 import org.koitharu.kotatsu.parsers.model.ContentRating
@@ -29,6 +30,7 @@ import org.xtimms.tokusho.core.cache.SafeDeferred
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import java.util.Locale
 
+@OptIn(InternalParsersApi::class)
 class RemoteMangaRepository(
     private val parser: MangaParser,
     private val cache: ContentCache,
@@ -54,6 +56,9 @@ class RemoteMangaRepository(
 
     override val isTagsExclusionSupported: Boolean
         get() = parser.isTagsExclusionSupported
+
+    val domains: Array<out String>
+        get() = parser.configKeyDomain.presetValues
 
     override fun intercept(chain: Interceptor.Chain): Response {
         return if (parser is Interceptor) {

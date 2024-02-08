@@ -9,21 +9,36 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.Manga
+import org.koitharu.kotatsu.parsers.model.MangaState
 import org.xtimms.tokusho.core.components.DetailsToolbar
 
-const val DETAILS_DESTINATION = "details"
+const val MANGA_ID_ARGUMENT = "{mangaId}"
+const val DETAILS_DESTINATION = "details/$MANGA_ID_ARGUMENT"
 
 @Composable
 fun DetailsView(
+    coil: ImageLoader,
+    mangaId: Long,
     navigateBack: () -> Unit,
 ) {
+    val viewModel: DetailsViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val chapterListState = rememberLazyListState()
+
+    LaunchedEffect(mangaId) {
+        viewModel.getDetails(mangaId)
+    }
 
     Scaffold(
         topBar = {
@@ -68,8 +83,27 @@ fun DetailsView(
                 contentType = DetailsViewItem.INFO_BOX
             ) {
                 DetailsInfoBox(
+                    coil = coil,
+                    imageUrl = uiState.manga?.largeCoverUrl ?: "",
+                    title = uiState.manga?.title ?: "",
+                    author = uiState.manga?.author ?: "",
+                    artist = "",
+                    state = uiState.manga?.state ?: MangaState.FINISHED,
                     isTabletUi = false,
                     appBarPadding = topPadding,
+                )
+            }
+
+            item(
+                key = DetailsViewItem.DESCRIPTION_WITH_TAG,
+                contentType = DetailsViewItem.DESCRIPTION_WITH_TAG,
+            ) {
+                ExpandableMangaDescription(
+                    defaultExpandState = true,
+                    description = uiState.manga?.description ?: "",
+                    tagsProvider = { uiState.manga?.tags?.toList() },
+                    onTagSearch = {  },
+                    onCopyTagToClipboard = {  },
                 )
             }
         }

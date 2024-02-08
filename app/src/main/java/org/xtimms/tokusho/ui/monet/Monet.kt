@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import org.xtimms.tokusho.ui.monet.TonalPalettes.Companion.toTonalPalettes
 
 val LocalTonalPalettes = staticCompositionLocalOf {
-    Color(0xFF0057C9).toTonalPalettes()
+    Color(0xFF1978D2).toTonalPalettes()
 }
 
 inline val Number.a1: Color
