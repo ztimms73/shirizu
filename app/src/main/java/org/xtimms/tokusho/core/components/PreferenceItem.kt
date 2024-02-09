@@ -121,8 +121,13 @@ fun PreferenceItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .padding(end = 8.dp)
+                    .then(
+                        if (icon != null)
+                            Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(end = 8.dp)
+                        else Modifier.padding(horizontal = 8.dp)
+                    )
             ) {
                 PreferenceItemTitle(text = title, enabled = enabled)
                 if (!description.isNullOrEmpty()) PreferenceItemDescription(
@@ -465,7 +470,8 @@ fun PreferenceSwitch(
                 )
             }
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
                     .padding(horizontal = 16.dp)
             ) {
                 PreferenceItemTitle(
@@ -542,7 +548,7 @@ fun PreferencesHintCard(
 @Preview
 fun PreferenceItemPreview() {
     Column {
-        PreferenceItem(title = "title", description = "description", icon = 0)
+        PreferenceItem(title = "title", description = "description")
         PreferenceItem(title = "title", description = "description", icon = Icons.Outlined.Update)
     }
 }

@@ -140,7 +140,8 @@ fun Navigation(
             SettingsView(
                 navigateBack = navigateBack,
                 navigateToAppearance = { navController.navigate(APPEARANCE_DESTINATION) },
-                navigateToAbout = { navController.navigate(ABOUT_DESTINATION) }
+                navigateToAbout = { navController.navigate(ABOUT_DESTINATION) },
+                navigateToAdvanced = { navController.navigate(ADVANCED_DESTINATION) }
             )
         }
 
@@ -162,6 +163,12 @@ fun Navigation(
         composable(LANGUAGES_DESTINATION) {
             LanguagesView(
                 navigateBack = navigateBack
+            )
+        }
+
+        composable(ADVANCED_DESTINATION) {
+            AdvancedView(
+                navigateBack = navigateBack,
             )
         }
 

@@ -73,4 +73,10 @@
     <string name="manga_info_expand">More</string>
     <string name="action_copy_to_clipboard">Copy to clipboard</string>
     <string name="description_placeholder">No description</string>
+    <string name="advanced">Advanced</string>
+    <string name="app_info">App info</string>
+    <string name="app_version">App version</string>
+    <string name="build_time">Build time</string>
+    <string name="webview_version">WebView version</string>
+    <string name="advanced_page">Dump crash logs, debug info</string>
 </resources>

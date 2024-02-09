@@ -1,3 +1,8 @@
+import java.io.ByteArrayOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.TimeZone
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -18,6 +23,10 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
+        buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
+        buildConfigField("String", "BUILD_TIME", "\"${getBuildTime()}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -79,6 +88,7 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class:1.2.0-rc01")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
@@ -97,6 +107,7 @@ dependencies {
     implementation("com.squareup.okio:okio:3.7.0")
     implementation("com.tencent:mmkv:1.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation("io.coil-kt:coil-compose:2.5.0")
     testImplementation("junit:junit:4.13.2")
@@ -106,4 +117,31 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+// Git is needed in your system PATH for these commands to work.
+// If it's not installed, you can return a random value as a workaround
+fun Project.getCommitCount(): String {
+    return runCommand("git rev-list --count HEAD")
+    // return "1"
+}
+
+fun Project.getGitSha(): String {
+    return runCommand("git rev-parse --short HEAD")
+    // return "1"
+}
+
+fun Project.getBuildTime(): String {
+    val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+    df.timeZone = TimeZone.getTimeZone("UTC")
+    return df.format(Date())
+}
+
+fun Project.runCommand(command: String): String {
+    val byteOut = ByteArrayOutputStream()
+    project.exec {
+        commandLine = command.split(" ")
+        standardOutput = byteOut
+    }
+    return String(byteOut.toByteArray()).trim()
 }
