@@ -4,11 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,21 +18,23 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -46,7 +48,6 @@ import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.Navigation
 import org.xtimms.tokusho.core.components.BottomNavBar
 import org.xtimms.tokusho.core.components.TopAppBar
-import org.xtimms.tokusho.sections.list.LIST_DESTINATION
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import javax.inject.Inject
@@ -119,16 +120,24 @@ fun MainView(
     var topBarHeightPx by remember { mutableFloatStateOf(0f) }
     val topBarOffsetY = remember { Animatable(0f) }
 
+    val scroll: LazyGridState = rememberLazyGridState()
+
     Scaffold(
         topBar = {
             if (isCompactScreen) {
+                val isScrolled by remember {
+                    derivedStateOf { scroll.firstVisibleItemScrollOffset > 0 }
+                }
+                val animatedBgAlpha by animateFloatAsState(
+                    if (isScrolled) 1f else 0f,
+                    label = "Top Bar Background",
+                )
                 TopAppBar(
                     navController = navController,
                     modifier = Modifier
-                        .padding(0.dp, 8.dp)
-                        .graphicsLayer {
-                            translationY = topBarOffsetY.value
-                        }
+                        .statusBarsPadding()
+                        .padding(0.dp, 16.dp),
+                    backgroundAlphaProvider = { animatedBgAlpha },
                 )
             }
         },
@@ -161,7 +170,8 @@ fun MainView(
                         bottom = systemBarsPadding.calculateBottomPadding()
                     ),
                     topBarHeightPx = topBarHeightPx,
-                    topBarOffsetY = topBarOffsetY
+                    topBarOffsetY = topBarOffsetY,
+                    listState = scroll
                 )
             }
         } else {
@@ -178,7 +188,8 @@ fun MainView(
                 ),
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
-                topBarOffsetY = topBarOffsetY
+                topBarOffsetY = topBarOffsetY,
+                listState = scroll
             )
         }
     }

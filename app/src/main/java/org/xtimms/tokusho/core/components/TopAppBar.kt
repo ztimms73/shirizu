@@ -1,13 +1,13 @@
 package org.xtimms.tokusho.core.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.RssFeed
@@ -50,8 +50,10 @@ import org.xtimms.tokusho.ui.theme.TokushoTheme
 fun TopAppBar(
     navController: NavController,
     modifier: Modifier = Modifier,
+    backgroundAlphaProvider: () -> Float,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+
     val isVisible by remember {
         derivedStateOf {
             when (navBackStackEntry?.destination?.route) {
@@ -69,10 +71,15 @@ fun TopAppBar(
         exit = materialSharedAxisXOut(targetOffsetX = { -(it * initialOffset).toInt() })
     ) {
         Row(
-            modifier = modifier
-                .statusBarsPadding()
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
+                .background(
+                    MaterialTheme.colorScheme
+                        .surfaceColorAtElevation(3.dp)
+                        .copy(
+                            alpha = backgroundAlphaProvider()
+                        )
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -80,14 +87,15 @@ fun TopAppBar(
                 onClick = { navController.navigate(SEARCH_DESTINATION) },
                 modifier = modifier
                     .weight(1f)
-                    .height(56.dp),
+                    .height(56.dp)
+                    .padding(start = 16.dp),
                 shape = RoundedCornerShape(50),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
                 ),
             ) {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxHeight(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -106,11 +114,11 @@ fun TopAppBar(
                 }
             }
             Row(
-                modifier = modifier,
+                modifier = modifier.padding(end = 16.dp),
             ) {
                 IconButton(
-                    onClick = {  },
-                    modifier = modifier.padding(0.dp),
+                    onClick = { },
+                    modifier = Modifier.padding(0.dp),
                 ) {
                     Icon(
                         Icons.Outlined.RssFeed,
@@ -120,7 +128,7 @@ fun TopAppBar(
                 }
                 IconButton(
                     onClick = { navController.navigate(SETTINGS_DESTINATION) },
-                    modifier = modifier.padding(0.dp),
+                    modifier = Modifier.padding(0.dp),
                 ) {
                     Icon(
                         Icons.Outlined.Settings,

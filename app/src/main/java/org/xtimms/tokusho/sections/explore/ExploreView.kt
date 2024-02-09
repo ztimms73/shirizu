@@ -12,10 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.Download
@@ -34,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.R
@@ -43,7 +41,6 @@ import org.xtimms.tokusho.core.components.ExploreButton
 import org.xtimms.tokusho.core.components.SourceItem
 import org.xtimms.tokusho.core.components.icons.Dice
 import org.xtimms.tokusho.core.parser.favicon.faviconUri
-import org.xtimms.tokusho.sections.list.LIST_DESTINATION
 import org.xtimms.tokusho.utils.system.toast
 
 const val EXPLORE_DESTINATION = "explore"
@@ -54,6 +51,7 @@ fun ExploreView(
     navigateToSource: (MangaSource) -> Unit,
     topBarHeightPx: Float,
     topBarOffsetY: Animatable<Float, AnimationVector1D>,
+    listState: LazyGridState,
     padding: PaddingValues,
 ) {
     val viewModel: ExploreViewModel = hiltViewModel()
@@ -66,6 +64,7 @@ fun ExploreView(
         event = viewModel,
         topBarHeightPx = topBarHeightPx,
         topBarOffsetY = topBarOffsetY,
+        listState = listState,
         padding = padding
     )
 }
@@ -79,13 +78,12 @@ fun ExploreViewContent(
     nestedScrollConnection: NestedScrollConnection? = null,
     topBarHeightPx: Float = 0f,
     topBarOffsetY: Animatable<Float, AnimationVector1D> = Animatable(0f),
+    listState: LazyGridState,
     padding: PaddingValues = PaddingValues(),
 ) {
 
     val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
-
-    val scrollState = rememberScrollState()
 
     if (uiState.message != null) {
         LaunchedEffect(uiState.message) {
@@ -100,7 +98,6 @@ fun ExploreViewContent(
             .fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
-        val listState = rememberLazyGridState()
         val listModifier = Modifier
             .fillMaxWidth()
             .align(Alignment.TopStart)
@@ -110,7 +107,7 @@ fun ExploreViewContent(
                 else Modifier
             )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 72.dp),
+            columns = GridCells.Adaptive(minSize = 90.dp),
             modifier = listModifier
                 .collapsable(
                     state = listState,
@@ -120,7 +117,7 @@ fun ExploreViewContent(
             state = listState,
             contentPadding = PaddingValues(
                 start = padding.calculateStartPadding(layoutDirection) + 8.dp,
-                top = padding.calculateTopPadding(),
+                top = padding.calculateTopPadding() + 8.dp,
                 end = padding.calculateEndPadding(layoutDirection) + 8.dp,
                 bottom = padding.calculateBottomPadding()
             ),

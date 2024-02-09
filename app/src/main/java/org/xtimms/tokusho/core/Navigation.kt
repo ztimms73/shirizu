@@ -7,6 +7,7 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
@@ -36,6 +37,8 @@ import org.xtimms.tokusho.sections.settings.about.ABOUT_DESTINATION
 import org.xtimms.tokusho.sections.settings.about.AboutView
 import org.xtimms.tokusho.sections.settings.about.UPDATES_DESTINATION
 import org.xtimms.tokusho.sections.settings.about.UpdateView
+import org.xtimms.tokusho.sections.settings.advanced.ADVANCED_DESTINATION
+import org.xtimms.tokusho.sections.settings.advanced.AdvancedView
 import org.xtimms.tokusho.sections.settings.appearance.APPEARANCE_DESTINATION
 import org.xtimms.tokusho.sections.settings.appearance.AppearanceView
 import org.xtimms.tokusho.sections.settings.appearance.DARK_THEME_DESTINATION
@@ -63,6 +66,7 @@ fun Navigation(
     padding: PaddingValues,
     topBarHeightPx: Float,
     topBarOffsetY: Animatable<Float, AnimationVector1D>,
+    listState: LazyGridState,
 ) {
 
     val navigateBack: () -> Unit = { navController.popBackStack() }
@@ -124,7 +128,8 @@ fun Navigation(
                 },
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
-                topBarOffsetY = topBarOffsetY
+                topBarOffsetY = topBarOffsetY,
+                listState = listState
             )
         }
 
