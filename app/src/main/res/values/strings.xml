@@ -95,4 +95,8 @@
     <string name="text_file_sizes_free">B free|kB free|MB free|GB free|TB free</string>
     <string name="confirm">Confirm</string>
     <string name="free_up_space_summary">Space can be cleared:</string>
+    <string name="disable_battery_optimization">Disable battery optimization</string>
+    <string name="disable_battery_optimization_summary">Helps with background updates checks</string>
+    <string name="recommended_action">Recommended action</string>
+    <string name="space_used">% used</string>
 </resources>
