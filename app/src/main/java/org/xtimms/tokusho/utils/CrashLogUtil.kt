@@ -5,8 +5,8 @@ import android.os.Build
 import org.xtimms.tokusho.BuildConfig
 import org.xtimms.tokusho.utils.lang.withNonCancellableContext
 import org.xtimms.tokusho.utils.lang.withUIContext
-import org.xtimms.tokusho.utils.storage.getUriCompat
 import org.xtimms.tokusho.utils.system.createFileInCacheDir
+import org.xtimms.tokusho.utils.system.getUriCompat
 import org.xtimms.tokusho.utils.system.toShareIntent
 import org.xtimms.tokusho.utils.system.toast
 

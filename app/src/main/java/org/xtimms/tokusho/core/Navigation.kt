@@ -45,6 +45,8 @@ import org.xtimms.tokusho.sections.settings.appearance.DARK_THEME_DESTINATION
 import org.xtimms.tokusho.sections.settings.appearance.DarkThemeView
 import org.xtimms.tokusho.sections.settings.appearance.LANGUAGES_DESTINATION
 import org.xtimms.tokusho.sections.settings.appearance.LanguagesView
+import org.xtimms.tokusho.sections.settings.storage.STORAGE_DESTINATION
+import org.xtimms.tokusho.sections.settings.storage.StorageView
 import org.xtimms.tokusho.sections.shelf.ShelfMap
 import org.xtimms.tokusho.sections.shelf.ShelfView
 import org.xtimms.tokusho.utils.lang.removeFirstAndLast
@@ -144,7 +146,8 @@ fun Navigation(
                 navigateBack = navigateBack,
                 navigateToAppearance = { navController.navigate(APPEARANCE_DESTINATION) },
                 navigateToAbout = { navController.navigate(ABOUT_DESTINATION) },
-                navigateToAdvanced = { navController.navigate(ADVANCED_DESTINATION) }
+                navigateToAdvanced = { navController.navigate(ADVANCED_DESTINATION) },
+                navigateToStorage = { navController.navigate(STORAGE_DESTINATION) }
             )
         }
 
@@ -166,6 +169,12 @@ fun Navigation(
         composable(LANGUAGES_DESTINATION) {
             LanguagesView(
                 navigateBack = navigateBack
+            )
+        }
+
+        composable(STORAGE_DESTINATION) {
+            StorageView(
+                navigateBack = navigateBack,
             )
         }
 

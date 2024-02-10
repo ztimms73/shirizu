@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.xtimms.tokusho.R
+import org.xtimms.tokusho.core.components.DismissButton
 import org.xtimms.tokusho.core.updates.Updater
 import org.xtimms.tokusho.utils.system.suspendToast
 
@@ -87,11 +88,4 @@ fun UpdateDialogImpl(
                 Text(releaseNote)
             }
         })
-}
-
-@Composable
-fun DismissButton(text: String = stringResource(R.string.dismiss), onClick: () -> Unit) {
-    TextButton(onClick = onClick) {
-        Text(text)
-    }
 }

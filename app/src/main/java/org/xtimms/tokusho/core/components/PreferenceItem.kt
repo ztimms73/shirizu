@@ -16,14 +16,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.TipsAndUpdates
 import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.TipsAndUpdates
 import androidx.compose.material.icons.outlined.ToggleOn
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -41,8 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -57,8 +61,10 @@ import org.xtimms.tokusho.R
 import org.xtimms.tokusho.ui.monet.LocalTonalPalettes
 import org.xtimms.tokusho.ui.monet.TonalPalettes.Companion.toTonalPalettes
 import org.xtimms.tokusho.ui.theme.PreviewThemeLight
+import org.xtimms.tokusho.ui.theme.TokushoTheme
 import org.xtimms.tokusho.ui.theme.applyOpacity
 import org.xtimms.tokusho.ui.theme.preferenceTitle
+import org.xtimms.tokusho.utils.FileSize
 
 private const val horizontal = 8
 private const val vertical = 16
@@ -516,7 +522,7 @@ fun PreferencesHintCard(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 16.dp)
+                    .padding(start = 8.dp, end = 24.dp)
                     .size(24.dp),
                 tint = contentColor
             )
@@ -541,6 +547,160 @@ fun PreferencesHintCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun PreferenceStorageHeader(
+    used: Long = 4L,
+    total: Long = 128L
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = FileSize.BYTES.formatWithoutUnits(used),
+                modifier = Modifier.padding(end = 4.dp),
+                style = MaterialTheme.typography.displayLarge
+            )
+            Text(
+                text = FileSize.BYTES.showUnit(LocalContext.current, used),
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.Bottom)
+                    .padding(PaddingValues(bottom = 8.dp))
+            )
+            Text(
+                text = FileSize.BYTES.totalFormat(LocalContext.current, total),
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+                    .padding(PaddingValues(bottom = 8.dp))
+            )
+        }
+        LinearProgressIndicator(
+            progress = { (1 - ((total - used) / total.toFloat())) },
+            modifier = Modifier
+                .padding(PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp))
+                .height(16.dp)
+                .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.primaryContainer,
+            strokeCap = StrokeCap.Round,
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PreferenceStorageItem(
+    title: String,
+    used: Long? = 0L,
+    total: Long?,
+    icon: Any? = null,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit = {},
+) {
+    Surface(
+        modifier = Modifier.combinedClickable(
+            onClick = onClick,
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal.dp, vertical.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            leadingIcon?.invoke()
+
+            when (icon) {
+                is ImageVector -> {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 16.dp)
+                            .size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(true),
+                    )
+                }
+
+                is Painter -> {
+                    Icon(
+                        painter = icon,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 16.dp)
+                            .size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.applyOpacity(true),
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .then(
+                        if (icon != null)
+                            Modifier
+                                .padding(start = 16.dp, end = 8.dp)
+                        else Modifier.padding(horizontal = 8.dp)
+                    )
+            ) {
+                Row {
+                    PreferenceItemTitle(
+                        modifier = Modifier.weight(1f),
+                        text = title,
+                        enabled = true
+                    )
+                    Text(text = FileSize.BYTES.format(LocalContext.current, used ?: 0L))
+                }
+                if (total != null) {
+                    LinearProgressIndicator(
+                        progress = { (1 - ((total - used!!) / total.toFloat())) },
+                        modifier = Modifier
+                            .padding(PaddingValues(top = 12.dp))
+                            .height(5.dp)
+                            .fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer,
+                        strokeCap = StrokeCap.Round,
+                    )
+                }
+            }
+            trailingIcon?.let {
+                VerticalDivider(
+                    modifier = Modifier
+                        .height(32.dp)
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.CenterVertically),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    thickness = 1.dp
+                )
+                trailingIcon.invoke()
+            }
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PreferenceStorageHeaderPreview() {
+    TokushoTheme {
+        PreferenceStorageHeader()
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun PreferenceStorageItemPreview() {
+    TokushoTheme {
+        PreferenceStorageItem(title = "Saved manga", icon = Icons.Outlined.Save, total = 0L)
     }
 }
 

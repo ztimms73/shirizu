@@ -80,4 +80,19 @@
     <string name="webview_version">WebView version</string>
     <string name="advanced_page">Dump crash logs, debug info</string>
     <string name="device_info">Device info</string>
+    <string name="storage">Storage</string>
+    <string name="free_up_space">Free up space</string>
+    <string name="free_up_space_hint">Choose what needs to be cleared</string>
+    <string name="saved_manga">Saved manga</string>
+    <string name="pages_cache">Pages cache</string>
+    <string name="other_cache">Other cache</string>
+    <string name="thumbnails_cache">Thumbnails cache</string>
+    <string name="network_cache">Network cache</string>
+    <string name="text_file_sizes">B|kB|MB|GB|TB</string>
+    <string name="computing_">Computing...</string>
+    <string name="text_file_sizes_total">B total|kB total|MB total|GB total|TB total</string>
+    <string name="text_file_sizes_used">B used|kB used|MB used|GB used|TB used</string>
+    <string name="text_file_sizes_free">B free|kB free|MB free|GB free|TB free</string>
+    <string name="confirm">Confirm</string>
+    <string name="free_up_space_summary">Space can be cleared:</string>
 </resources>

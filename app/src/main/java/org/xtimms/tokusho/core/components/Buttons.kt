@@ -9,8 +9,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.xtimms.tokusho.R
+
+@Composable
+fun ConfirmButton(
+    text: String = stringResource(R.string.confirm),
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    TextButton(onClick = onClick, enabled = enabled) {
+        Text(text)
+    }
+}
+
+@Composable
+fun DismissButton(text: String = stringResource(R.string.dismiss), onClick: () -> Unit) {
+    TextButton(onClick = onClick) {
+        Text(text)
+    }
+}
 
 @Composable
 fun ActionButton(
