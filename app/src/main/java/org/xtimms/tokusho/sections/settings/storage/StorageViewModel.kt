@@ -2,6 +2,8 @@ package org.xtimms.tokusho.sections.settings.storage
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runInterruptible
@@ -21,17 +23,18 @@ class StorageViewModel @Inject constructor(
     val httpCacheSize = MutableStateFlow(-1L)
     val cacheSizes = EnumMap<CacheDir, MutableStateFlow<Long>>(CacheDir::class.java)
 
+    private var storageUsageJob: Job? = null
+
     init {
-        launchJob(Dispatchers.Default) {
-            setLoading(true)
-            httpCacheSize.value = runInterruptible { httpCache.size() }
+        val prevJob = storageUsageJob
+        storageUsageJob = launchJob(Dispatchers.Default) {
+            prevJob?.cancelAndJoin()
             mutableUiState.update {
                 it.copy(
                     availableSpace = storageManager.computeAvailableSize(),
                     pagesCache = storageManager.computeCacheSize(CacheDir.PAGES),
                     thumbnailsCache = storageManager.computeCacheSize(CacheDir.THUMBS),
-                    httpCacheSize = httpCacheSize.value,
-                    isLoading = false
+                    httpCacheSize = runInterruptible { httpCache.size() }
                 )
             }
         }
@@ -41,13 +44,13 @@ class StorageViewModel @Inject constructor(
         launchJob(Dispatchers.Default) {
             try {
                 storageManager.clearCache(cache)
-                checkNotNull(cacheSizes[cache]).value = storageManager.computeCacheSize(cache)
+                storageManager.computeCacheSize(cache)
                 mutableUiState.update {
                     it.copy(
                         availableSpace = storageManager.computeAvailableSize(),
                         pagesCache = storageManager.computeCacheSize(CacheDir.PAGES),
                         thumbnailsCache = storageManager.computeCacheSize(CacheDir.THUMBS),
-                        httpCacheSize = httpCacheSize.value,
+                        httpCacheSize = runInterruptible { httpCache.size() },
                         isLoading = false
                     )
                 }
@@ -64,13 +67,12 @@ class StorageViewModel @Inject constructor(
                     httpCache.evictAll()
                     httpCache.size()
                 }
-                httpCacheSize.value = size
                 mutableUiState.update {
                     it.copy(
                         availableSpace = storageManager.computeAvailableSize(),
                         pagesCache = storageManager.computeCacheSize(CacheDir.PAGES),
                         thumbnailsCache = storageManager.computeCacheSize(CacheDir.THUMBS),
-                        httpCacheSize = httpCacheSize.value,
+                        httpCacheSize = size,
                         isLoading = false
                     )
                 }
