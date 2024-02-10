@@ -56,7 +56,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject lateinit var coil: ImageLoader
+    @Inject
+    lateinit var coil: ImageLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -146,7 +147,7 @@ fun MainView(
                 BottomNavBar(
                     navController = navController,
                     bottomBarState = bottomBarState,
-                    topBarOffsetY = topBarOffsetY
+                    topBarOffsetY = topBarOffsetY,
                 )
             }
         },
@@ -170,7 +171,6 @@ fun MainView(
                         bottom = systemBarsPadding.calculateBottomPadding()
                     ),
                     topBarHeightPx = topBarHeightPx,
-                    topBarOffsetY = topBarOffsetY,
                     listState = scroll
                 )
             }
@@ -188,7 +188,6 @@ fun MainView(
                 ),
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
-                topBarOffsetY = topBarOffsetY,
                 listState = scroll
             )
         }

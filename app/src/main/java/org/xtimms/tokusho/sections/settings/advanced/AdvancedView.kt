@@ -1,5 +1,6 @@
 package org.xtimms.tokusho.sections.settings.advanced
 
+import android.os.Build
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.PreferenceItem
 import org.xtimms.tokusho.core.components.PreferenceSubtitle
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
+import org.xtimms.tokusho.utils.DeviceUtil
 import org.xtimms.tokusho.utils.WebViewUtil
 import org.xtimms.tokusho.utils.lang.toDateTimestampString
 import java.text.DateFormat
@@ -60,6 +62,44 @@ fun AdvancedView(
                 PreferenceItem(
                     title = stringResource(id = R.string.webview_version),
                     description = getWebViewVersion()
+                )
+            }
+            item {
+                PreferenceSubtitle(text = stringResource(id = R.string.device_info))
+            }
+            item {
+                PreferenceItem(
+                    title = "Model",
+                    description = "${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})"
+                )
+            }
+            if (DeviceUtil.oneUiVersion != null) {
+                item {
+                    PreferenceItem(
+                        title = "OneUI version",
+                        description = "${DeviceUtil.oneUiVersion}"
+                    )
+                }
+            }
+            if (DeviceUtil.miuiMajorVersion != null) {
+                item {
+                    PreferenceItem(
+                        title = "MIUI version",
+                        description = "${DeviceUtil.miuiMajorVersion}",
+                    )
+                }
+            }
+            val androidVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Build.VERSION.RELEASE_OR_PREVIEW_DISPLAY
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Build.VERSION.RELEASE_OR_CODENAME
+            } else {
+                Build.VERSION.RELEASE
+            }
+            item {
+                PreferenceItem(
+                    title = "Android version",
+                    description = "$androidVersion (${Build.DISPLAY})"
                 )
             }
         }

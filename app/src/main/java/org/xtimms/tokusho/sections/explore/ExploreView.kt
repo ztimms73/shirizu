@@ -50,7 +50,6 @@ fun ExploreView(
     coil: ImageLoader,
     navigateToSource: (MangaSource) -> Unit,
     topBarHeightPx: Float,
-    topBarOffsetY: Animatable<Float, AnimationVector1D>,
     listState: LazyGridState,
     padding: PaddingValues,
 ) {
@@ -63,7 +62,6 @@ fun ExploreView(
         uiState = uiState,
         event = viewModel,
         topBarHeightPx = topBarHeightPx,
-        topBarOffsetY = topBarOffsetY,
         listState = listState,
         padding = padding
     )
@@ -108,12 +106,7 @@ fun ExploreViewContent(
             )
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 90.dp),
-            modifier = listModifier
-                .collapsable(
-                    state = listState,
-                    topBarHeightPx = topBarHeightPx,
-                    topBarOffsetY = topBarOffsetY,
-                ),
+            modifier = listModifier,
             state = listState,
             contentPadding = PaddingValues(
                 start = padding.calculateStartPadding(layoutDirection) + 8.dp,

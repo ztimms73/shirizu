@@ -65,7 +65,6 @@ fun Navigation(
     modifier: Modifier,
     padding: PaddingValues,
     topBarHeightPx: Float,
-    topBarOffsetY: Animatable<Float, AnimationVector1D>,
     listState: LazyGridState,
 ) {
 
@@ -128,7 +127,6 @@ fun Navigation(
                 },
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
-                topBarOffsetY = topBarOffsetY,
                 listState = listState
             )
         }
