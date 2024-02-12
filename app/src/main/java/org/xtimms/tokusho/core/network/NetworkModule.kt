@@ -14,6 +14,10 @@ import okhttp3.OkHttpClient
 import org.xtimms.tokusho.core.network.cookies.AndroidCookieJar
 import org.xtimms.tokusho.core.network.cookies.MutableCookieJar
 import org.xtimms.tokusho.core.network.cookies.PreferencesCookieJar
+import org.xtimms.tokusho.core.network.interceptors.CacheLimitInterceptor
+import org.xtimms.tokusho.core.network.interceptors.CommonHeadersInterceptor
+import org.xtimms.tokusho.core.network.interceptors.GZipInterceptor
+import org.xtimms.tokusho.core.network.interceptors.RateLimitInterceptor
 import org.xtimms.tokusho.data.LocalStorageManager
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -55,6 +59,8 @@ interface NetworkModule {
             writeTimeout(20, TimeUnit.SECONDS)
             cookieJar(cookieJar)
             cache(cache)
+            addInterceptor(GZipInterceptor())
+            addInterceptor(RateLimitInterceptor())
         }.build()
 
         @Provides
@@ -62,7 +68,11 @@ interface NetworkModule {
         @MangaHttpClient
         fun provideMangaHttpClient(
             @BaseHttpClient baseClient: OkHttpClient,
-        ): OkHttpClient = baseClient.newBuilder().build()
+            commonHeadersInterceptor: CommonHeadersInterceptor,
+        ): OkHttpClient = baseClient.newBuilder().apply {
+            addNetworkInterceptor(CacheLimitInterceptor())
+            addInterceptor(commonHeadersInterceptor)
+        }.build()
 
     }
 

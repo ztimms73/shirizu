@@ -3,7 +3,9 @@ package org.xtimms.tokusho.core.components
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +31,8 @@ fun ScaffoldWithTopAppBar(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
+            .consumeWindowInsets(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
             DefaultTopAppBar(
                 title = title,
@@ -38,8 +41,7 @@ fun ScaffoldWithTopAppBar(
             )
         },
         floatingActionButton = floatingActionButton,
-        contentWindowInsets = WindowInsets.systemBars
-            .only(WindowInsetsSides.Horizontal),
+        contentWindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal),
         content = content
     )
 }

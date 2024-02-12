@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.Navigation
 import org.xtimms.tokusho.core.components.BottomNavBar
 import org.xtimms.tokusho.core.components.TopAppBar
+import org.xtimms.tokusho.core.logs.FileLogger
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import javax.inject.Inject
@@ -59,9 +61,18 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var coil: ImageLoader
 
+    @Inject
+    lateinit var loggers: Set<@JvmSuppressWildcards FileLogger>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        if (!isTaskRoot) {
+            finish()
+            return
+        }
+
         setContent {
             val navController = rememberNavController()
             val windowSizeClass = calculateWindowSizeClass(this)
@@ -74,6 +85,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     MainView(
                         coil = coil,
+                        loggers = loggers,
                         isCompactScreen = isCompactScreen,
                         navController = navController
                     )
@@ -112,6 +124,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainView(
     coil: ImageLoader,
+    loggers: Set<FileLogger>,
     isCompactScreen: Boolean,
     navController: NavHostController,
 ) {
@@ -161,6 +174,7 @@ fun MainView(
             ) {
                 Navigation(
                     coil = coil,
+                    loggers = loggers,
                     navController = navController,
                     isCompactScreen = false,
                     modifier = Modifier,
@@ -180,6 +194,7 @@ fun MainView(
             }
             Navigation(
                 coil = coil,
+                loggers = loggers,
                 navController = navController,
                 isCompactScreen = true,
                 modifier = Modifier.padding(

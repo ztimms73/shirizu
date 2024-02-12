@@ -11,11 +11,15 @@ import com.tencent.mmkv.MMKV
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.acra.ReportField
+import org.acra.config.httpSender
+import org.acra.data.StringFormat
+import org.acra.ktx.initAcra
+import org.acra.sender.HttpSender
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
 import org.xtimms.tokusho.core.database.MangaDatabase
+import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.updates.Updater
-import org.xtimms.tokusho.crash.CrashActivity
-import org.xtimms.tokusho.crash.GlobalExceptionHandler
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import javax.inject.Inject
 import javax.inject.Provider
@@ -44,7 +48,30 @@ class App : Application() {
             }
         }
 
-        GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
+        // GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
+        if (AppSettings.isACRAEnabled()) {
+            initAcra {
+                buildConfigClass = BuildConfig::class.java
+                reportFormat = StringFormat.JSON
+                httpSender {
+                    uri = BuildConfig.ACRA_URI
+                    basicAuthLogin = BuildConfig.ACRA_AUTH_LOGIN
+                    basicAuthPassword = BuildConfig.ACRA_AUTH_PASSWORD
+                    httpMethod = HttpSender.Method.POST
+                }
+                reportContent = listOf(
+                    ReportField.PACKAGE_NAME,
+                    ReportField.INSTALLATION_ID,
+                    ReportField.APP_VERSION_CODE,
+                    ReportField.APP_VERSION_NAME,
+                    ReportField.ANDROID_VERSION,
+                    ReportField.PHONE_MODEL,
+                    ReportField.STACK_TRACE,
+                    ReportField.CRASH_CONFIGURATION,
+                    ReportField.CUSTOM_DATA,
+                )
+            }
+        }
     }
 
     override fun attachBaseContext(base: Context?) {

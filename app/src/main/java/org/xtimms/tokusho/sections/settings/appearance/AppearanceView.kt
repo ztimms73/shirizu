@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LightMode
+import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,12 +55,14 @@ import org.xtimms.tokusho.LocalPaletteStyleIndex
 import org.xtimms.tokusho.LocalSeedColor
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.PreferenceItem
+import org.xtimms.tokusho.core.components.PreferenceSubtitle
 import org.xtimms.tokusho.core.components.PreferenceSwitch
 import org.xtimms.tokusho.core.components.PreferenceSwitchWithDivider
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.prefs.DarkThemePreference.Companion.OFF
 import org.xtimms.tokusho.core.prefs.DarkThemePreference.Companion.ON
+import org.xtimms.tokusho.core.prefs.READING_TIME
 import org.xtimms.tokusho.core.prefs.STYLE_MONOCHROME
 import org.xtimms.tokusho.core.prefs.STYLE_TONAL_SPOT
 import org.xtimms.tokusho.core.prefs.paletteStyles
@@ -92,6 +96,10 @@ fun AppearanceView(
         )
     }
 
+    var isReadingTimeEstimationEnabled by remember {
+        mutableStateOf(AppSettings.isReadingTimeEstimationEnabled())
+    }
+
     ScaffoldWithTopAppBar(
         title = stringResource(R.string.appearance),
         navigateBack = navigateBack
@@ -99,7 +107,7 @@ fun AppearanceView(
         Column(
             Modifier
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
         ) {
             MangaCard(
                 modifier = Modifier.padding(18.dp),
@@ -180,6 +188,16 @@ fun AppearanceView(
                 icon = Icons.Outlined.Language,
                 description = getLanguageDesc(),
                 onClick = { navigateToLanguages() })
+            PreferenceSubtitle(text = stringResource(id = R.string.details))
+            PreferenceSwitch(
+                title = stringResource(id = R.string.show_estimated_read_time),
+                description = stringResource(id = R.string.show_estimated_read_time_desc),
+                icon = Icons.Outlined.Timelapse,
+                isChecked = isReadingTimeEstimationEnabled,
+                onClick = {
+                    isReadingTimeEstimationEnabled = !isReadingTimeEstimationEnabled
+                    AppSettings.updateValue(READING_TIME, isReadingTimeEstimationEnabled)
+                })
         }
     }
 }

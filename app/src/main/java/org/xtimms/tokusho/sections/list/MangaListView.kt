@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +48,7 @@ fun MangaListView(
     val viewModel: MangaListViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    MangaListView(
+    MangaListViewContent(
         coil = coil,
         source = source,
         uiState = uiState,
@@ -60,7 +59,7 @@ fun MangaListView(
 }
 
 @Composable
-private fun MangaListView(
+private fun MangaListViewContent(
     coil: ImageLoader,
     source: MangaSource,
     uiState: MangaListUiState,
@@ -69,7 +68,6 @@ private fun MangaListView(
     navigateToDetails: (Long) -> Unit,
 ) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
 
     if (uiState.message != null) {
         LaunchedEffect(uiState.message) {
@@ -85,7 +83,7 @@ private fun MangaListView(
             .only(WindowInsetsSides.Horizontal)
     ) { padding ->
         val listState = rememberLazyGridState()
-        listState.onBottomReached(buffer = 3) {
+        listState.onBottomReached(buffer = 5) {
             event?.loadMore()
         }
         Column(

@@ -7,16 +7,12 @@ import android.text.style.ForegroundColorSpan
 import androidx.core.text.getSpans
 import androidx.core.text.parseAsHtml
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.runInterruptible
-import org.koitharu.kotatsu.parsers.exception.NotFoundException
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.koitharu.kotatsu.parsers.util.recoverNotNull
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.xtimms.tokusho.core.parser.MangaDataRepository
-import org.xtimms.tokusho.core.parser.MangaIntent
 import org.xtimms.tokusho.core.parser.MangaRepository
 import org.xtimms.tokusho.sections.details.data.MangaDetails
 import org.xtimms.tokusho.utils.lang.sanitize
@@ -29,9 +25,9 @@ class DetailsLoadUseCase @Inject constructor(
     private val imageGetter: Html.ImageGetter,
 ) {
 
-    operator fun invoke(intent: MangaIntent): Flow<MangaDetails> = channelFlow {
-        val manga = requireNotNull(mangaDataRepository.resolveIntent(intent)) {
-            "Cannot resolve intent $intent"
+    operator fun invoke(mangaId: Long): Flow<MangaDetails> = channelFlow {
+        val manga = requireNotNull(mangaDataRepository.findMangaById(mangaId)) {
+            "Cannot resolve id $mangaId"
         }
         send(MangaDetails(manga, null, false))
         try {

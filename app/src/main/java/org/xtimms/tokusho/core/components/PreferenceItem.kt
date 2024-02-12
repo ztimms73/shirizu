@@ -1,5 +1,13 @@
 package org.xtimms.tokusho.core.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +35,7 @@ import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -186,14 +195,28 @@ internal fun PreferenceItemDescription(
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     overflow: TextOverflow = TextOverflow.Ellipsis
 ) {
-    Text(
+    AnimatedContent(
+        targetState = text,
+        transitionSpec = {
+            if (targetState > initialState) {
+                (slideInVertically { height -> -height } + fadeIn()).togetherWith(
+                    slideOutVertically { height -> height } + fadeOut())
+            } else {
+                (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                    slideOutVertically { height -> -height } + fadeOut())
+            }.using(SizeTransform(clip = false))
+        },
         modifier = modifier.padding(top = 2.dp),
-        text = text,
-        maxLines = maxLines,
-        style = style,
-        color = color.applyOpacity(enabled),
-        overflow = overflow
-    )
+        label = "Preference desc"
+    ) { targetText ->
+        Text(
+            text = targetText,
+            maxLines = maxLines,
+            style = style,
+            color = color.applyOpacity(enabled),
+            overflow = overflow
+        )
+    }
 }
 
 @Composable
@@ -552,9 +575,16 @@ fun PreferencesHintCard(
 
 @Composable
 fun PreferenceStorageHeader(
-    used: Long = 4L,
-    total: Long = 128L
+    used: Float = 40F,
+    total: Float = 128F
 ) {
+
+    val animatedProgress = animateFloatAsState(
+        targetValue = 1 - ((total - used) / total),
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "Progress"
+    ).value
+
     Column {
         Row(
             modifier = Modifier
@@ -562,27 +592,47 @@ fun PreferenceStorageHeader(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = FileSize.BYTES.formatWithoutUnits(used),
-                modifier = Modifier.padding(end = 4.dp),
-                style = MaterialTheme.typography.displayLarge
+            AnimatedNumber(
+                value = FileSize.BYTES.formatWithoutUnits(used)
             )
-            Text(
-                text = FileSize.BYTES.showUnit(LocalContext.current, used),
+            AnimatedContent(
+                targetState = used,
+                transitionSpec = {
+                    if (targetState > initialState) {
+                        (fadeIn()).togetherWith(fadeOut())
+                    } else {
+                        (fadeIn()).togetherWith(fadeOut())
+                    }.using(SizeTransform(clip = false))
+                },
                 modifier = Modifier
                     .weight(1f)
                     .align(Alignment.Bottom)
-                    .padding(PaddingValues(bottom = 8.dp))
-            )
-            Text(
-                text = FileSize.BYTES.totalFormat(LocalContext.current, total),
+                    .padding(PaddingValues(start = 4.dp, bottom = 8.dp)),
+                label = "Unit"
+            ) { targetUsed ->
+                Text(text = FileSize.BYTES.showUnit(LocalContext.current, targetUsed))
+            }
+            AnimatedContent(
+                targetState = total,
+                transitionSpec = {
+                    if (targetState > initialState) {
+                        (fadeIn()).togetherWith(fadeOut())
+                    } else {
+                        (fadeIn()).togetherWith(fadeOut())
+                    }.using(SizeTransform(clip = false))
+                },
                 modifier = Modifier
                     .align(Alignment.Bottom)
-                    .padding(PaddingValues(bottom = 8.dp))
-            )
+                    .padding(PaddingValues(bottom = 8.dp)),
+                label = "Total used"
+            ) { targetTotal ->
+                Text(
+                    text = FileSize.BYTES.totalFormat(LocalContext.current, targetTotal),
+                )
+            }
         }
         LinearProgressIndicator(
-            progress = { (1 - ((total - used) / total.toFloat())) },
+            progress = { animatedProgress },
             modifier = Modifier
                 .padding(PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp))
                 .height(16.dp)
@@ -598,13 +648,20 @@ fun PreferenceStorageHeader(
 @Composable
 fun PreferenceStorageItem(
     title: String,
-    used: Long? = 0L,
-    total: Long?,
+    used: Float = 0F,
+    total: Float = 0F,
     icon: Any? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {
+
+    val animatedProgress = animateFloatAsState(
+        targetValue = 1 - ((total - used) / total),
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "Progress"
+    ).value
+
     Surface(
         modifier = Modifier.combinedClickable(
             onClick = onClick,
@@ -658,20 +715,30 @@ fun PreferenceStorageItem(
                         text = title,
                         enabled = true
                     )
-                    Text(text = FileSize.BYTES.format(LocalContext.current, used ?: 0L))
+                    AnimatedContent(
+                        targetState = used,
+                        transitionSpec = {
+                            if (targetState > initialState) {
+                                (fadeIn()).togetherWith(fadeOut())
+                            } else {
+                                (fadeIn()).togetherWith(fadeOut())
+                            }.using(SizeTransform(clip = false))
+                        },
+                        label = "Total used"
+                    ) { targetTotal ->
+                        Text(text = FileSize.BYTES.format(LocalContext.current, targetTotal))
+                    }
                 }
-                if (total != null) {
-                    LinearProgressIndicator(
-                        progress = { (1 - ((total - used!!) / total.toFloat())) },
-                        modifier = Modifier
-                            .padding(PaddingValues(top = 12.dp))
-                            .height(5.dp)
-                            .fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primaryContainer,
-                        strokeCap = StrokeCap.Round,
-                    )
-                }
+                LinearProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier
+                        .padding(PaddingValues(top = 12.dp))
+                        .height(5.dp)
+                        .fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primaryContainer,
+                    strokeCap = StrokeCap.Round,
+                )
             }
             trailingIcon?.let {
                 VerticalDivider(
@@ -700,7 +767,7 @@ fun PreferenceStorageHeaderPreview() {
 @Preview(showBackground = true)
 fun PreferenceStorageItemPreview() {
     TokushoTheme {
-        PreferenceStorageItem(title = "Saved manga", icon = Icons.Outlined.Save, total = 0L)
+        PreferenceStorageItem(title = "Saved manga", icon = Icons.Outlined.Save, total = 0F)
     }
 }
 

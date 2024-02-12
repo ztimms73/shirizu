@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.currentCoroutineContext
+import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.koitharu.kotatsu.parsers.InternalParsersApi
@@ -59,6 +60,9 @@ class RemoteMangaRepository(
 
     val domains: Array<out String>
         get() = parser.configKeyDomain.presetValues
+
+    val headers: Headers
+        get() = parser.headers
 
     override fun intercept(chain: Interceptor.Chain): Response {
         return if (parser is Interceptor) {

@@ -19,7 +19,7 @@ private const val DIR_NAME = "manga"
 private const val NOMEDIA = ".nomedia"
 private const val CACHE_DISK_PERCENTAGE = 0.02
 private const val CACHE_SIZE_MIN: Long = 10 * 1024 * 1024 // 10MB
-private const val CACHE_SIZE_MAX: Long = 250 * 1024 * 1024 // 250MB
+const val CACHE_SIZE_MAX: Long = 250 * 1024 * 1024 // 250MB
 
 @Reusable
 class LocalStorageManager @Inject constructor(

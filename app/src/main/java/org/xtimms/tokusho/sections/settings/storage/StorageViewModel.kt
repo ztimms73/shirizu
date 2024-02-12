@@ -3,7 +3,6 @@ package org.xtimms.tokusho.sections.settings.storage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runInterruptible
@@ -11,32 +10,29 @@ import okhttp3.Cache
 import org.xtimms.tokusho.core.base.viewmodel.BaseViewModel
 import org.xtimms.tokusho.core.cache.CacheDir
 import org.xtimms.tokusho.data.LocalStorageManager
-import java.util.EnumMap
 import javax.inject.Inject
 
 @HiltViewModel
 class StorageViewModel @Inject constructor(
     private val storageManager: LocalStorageManager,
     private val httpCache: Cache,
-) : BaseViewModel<StorageUiState>() {
-
-    val httpCacheSize = MutableStateFlow(-1L)
-    val cacheSizes = EnumMap<CacheDir, MutableStateFlow<Long>>(CacheDir::class.java)
+) : BaseViewModel<StorageUiState>(), StorageEvent {
 
     private var storageUsageJob: Job? = null
 
     init {
-        val prevJob = storageUsageJob
         storageUsageJob = launchJob(Dispatchers.Default) {
-            prevJob?.cancelAndJoin()
+            setLoading(true)
             mutableUiState.update {
                 it.copy(
                     availableSpace = storageManager.computeAvailableSize(),
                     pagesCache = storageManager.computeCacheSize(CacheDir.PAGES),
                     thumbnailsCache = storageManager.computeCacheSize(CacheDir.THUMBS),
-                    httpCacheSize = runInterruptible { httpCache.size() }
+                    httpCacheSize = runInterruptible { httpCache.size() },
+                    isLoading = false
                 )
             }
+            setLoading(false)
         }
     }
 
@@ -51,7 +47,7 @@ class StorageViewModel @Inject constructor(
                         pagesCache = storageManager.computeCacheSize(CacheDir.PAGES),
                         thumbnailsCache = storageManager.computeCacheSize(CacheDir.THUMBS),
                         httpCacheSize = runInterruptible { httpCache.size() },
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             } catch (_: Exception) {

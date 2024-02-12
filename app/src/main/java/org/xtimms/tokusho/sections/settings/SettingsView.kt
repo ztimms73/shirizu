@@ -13,6 +13,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -22,6 +26,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,16 +37,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.xtimms.tokusho.R
-import org.xtimms.tokusho.core.components.PreferenceSubtitle
 import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.core.components.SettingItem
+import org.xtimms.tokusho.sections.settings.storage.StorageEvent
+import org.xtimms.tokusho.sections.settings.storage.StorageUiState
 import org.xtimms.tokusho.sections.settings.storage.StorageViewModel
 import org.xtimms.tokusho.utils.FileSize
+import org.xtimms.tokusho.utils.system.toast
 
 const val SETTINGS_DESTINATION = "settings"
 
-@SuppressLint("BatteryLife")
 @Composable
 fun SettingsView(
     navigateBack: () -> Unit,
@@ -51,9 +57,40 @@ fun SettingsView(
     navigateToStorage: () -> Unit
 ) {
 
-    val context = LocalContext.current
     val viewModel: StorageViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SettingsViewContent(
+        uiState = uiState,
+        event = viewModel,
+        navigateBack = navigateBack,
+        navigateToAppearance = navigateToAppearance,
+        navigateToAbout = navigateToAbout,
+        navigateToAdvanced = navigateToAdvanced,
+        navigateToStorage = navigateToStorage
+    )
+}
+
+@SuppressLint("BatteryLife")
+@Composable
+private fun SettingsViewContent(
+    uiState: StorageUiState,
+    event: StorageEvent?,
+    navigateBack: () -> Unit,
+    navigateToAppearance: () -> Unit,
+    navigateToAbout: () -> Unit,
+    navigateToAdvanced: () -> Unit,
+    navigateToStorage: () -> Unit
+) {
+
+    val context = LocalContext.current
+
+    if (uiState.message != null) {
+        LaunchedEffect(uiState.message) {
+            context.toast(uiState.message)
+            event?.onMessageDisplayed()
+        }
+    }
 
     val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
     var showBatteryHint by remember {
@@ -85,8 +122,10 @@ fun SettingsView(
         navigateBack = navigateBack
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .padding(padding)
+            modifier = Modifier.padding(padding),
+            contentPadding = PaddingValues(
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            )
         ) {
             item {
                 AnimatedVisibility(
@@ -123,16 +162,16 @@ fun SettingsView(
                     append(
                         FileSize.BYTES.freeFormat(
                             context,
-                            uiState.availableSpace -
+                            (uiState.availableSpace -
                                     uiState.httpCacheSize -
                                     uiState.pagesCache -
-                                    uiState.thumbnailsCache
+                                    uiState.thumbnailsCache).toFloat()
                         )
                     )
                 }
                 SettingItem(
                     title = stringResource(id = R.string.storage),
-                    description = desc,
+                    description = if (uiState.isLoading) context.getString(R.string.calculating_) else desc,
                     icon = Icons.Outlined.Storage,
                     onClick = navigateToStorage
                 )

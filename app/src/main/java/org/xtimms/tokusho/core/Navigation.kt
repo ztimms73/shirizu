@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.tokusho.core.logs.FileLogger
 import org.xtimms.tokusho.core.model.ShelfCategory
 import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
 import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
@@ -62,6 +63,7 @@ fun PathInterpolator.toEasing(): Easing {
 @Composable
 fun Navigation(
     coil: ImageLoader,
+    loggers: Set<FileLogger>,
     navController: NavHostController,
     isCompactScreen: Boolean,
     modifier: Modifier,
@@ -180,6 +182,7 @@ fun Navigation(
 
         composable(ADVANCED_DESTINATION) {
             AdvancedView(
+                loggers = loggers,
                 navigateBack = navigateBack,
             )
         }
@@ -220,13 +223,16 @@ fun Navigation(
             )
         }
 
-        // TODO
         composable(
-            route = DETAILS_DESTINATION
+            route = DETAILS_DESTINATION,
+            arguments = listOf(
+                navArgument(MANGA_ID_ARGUMENT.removeFirstAndLast()) {
+                    type = NavType.LongType
+                }
+            )
         ) { navEntry ->
             DetailsView(
                 coil = coil,
-                mangaId = 0L,
                 navigateBack = navigateBack,
             )
         }

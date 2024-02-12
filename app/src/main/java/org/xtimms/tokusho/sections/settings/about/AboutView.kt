@@ -1,5 +1,9 @@
 package org.xtimms.tokusho.sections.settings.about
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -56,8 +60,10 @@ fun AboutView(
         navigateBack = navigateBack
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .padding(padding)
+            modifier = Modifier.padding(padding),
+            contentPadding = PaddingValues(
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            )
         ) {
             item {
                 PreferenceItem(

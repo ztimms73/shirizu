@@ -12,7 +12,7 @@ enum class FileSize(private val multiplier: Int) {
 
     fun convert(amount: Long, target: FileSize): Long = amount * multiplier / target.multiplier
 
-    fun freeFormat(context: Context, amount: Long): String {
+    fun freeFormat(context: Context, amount: Float): String {
         val bytes = amount * multiplier
         val units = context.getString(R.string.text_file_sizes_free).split('|')
         if (bytes <= 0) {
@@ -33,7 +33,7 @@ enum class FileSize(private val multiplier: Int) {
         }
     }
 
-    fun totalFormat(context: Context, amount: Long): String {
+    fun totalFormat(context: Context, amount: Float): String {
         val bytes = amount * multiplier
         val units = context.getString(R.string.text_file_sizes_total).split('|')
         if (bytes <= 0) {
@@ -54,7 +54,7 @@ enum class FileSize(private val multiplier: Int) {
         }
     }
 
-    fun showUnit(context: Context, amount: Long): String {
+    fun showUnit(context: Context, amount: Float): String {
         val bytes = amount * multiplier
         val units = context.getString(R.string.text_file_sizes_used).split('|')
         if (bytes <= 0) {
@@ -70,7 +70,7 @@ enum class FileSize(private val multiplier: Int) {
         }
     }
 
-    fun format(context: Context, amount: Long): String {
+    fun format(context: Context, amount: Float): String {
         val bytes = amount * multiplier
         val units = context.getString(R.string.text_file_sizes).split('|')
         if (bytes <= 0) {
@@ -91,7 +91,7 @@ enum class FileSize(private val multiplier: Int) {
         }
     }
 
-    fun formatWithoutUnits(amount: Long): String {
+    fun formatWithoutUnits(amount: Float): String {
         val bytes = amount * multiplier
         if (bytes <= 0) {
             return "0"

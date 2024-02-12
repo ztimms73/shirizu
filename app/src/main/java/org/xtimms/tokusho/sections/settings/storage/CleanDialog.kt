@@ -96,7 +96,12 @@ fun CleanDialog(
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
                 Spacer(modifier = Modifier.height(4.dp))
                 val summary = StringBuilder().run {
-                    append(FileSize.BYTES.format(LocalContext.current, uiState.pagesCache + uiState.thumbnailsCache + uiState.httpCacheSize))
+                    append(
+                        FileSize.BYTES.format(
+                            LocalContext.current,
+                            (uiState.pagesCache + uiState.thumbnailsCache + uiState.httpCacheSize).toFloat()
+                        )
+                    )
                     append("")
                 }
                 Text(
@@ -104,7 +109,6 @@ fun CleanDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-//                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         })

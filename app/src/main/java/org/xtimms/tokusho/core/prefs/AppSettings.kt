@@ -26,11 +26,15 @@ const val UPDATE_CHANNEL = "update_channel"
 private const val THEME_COLOR = "theme_color"
 const val PALETTE_STYLE = "palette_style"
 const val LANGUAGE = "language"
+const val READING_TIME = "reading_time"
 
 const val SYSTEM_DEFAULT = 0
 
 const val STABLE = 0
 const val PRE_RELEASE = 1
+
+const val ACRA = "acra"
+const val LOGGING = "logging"
 
 val paletteStyles = listOf(
     PaletteStyle.TonalSpot,
@@ -87,6 +91,12 @@ object AppSettings {
 
     fun isAutoUpdateEnabled() = AUTO_UPDATE.getBoolean(false)
 
+    fun isACRAEnabled() = ACRA.getBoolean(false)
+
+    fun isLoggingEnabled() = LOGGING.getBoolean(false)
+
+    fun isReadingTimeEstimationEnabled() = READING_TIME.getBoolean(true)
+
     fun getLanguageConfiguration(languageNumber: Int = kv.decodeInt(LANGUAGE)) =
         languageMap.getOrElse(languageNumber) { "" }
 
@@ -112,13 +122,10 @@ object AppSettings {
     private val mutableAppSettingsStateFlow = MutableStateFlow(
         Settings(
             DarkThemePreference(
-                darkThemeValue = kv.decodeInt(
-                    DARK_THEME_VALUE, DarkThemePreference.FOLLOW_SYSTEM
-                ), isHighContrastModeEnabled = kv.decodeBool(HIGH_CONTRAST, false)
+                darkThemeValue = kv.decodeInt(DARK_THEME_VALUE, DarkThemePreference.FOLLOW_SYSTEM),
+                isHighContrastModeEnabled = kv.decodeBool(HIGH_CONTRAST, false)
             ),
-            isDynamicColorEnabled = kv.decodeBool(
-                DYNAMIC_COLOR, DynamicColors.isDynamicColorAvailable()
-            ),
+            isDynamicColorEnabled = kv.decodeBool(DYNAMIC_COLOR, DynamicColors.isDynamicColorAvailable()),
             seedColor = kv.decodeInt(THEME_COLOR, SEED),
             paletteStyleIndex = kv.decodeInt(PALETTE_STYLE, 0)
         )

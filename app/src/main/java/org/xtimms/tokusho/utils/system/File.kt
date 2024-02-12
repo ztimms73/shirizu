@@ -10,6 +10,10 @@ import java.io.File
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.walk
 
+fun File.subdir(name: String) = File(this, name).also {
+    if (!it.exists()) it.mkdirs()
+}
+
 fun File.getUriCompat(context: Context): Uri {
     return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", this)
 }

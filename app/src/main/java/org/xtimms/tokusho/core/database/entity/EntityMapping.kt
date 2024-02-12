@@ -6,8 +6,10 @@ import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.koitharu.kotatsu.parsers.util.mapToSet
 import org.koitharu.kotatsu.parsers.util.toTitleCase
+import org.xtimms.tokusho.core.model.MangaHistory
 import org.xtimms.tokusho.core.model.MangaSource
 import org.xtimms.tokusho.utils.lang.longHashCode
+import java.time.Instant
 
 // Entity to model
 
@@ -74,3 +76,12 @@ fun SortOrder(name: String, fallback: SortOrder): SortOrder = runCatching {
 fun MangaState(name: String): MangaState? = runCatching {
     MangaState.valueOf(name)
 }.getOrNull()
+
+fun HistoryEntity.toMangaHistory() = MangaHistory(
+    createdAt = Instant.ofEpochMilli(createdAt),
+    updatedAt = Instant.ofEpochMilli(updatedAt),
+    chapterId = chapterId,
+    page = page,
+    scroll = scroll.toInt(),
+    percent = percent,
+)

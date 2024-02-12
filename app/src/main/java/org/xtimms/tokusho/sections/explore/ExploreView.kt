@@ -36,7 +36,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.R
-import org.xtimms.tokusho.core.collapsable
 import org.xtimms.tokusho.core.components.ExploreButton
 import org.xtimms.tokusho.core.components.SourceItem
 import org.xtimms.tokusho.core.components.icons.Dice

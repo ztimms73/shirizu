@@ -1,5 +1,10 @@
 package org.xtimms.tokusho.core.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,12 +65,24 @@ fun SettingItem(title: String, description: String, icon: ImageVector?, onClick:
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Text(
-                    text = description,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                AnimatedContent(
+                    targetState = description,
+                    transitionSpec = {
+                        if (targetState > initialState) {
+                            (fadeIn()).togetherWith(fadeOut())
+                        } else {
+                            (fadeIn()).togetherWith(fadeOut())
+                        }.using(SizeTransform(clip = false))
+                    },
+                    label = "Total used"
+                ) { targetDescription ->
+                    Text(
+                        text = targetDescription,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
         }
     }

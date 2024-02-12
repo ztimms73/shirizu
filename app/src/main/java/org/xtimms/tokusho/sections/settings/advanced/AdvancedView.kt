@@ -1,12 +1,27 @@
 package org.xtimms.tokusho.sections.settings.advanced
 
 import android.os.Build
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Print
+import androidx.compose.material.icons.outlined.PrintDisabled
+import androidx.compose.material.icons.outlined.Report
+import androidx.compose.material.icons.outlined.ReportOff
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -16,10 +31,17 @@ import org.xtimms.tokusho.BuildConfig
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.PreferenceItem
 import org.xtimms.tokusho.core.components.PreferenceSubtitle
+import org.xtimms.tokusho.core.components.PreferenceSwitch
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
+import org.xtimms.tokusho.core.logs.FileLogger
+import org.xtimms.tokusho.core.prefs.ACRA
+import org.xtimms.tokusho.core.prefs.AppSettings
+import org.xtimms.tokusho.core.prefs.LOGGING
 import org.xtimms.tokusho.utils.DeviceUtil
+import org.xtimms.tokusho.utils.ShareHelper
 import org.xtimms.tokusho.utils.WebViewUtil
 import org.xtimms.tokusho.utils.lang.toDateTimestampString
+import org.xtimms.tokusho.utils.system.toast
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -29,17 +51,65 @@ const val ADVANCED_DESTINATION = "advanced"
 
 @Composable
 fun AdvancedView(
+    loggers: Set<FileLogger>,
     navigateBack: () -> Unit,
 ) {
+
+    val context = LocalContext.current
+
+    var isAcraEnabled by remember {
+        mutableStateOf(AppSettings.isACRAEnabled())
+    }
+
+    var isLoggingEnabled by remember {
+        mutableStateOf(AppSettings.isLoggingEnabled())
+    }
 
     ScaffoldWithTopAppBar(
         title = stringResource(R.string.advanced),
         navigateBack = navigateBack
     ) { padding ->
         LazyColumn(
-            modifier = Modifier
-                .padding(padding)
+            modifier = Modifier.padding(padding),
+            contentPadding = PaddingValues(
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            )
         ) {
+            item {
+                PreferenceSwitch(
+                    title = stringResource(id = R.string.send_crash_reports),
+                    description = stringResource(id = R.string.send_crash_reports_desc),
+                    icon = if (isAcraEnabled) Icons.Outlined.Report else Icons.Outlined.ReportOff,
+                    isChecked = isAcraEnabled,
+                    onClick = {
+                        isAcraEnabled = !isAcraEnabled
+                        AppSettings.updateValue(ACRA, isAcraEnabled)
+                        context.toast(R.string.restart_required)
+                    }
+                )
+            }
+            item {
+                PreferenceSwitch(
+                    title = stringResource(id = R.string.enable_logging),
+                    description = stringResource(id = R.string.enable_logging_desc),
+                    icon = if (isLoggingEnabled) Icons.Outlined.Print else Icons.Outlined.PrintDisabled,
+                    isChecked = isLoggingEnabled,
+                    onClick = {
+                        isLoggingEnabled = !isLoggingEnabled
+                        AppSettings.updateValue(LOGGING, isLoggingEnabled)
+                    }
+                )
+            }
+            item {
+                PreferenceItem(
+                    title = stringResource(id = R.string.share_logs),
+                    icon = Icons.Outlined.Share,
+                    enabled = isLoggingEnabled,
+                    onClick = {
+                        ShareHelper(context).shareLogs(loggers)
+                    }
+                )
+            }
             item {
                 PreferenceSubtitle(text = stringResource(id = R.string.app_info))
             }

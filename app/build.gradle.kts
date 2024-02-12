@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -12,6 +13,9 @@ plugins {
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
 }
+
+val acraAuthLogin: String = gradleLocalProperties(rootDir).getProperty("authLogin") ?: "\"acra_login\""
+val acraAuthPassword: String = gradleLocalProperties(rootDir).getProperty("authPassword") ?: "\"acra_password\""
 
 android {
     namespace = "org.xtimms.tokusho"
@@ -28,6 +32,10 @@ android {
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
         buildConfigField("String", "BUILD_TIME", "\"${getBuildTime()}\"")
 
+        buildConfigField("String", "ACRA_URI", "\"https://bugs.kotatsu.app/report\"")
+        buildConfigField("String", "ACRA_AUTH_LOGIN", acraAuthLogin)
+        buildConfigField("String", "ACRA_AUTH_PASSWORD", acraAuthPassword)
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -43,6 +51,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
@@ -93,6 +104,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     ksp("androidx.room:room-compiler:2.6.1")
+    implementation("ch.acra:acra-http:5.9.7")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.accompanist:accompanist-flowlayout:0.32.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
