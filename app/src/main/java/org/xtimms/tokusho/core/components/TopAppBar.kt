@@ -3,11 +3,15 @@ package org.xtimms.tokusho.core.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.RssFeed
@@ -19,12 +23,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -157,6 +164,39 @@ fun DefaultTopAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun SmallTopAppBarWithChips(
+    title: String,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    navigateBack: () -> Unit,
+    chips: List<String>
+) {
+    Column {
+        MediumTopAppBar(
+            title = { Text(text = title) },
+            navigationIcon = {
+                BackIconButton(onClick = navigateBack)
+            },
+            scrollBehavior = scrollBehavior
+        )
+        LazyRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(items = chips) {
+                CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                    SuggestionChip(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        onClick = { },
+                        label = { Text(text = it) },
+                    )
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmallTopAppBar(
@@ -196,6 +236,19 @@ fun DefaultTopAppBarPreview() {
     TokushoTheme {
         DefaultTopAppBar(
             title = "Tokusho",
+            navigateBack = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun DefaultTopAppBarWithChipsPreview() {
+    TokushoTheme {
+        SmallTopAppBarWithChips(
+            title = "Tokusho",
+            chips = listOf("Chip 1", "Chip 2", "Chip 3", "Chip 4", "Chip 1", "Chip 2", "Chip 3", "Chip 4"),
             navigateBack = {}
         )
     }

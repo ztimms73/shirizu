@@ -48,8 +48,9 @@ fun ScaffoldWithTopAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScaffoldWithSmallTopAppBar(
+fun ScaffoldWithSmallTopAppBarWithChips(
     title: String,
+    chips: List<String>,
     navigateBack: () -> Unit,
     floatingActionButton: @Composable (() -> Unit) = {},
     contentWindowInsets: WindowInsets = WindowInsets.systemBars,
@@ -64,9 +65,10 @@ fun ScaffoldWithSmallTopAppBar(
             .fillMaxSize()
             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         topBar = {
-            SmallTopAppBar(
+            SmallTopAppBarWithChips(
                 title = title,
                 scrollBehavior = topAppBarScrollBehavior,
+                chips = chips,
                 navigateBack = navigateBack
             )
         },

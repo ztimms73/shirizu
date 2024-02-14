@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.core.components.MangaCompactGridItem
-import org.xtimms.tokusho.core.components.ScaffoldWithSmallTopAppBar
+import org.xtimms.tokusho.core.components.ScaffoldWithSmallTopAppBarWithChips
 import org.xtimms.tokusho.utils.composable.onBottomReached
 import org.xtimms.tokusho.utils.system.toast
 
@@ -76,8 +76,9 @@ private fun MangaListViewContent(
         }
     }
 
-    ScaffoldWithSmallTopAppBar(
+    ScaffoldWithSmallTopAppBarWithChips(
         title = source.title,
+        chips = listOf("Chip 1", "Chip 2", "Chip 3", "Chip 4", "Chip 1", "Chip 2", "Chip 3", "Chip 4"),
         navigateBack = navigateBack,
         contentWindowInsets = WindowInsets.systemBars
             .only(WindowInsetsSides.Horizontal)
