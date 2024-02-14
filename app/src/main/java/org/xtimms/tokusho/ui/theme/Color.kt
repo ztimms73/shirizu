@@ -6,6 +6,9 @@ import org.xtimms.tokusho.ui.monet.a1
 import org.xtimms.tokusho.ui.monet.a2
 import org.xtimms.tokusho.ui.monet.a3
 
+val colorMin = Color(0xFF185ED6)
+val colorMax = Color(0xFFDD1414)
+
 object FixedAccentColors {
     val primaryFixed: Color
         @Composable get() = 90.a1

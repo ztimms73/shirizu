@@ -50,6 +50,8 @@ import org.xtimms.tokusho.sections.settings.storage.STORAGE_DESTINATION
 import org.xtimms.tokusho.sections.settings.storage.StorageView
 import org.xtimms.tokusho.sections.shelf.ShelfMap
 import org.xtimms.tokusho.sections.shelf.ShelfView
+import org.xtimms.tokusho.sections.stats.STATS_DESTINATION
+import org.xtimms.tokusho.sections.stats.StatsView
 import org.xtimms.tokusho.utils.lang.removeFirstAndLast
 
 const val DURATION_ENTER = 400
@@ -184,6 +186,13 @@ fun Navigation(
             AdvancedView(
                 loggers = loggers,
                 navigateBack = navigateBack,
+                navigateToStats = { navController.navigate(STATS_DESTINATION) }
+            )
+        }
+
+        composable(STATS_DESTINATION) {
+            StatsView(
+                navigateBack = navigateBack
             )
         }
 

@@ -112,4 +112,10 @@
     <string name="show_estimated_read_time_desc">The time estimation value may be inaccurate</string>
     <string name="approximate_remaining_time">Approximate remaining time</string>
     <string name="approximate_reading_time">Approximate reading time</string>
+    <string name="reading_based_stats">Reading-based statistics</string>
+    <string name="got_it">Got it</string>
+    <string name="reading_based_stats_desc">Here are your reading statistics</string>
+    <string name="total_chapters_read">Total chapters read</string>
+    <string name="min_chapters_read">Minimum chapters read</string>
+    <string name="max_chapters_read">Maximum chapters read</string>
 </resources>

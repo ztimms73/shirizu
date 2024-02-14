@@ -53,6 +53,7 @@ const val ADVANCED_DESTINATION = "advanced"
 fun AdvancedView(
     loggers: Set<FileLogger>,
     navigateBack: () -> Unit,
+    navigateToStats: () -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -75,6 +76,9 @@ fun AdvancedView(
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
         ) {
+            item {
+                PreferenceItem(title = "STATS", onClick = { navigateToStats() } )
+            }
             item {
                 PreferenceSwitch(
                     title = stringResource(id = R.string.send_crash_reports),
