@@ -4,7 +4,7 @@ import dagger.Reusable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.xtimms.tokusho.core.database.MangaDatabase
+import org.xtimms.tokusho.core.database.TokushoDatabase
 import org.xtimms.tokusho.core.database.entity.HistoryEntity
 import org.xtimms.tokusho.core.database.entity.toMangaHistory
 import org.xtimms.tokusho.core.model.MangaHistory
@@ -15,7 +15,7 @@ const val PROGRESS_NONE = -1f
 
 @Reusable
 class HistoryRepository @Inject constructor(
-    private val db: MangaDatabase,
+    private val db: TokushoDatabase,
 ) {
 
     suspend fun getOne(manga: Manga): MangaHistory? {

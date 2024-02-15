@@ -2,14 +2,14 @@ package org.xtimms.tokusho.core.parser
 
 import dagger.Reusable
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.xtimms.tokusho.core.database.MangaDatabase
+import org.xtimms.tokusho.core.database.TokushoDatabase
 import org.xtimms.tokusho.core.database.entity.toManga
 import javax.inject.Inject
 import javax.inject.Provider
 
 @Reusable
 class MangaDataRepository @Inject constructor(
-    private val db: MangaDatabase,
+    private val db: TokushoDatabase,
     private val resolverProvider: Provider<MangaLinkResolver>,
 ) {
 

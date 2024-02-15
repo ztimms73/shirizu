@@ -8,32 +8,35 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.collapsable
+import org.xtimms.tokusho.core.model.FavouriteCategory
 import org.xtimms.tokusho.core.model.ShelfCategory
-import org.xtimms.tokusho.ui.theme.TokushoTheme
 
 const val SHELF_DESTINATION = "shelf"
 
 @Composable
 fun ShelfView(
-    categories: List<ShelfCategory>,
     currentPage: () -> Int,
     showPageTabs: Boolean,
-    getNumberOfMangaForCategory: (ShelfCategory) -> Int?,
+    getNumberOfMangaForCategory: (FavouriteCategory) -> Int?,
     getLibraryForPage: (Int) -> List<ShelfItem>,
     topBarHeightPx: Float,
     padding: PaddingValues,
 ) {
+    val viewModel: ShelfViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     ShelfViewContent(
-        categories = categories,
+        uiState = uiState,
         currentPage = currentPage,
         showPageTabs = showPageTabs,
         getNumberOfMangaForCategory = getNumberOfMangaForCategory,
@@ -46,10 +49,10 @@ fun ShelfView(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShelfViewContent(
-    categories: List<ShelfCategory>,
+    uiState: ShelfUiState,
     currentPage: () -> Int,
     showPageTabs: Boolean,
-    getNumberOfMangaForCategory: (ShelfCategory) -> Int?,
+    getNumberOfMangaForCategory: (FavouriteCategory) -> Int?,
     getLibraryForPage: (Int) -> List<ShelfItem>,
     topBarHeightPx: Float,
     topBarOffsetY: Animatable<Float, AnimationVector1D> = Animatable(0f),
@@ -66,17 +69,17 @@ fun ShelfViewContent(
             )
             .padding(padding)
     ) {
-        val coercedCurrentPage = remember { currentPage().coerceAtMost(categories.lastIndex) }
-        val pagerState = rememberPagerState(coercedCurrentPage) { categories.size }
+        val coercedCurrentPage = remember { currentPage().coerceAtMost(uiState.categories.lastIndex) }
+        val pagerState = rememberPagerState(coercedCurrentPage) { uiState.categories.size }
         val scope = rememberCoroutineScope()
-        if (showPageTabs && categories.size > 1) {
-            LaunchedEffect(categories) {
-                if (categories.size <= pagerState.currentPage) {
-                    pagerState.scrollToPage(categories.size - 1)
+        if (showPageTabs && uiState.categories.size > 1) {
+            LaunchedEffect(uiState.categories) {
+                if (uiState.categories.size <= pagerState.currentPage) {
+                    pagerState.scrollToPage(uiState.categories.size - 1)
                 }
             }
             ShelfTabs(
-                categories = categories,
+                categories = uiState.categories,
                 pagerState = pagerState,
                 getNumberOfMangaForCategory = getNumberOfMangaForCategory,
             ) { scope.launch { pagerState.animateScrollToPage(it) } }
@@ -90,28 +93,6 @@ fun ShelfViewContent(
             onGlobalSearchClicked = {  },
             getLibraryForPage = getLibraryForPage,
         )
-    }
-}
-
-@Preview
-@Composable
-fun ShelfPreview() {
-    val library: ShelfMap = emptyMap()
-    TokushoTheme {
-        Surface {
-            ShelfViewContent(
-                categories = listOf(
-                    ShelfCategory(1, "Test 1", 1L, 1L),
-                    ShelfCategory(2, "Test 2", 2L, 2L)
-                ),
-                currentPage = { 0 },
-                showPageTabs = true,
-                getNumberOfMangaForCategory = { 2 },
-                getLibraryForPage = { library.values.toTypedArray().getOrNull(0).orEmpty() },
-                padding = PaddingValues(),
-                topBarHeightPx = 0f,
-            )
-        }
     }
 }
 

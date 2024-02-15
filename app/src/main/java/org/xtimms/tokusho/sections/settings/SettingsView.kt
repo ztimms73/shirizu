@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BatterySaver
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.runtime.Composable
@@ -54,6 +55,7 @@ fun SettingsView(
     navigateToAppearance: () -> Unit,
     navigateToAbout: () -> Unit,
     navigateToAdvanced: () -> Unit,
+    navigateToShelfSettings: () -> Unit,
     navigateToStorage: () -> Unit
 ) {
 
@@ -67,6 +69,7 @@ fun SettingsView(
         navigateToAppearance = navigateToAppearance,
         navigateToAbout = navigateToAbout,
         navigateToAdvanced = navigateToAdvanced,
+        navigateToShelfSettings = navigateToShelfSettings,
         navigateToStorage = navigateToStorage
     )
 }
@@ -80,6 +83,7 @@ private fun SettingsViewContent(
     navigateToAppearance: () -> Unit,
     navigateToAbout: () -> Unit,
     navigateToAdvanced: () -> Unit,
+    navigateToShelfSettings: () -> Unit,
     navigateToStorage: () -> Unit
 ) {
 
@@ -149,6 +153,14 @@ private fun SettingsViewContent(
                     description = stringResource(id = R.string.appearance_page),
                     icon = Icons.Outlined.Palette,
                     onClick = navigateToAppearance
+                )
+            }
+            item {
+                SettingItem(
+                    title = stringResource(id = R.string.nav_shelf),
+                    description = stringResource(id = R.string.shelf_page),
+                    icon = Icons.Outlined.LocalLibrary,
+                    onClick = navigateToShelfSettings
                 )
             }
             item {

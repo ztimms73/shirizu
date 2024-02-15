@@ -13,15 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.xtimms.tokusho.core.components.TabText
-import org.xtimms.tokusho.core.model.ShelfCategory
-import org.xtimms.tokusho.sections.shelf.ext.visualName
+import org.xtimms.tokusho.core.model.FavouriteCategory
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun ShelfTabs(
-    categories: List<ShelfCategory>,
+    categories: List<FavouriteCategory>,
     pagerState: PagerState,
-    getNumberOfMangaForCategory: (ShelfCategory) -> Int?,
+    getNumberOfMangaForCategory: (FavouriteCategory) -> Int?,
     onTabItemClick: (Int) -> Unit,
 ) {
     Column(
@@ -40,7 +39,7 @@ internal fun ShelfTabs(
                     onClick = { onTabItemClick(index) },
                     text = {
                         TabText(
-                            text = category.visualName,
+                            text = category.title,
                             badgeCount = getNumberOfMangaForCategory(category),
                         )
                     },

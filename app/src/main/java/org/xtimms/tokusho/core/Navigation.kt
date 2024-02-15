@@ -2,8 +2,6 @@ package org.xtimms.tokusho.core
 
 import android.graphics.Path
 import android.view.animation.PathInterpolator
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +17,6 @@ import androidx.navigation.navArgument
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.core.logs.FileLogger
-import org.xtimms.tokusho.core.model.ShelfCategory
 import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
 import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
 import org.xtimms.tokusho.sections.details.DETAILS_DESTINATION
@@ -46,6 +43,10 @@ import org.xtimms.tokusho.sections.settings.appearance.DARK_THEME_DESTINATION
 import org.xtimms.tokusho.sections.settings.appearance.DarkThemeView
 import org.xtimms.tokusho.sections.settings.appearance.LANGUAGES_DESTINATION
 import org.xtimms.tokusho.sections.settings.appearance.LanguagesView
+import org.xtimms.tokusho.sections.settings.shelf.SHELF_SETTINGS_DESTINATION
+import org.xtimms.tokusho.sections.settings.shelf.ShelfSettingsView
+import org.xtimms.tokusho.sections.settings.shelf.categories.CATEGORIES_DESTINATION
+import org.xtimms.tokusho.sections.settings.shelf.categories.CategoriesView
 import org.xtimms.tokusho.sections.settings.storage.STORAGE_DESTINATION
 import org.xtimms.tokusho.sections.settings.storage.StorageView
 import org.xtimms.tokusho.sections.shelf.ShelfMap
@@ -103,10 +104,6 @@ fun Navigation(
         composable(BottomNavDestination.Shelf.route) {
             val library: ShelfMap = emptyMap()
             ShelfView(
-                categories = listOf(
-                    ShelfCategory(1, "Test 1", 1L, 1L),
-                    ShelfCategory(2, "Test 2", 2L, 2L)
-                ),
                 currentPage = { 0 },
                 showPageTabs = true,
                 getNumberOfMangaForCategory = { 2 },
@@ -151,6 +148,7 @@ fun Navigation(
                 navigateToAppearance = { navController.navigate(APPEARANCE_DESTINATION) },
                 navigateToAbout = { navController.navigate(ABOUT_DESTINATION) },
                 navigateToAdvanced = { navController.navigate(ADVANCED_DESTINATION) },
+                navigateToShelfSettings = { navController.navigate(SHELF_SETTINGS_DESTINATION) },
                 navigateToStorage = { navController.navigate(STORAGE_DESTINATION) }
             )
         }
@@ -173,6 +171,19 @@ fun Navigation(
         composable(LANGUAGES_DESTINATION) {
             LanguagesView(
                 navigateBack = navigateBack
+            )
+        }
+
+        composable(SHELF_SETTINGS_DESTINATION) {
+            ShelfSettingsView(
+                navigateBack = navigateBack,
+                navigateToCategories = { navController.navigate(CATEGORIES_DESTINATION) }
+            )
+        }
+
+        composable(CATEGORIES_DESTINATION) {
+            CategoriesView(
+                navigateBack = navigateBack,
             )
         }
 

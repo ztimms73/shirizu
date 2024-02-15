@@ -17,7 +17,7 @@ import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
-import org.xtimms.tokusho.core.database.MangaDatabase
+import org.xtimms.tokusho.core.database.TokushoDatabase
 import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.updates.Updater
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
@@ -28,7 +28,7 @@ import javax.inject.Provider
 class App : Application() {
 
     @Inject
-    lateinit var database: Provider<MangaDatabase>
+    lateinit var database: Provider<TokushoDatabase>
 
     override fun onCreate() {
         super.onCreate()

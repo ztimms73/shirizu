@@ -6,8 +6,11 @@ import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.koitharu.kotatsu.parsers.util.mapToSet
 import org.koitharu.kotatsu.parsers.util.toTitleCase
+import org.xtimms.tokusho.core.model.FavouriteCategory
+import org.xtimms.tokusho.core.model.ListSortOrder
 import org.xtimms.tokusho.core.model.MangaHistory
 import org.xtimms.tokusho.core.model.MangaSource
+import org.xtimms.tokusho.sections.shelf.FavouriteManga
 import org.xtimms.tokusho.utils.lang.longHashCode
 import java.time.Instant
 
@@ -40,6 +43,20 @@ fun MangaEntity.toManga(tags: Set<MangaTag>) = Manga(
 )
 
 fun MangaWithTags.toManga() = manga.toManga(tags.toMangaTags())
+
+fun FavouriteCategoryEntity.toFavouriteCategory(id: Long = categoryId.toLong()) = FavouriteCategory(
+    id = id,
+    title = title,
+    sortKey = sortKey,
+    order = ListSortOrder(order, ListSortOrder.NEWEST),
+    createdAt = Instant.ofEpochMilli(createdAt),
+    isTrackingEnabled = track,
+    isVisibleInLibrary = isVisibleInLibrary,
+)
+
+fun FavouriteManga.toManga() = manga.toManga(tags.toMangaTags())
+
+fun Collection<FavouriteManga>.toMangaList() = map { it.toManga() }
 
 // Model to entity
 

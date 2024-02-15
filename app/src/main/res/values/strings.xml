@@ -118,4 +118,10 @@
     <string name="total_chapters_read">Total chapters read</string>
     <string name="min_chapters_read">Minimum chapters read</string>
     <string name="max_chapters_read">Maximum chapters read</string>
+    <string name="read_later">Read later</string>
+    <string name="shelf_page">Categories, new chapters updates</string>
+    <string name="categories">Categories</string>
+    <string name="edit_categories">Edit categories</string>
+    <string name="updates">Updates</string>
+    <string name="add">Add</string>
 </resources>

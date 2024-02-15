@@ -20,7 +20,7 @@ import org.xtimms.tokusho.core.cache.CacheDir
 import org.xtimms.tokusho.core.cache.ContentCache
 import org.xtimms.tokusho.core.cache.MemoryContentCache
 import org.xtimms.tokusho.core.cache.StubContentCache
-import org.xtimms.tokusho.core.database.MangaDatabase
+import org.xtimms.tokusho.core.database.TokushoDatabase
 import org.xtimms.tokusho.core.network.MangaHttpClient
 import org.xtimms.tokusho.core.os.NetworkState
 import org.xtimms.tokusho.core.parser.MangaLoaderContextImpl
@@ -53,8 +53,8 @@ interface TokushoModule {
         @Singleton
         fun provideMangaDatabase(
             @ApplicationContext context: Context,
-        ): MangaDatabase {
-            return MangaDatabase(context)
+        ): TokushoDatabase {
+            return TokushoDatabase(context)
         }
 
         @Provides
