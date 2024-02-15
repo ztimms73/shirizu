@@ -1,10 +1,22 @@
 package org.xtimms.tokusho.ui.theme
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // Set of Material typography styles to start with
@@ -16,22 +28,6 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
 )
 
 val preferenceTitle = TextStyle(
@@ -40,3 +36,47 @@ val preferenceTitle = TextStyle(
     fontSize = 20.sp, lineHeight = 24.sp,
     lineBreak = LineBreak.Paragraph,
 )
+
+@Composable
+fun FontCard(family: String, size: String, style: TextStyle) {
+    Card(
+        shape = CardDefaults.outlinedShape,
+        colors = CardDefaults.outlinedCardColors(),
+        modifier = Modifier.padding(8.dp),
+    ) {
+        Row(modifier = Modifier.padding(8.dp)) {
+            Text(text = family, style = style)
+            Text(text = size)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewTypography() {
+    TokushoTheme {
+        Surface {
+            Row {
+                Column {
+                    FontCard("Display", "L", MaterialTheme.typography.displayLarge)
+                    FontCard("Display", "M", MaterialTheme.typography.displayMedium)
+                    FontCard("Display", "S", MaterialTheme.typography.displaySmall)
+                    FontCard("Headline", "L", MaterialTheme.typography.headlineLarge)
+                    FontCard("Headline", "M", MaterialTheme.typography.headlineMedium)
+                    FontCard("Headline", "S", MaterialTheme.typography.headlineSmall)
+                    FontCard("Title", "L", MaterialTheme.typography.titleLarge)
+                    FontCard("Title", "M", MaterialTheme.typography.titleMedium)
+                    FontCard("Title", "S", MaterialTheme.typography.titleSmall)
+                }
+                Column {
+                    FontCard("Body", "L", MaterialTheme.typography.bodyLarge)
+                    FontCard("Body", "M", MaterialTheme.typography.bodyMedium)
+                    FontCard("Body", "S", MaterialTheme.typography.bodySmall)
+                    FontCard("Label", "L", MaterialTheme.typography.labelLarge)
+                    FontCard("Label", "M", MaterialTheme.typography.labelMedium)
+                    FontCard("Label", "S", MaterialTheme.typography.labelSmall)
+                }
+            }
+        }
+    }
+}
