@@ -6,6 +6,11 @@ An attempt to write an Android manga reading application on Jetpack Compose usin
 
 No, nothing works.
 
+## Screens
+|Shelf|History|Explore|
+|---|---|---|
+|[<img src="https://git.kotatsu.app/Xtimms/Tokusho/raw/branch/master/images/shelf.png" height="750"/>](https://git.kotatsu.app/Xtimms/Tokusho/raw/branch/master/images/shelf.png)|Soon|Soon|
+
 ## Acknowledgements
 
 - [Kotatsu](https://github.com/KotatsuApp/Kotatsu) - UI, parsers, under the hood
