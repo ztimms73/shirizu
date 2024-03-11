@@ -6,6 +6,8 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.android.material.color.DynamicColors
 import com.tencent.mmkv.MMKV
 import dagger.hilt.android.HiltAndroidApp
@@ -19,6 +21,7 @@ import org.acra.sender.HttpSender
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
 import org.xtimms.tokusho.core.database.TokushoDatabase
 import org.xtimms.tokusho.core.prefs.AppSettings
+import org.xtimms.tokusho.core.prefs.KotatsuAppSettings
 import org.xtimms.tokusho.core.updates.Updater
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import javax.inject.Inject
@@ -29,6 +32,9 @@ class App : Application() {
 
     @Inject
     lateinit var database: Provider<TokushoDatabase>
+
+    @Inject
+    lateinit var settings: KotatsuAppSettings
 
     override fun onCreate() {
         super.onCreate()

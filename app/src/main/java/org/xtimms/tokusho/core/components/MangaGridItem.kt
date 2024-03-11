@@ -6,14 +6,17 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,25 +36,19 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.Manga
 import org.xtimms.tokusho.core.AsyncImageImpl
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 
 private const val GridSelectedCoverAlpha = 0.76f
 
-/**
- * Layout of grid list item with title overlaying the cover.
- * Accepts null [title] for a cover-only view.
- */
 @Composable
-fun MangaCompactGridItem(
+fun MangaGridItem(
     coil: ImageLoader,
-    imageUrl: String,
+    manga: Manga,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
-    title: String? = null,
-    onClickContinueReading: (() -> Unit)? = null,
-    coverAlpha: Float = 1f,
 ) {
     GridItemSelectable(
         isSelected = isSelected,
@@ -71,12 +68,53 @@ fun MangaCompactGridItem(
                         .clip(MaterialTheme.shapes.medium)
                         .aspectRatio(10F / 16F),
                     coil = coil,
-                    model = imageUrl,
+                    model = manga.largeCoverUrl ?: manga.coverUrl,
                     contentDescription = null
                 )
             }
             Text(
-                text = title!!,
+                text = manga.title,
+                modifier = Modifier.padding(4.dp),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 2,
+                style = MaterialTheme.typography.titleSmall,
+            )
+        }
+    }
+}
+
+@Composable
+fun MangaHorizontalItem(
+    coil: ImageLoader,
+    manga: Manga,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    isSelected: Boolean = false,
+) {
+    GridItemSelectable(
+        isSelected = isSelected,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        modifier = Modifier.width(IntrinsicSize.Min)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.Start
+        ) {
+            Box {
+                AsyncImageImpl(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                        .clip(MaterialTheme.shapes.medium)
+                        .aspectRatio(10F / 16F)
+                        .height(156.dp),
+                    coil = coil,
+                    model = manga.largeCoverUrl ?: manga.coverUrl,
+                    contentDescription = null
+                )
+            }
+            Text(
+                text = manga.title,
                 modifier = Modifier.padding(4.dp),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2,
@@ -207,17 +245,3 @@ private fun Modifier.selectedOutline(
     isSelected: Boolean,
     color: Color,
 ) = this then drawBehind { if (isSelected) drawRect(color = color) }
-
-@PreviewLightDark
-@Composable
-fun MangaGridItemPreview() {
-    TokushoTheme {
-        MangaCompactGridItem(
-            coil = ImageLoader(LocalContext.current),
-            imageUrl = "https://cdn.myanimelist.net/images/manga/2/170594l.jpg",
-            title = "Stub",
-            onClick = {  },
-            onLongClick = {  }
-        )
-    }
-}

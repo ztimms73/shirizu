@@ -14,13 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import org.xtimms.tokusho.core.components.TabText
 import org.xtimms.tokusho.core.model.FavouriteCategory
+import org.xtimms.tokusho.core.prefs.AppSettings
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun ShelfTabs(
-    categories: List<FavouriteCategory>,
+    categories: List<FavouriteTabModel>,
     pagerState: PagerState,
-    getNumberOfMangaForCategory: (FavouriteCategory) -> Int?,
     onTabItemClick: (Int) -> Unit,
 ) {
     Column(
@@ -40,14 +40,13 @@ internal fun ShelfTabs(
                     text = {
                         TabText(
                             text = category.title,
-                            badgeCount = getNumberOfMangaForCategory(category),
+                            badgeCount = if (AppSettings.isMangaCountInTabsEnabled()) category.mangaCount else null
                         )
                     },
                     unselectedContentColor = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
-
         HorizontalDivider()
     }
 }

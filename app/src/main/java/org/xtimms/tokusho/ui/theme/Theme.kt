@@ -11,6 +11,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDirection
@@ -18,6 +19,10 @@ import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.material.color.MaterialColors
 import org.xtimms.tokusho.ui.monet.dynamicColorScheme
+
+fun Color.disabledIconOpacity(): Color {
+    return this.copy(alpha = 0.38f)
+}
 
 fun Color.applyOpacity(enabled: Boolean): Color {
     return if (enabled) this else this.copy(alpha = 0.62f)
@@ -41,7 +46,6 @@ private tailrec fun Context.findWindow(): Window? =
 @Composable
 fun TokushoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     isHighContrastModeEnabled: Boolean = false,
     isDynamicColorEnabled: Boolean = false,
     content: @Composable () -> Unit
@@ -71,7 +75,7 @@ fun TokushoTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = Typography,
+            typography = Typography(LocalContext.current),
             content = content
         )
     }
@@ -83,7 +87,7 @@ fun PreviewThemeLight(
 ) {
     MaterialTheme(
         colorScheme = dynamicColorScheme(),
-        typography = Typography,
+        typography = Typography(LocalContext.current),
         content = content
     )
 }

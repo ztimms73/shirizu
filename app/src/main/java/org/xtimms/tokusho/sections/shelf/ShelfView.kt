@@ -11,54 +11,63 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.collapsable
+import org.xtimms.tokusho.core.components.PullRefresh
 import org.xtimms.tokusho.core.model.FavouriteCategory
 import org.xtimms.tokusho.core.model.ShelfCategory
+import kotlin.time.Duration.Companion.seconds
 
 const val SHELF_DESTINATION = "shelf"
 
 @Composable
 fun ShelfView(
+    coil: ImageLoader,
     currentPage: () -> Int,
     showPageTabs: Boolean,
-    getNumberOfMangaForCategory: (FavouriteCategory) -> Int?,
-    getLibraryForPage: (Int) -> List<ShelfItem>,
     topBarHeightPx: Float,
     padding: PaddingValues,
+    navigateToDetails: (Long) -> Unit,
+    onRefresh: (FavouriteTabModel?) -> Boolean,
 ) {
-    val viewModel: ShelfViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ShelfViewContent(
-        uiState = uiState,
+        coil = coil,
         currentPage = currentPage,
         showPageTabs = showPageTabs,
-        getNumberOfMangaForCategory = getNumberOfMangaForCategory,
-        getLibraryForPage = getLibraryForPage,
         topBarHeightPx = topBarHeightPx,
-        padding = padding
+        padding = padding,
+        navigateToDetails = navigateToDetails,
+        onRefresh = onRefresh
     )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShelfViewContent(
-    uiState: ShelfUiState,
+    coil: ImageLoader,
+    viewModel: ShelfViewModel = hiltViewModel(),
     currentPage: () -> Int,
     showPageTabs: Boolean,
-    getNumberOfMangaForCategory: (FavouriteCategory) -> Int?,
-    getLibraryForPage: (Int) -> List<ShelfItem>,
     topBarHeightPx: Float,
     topBarOffsetY: Animatable<Float, AnimationVector1D> = Animatable(0f),
     padding: PaddingValues,
+    navigateToDetails: (Long) -> Unit,
+    onRefresh: (FavouriteTabModel?) -> Boolean,
 ) {
     val scrollState = rememberScrollState()
+
+    val categories by viewModel.categories.collectAsStateWithLifecycle(emptyList())
+    val mangas by viewModel.mangas.collectAsStateWithLifecycle(emptyList())
 
     Column(
         modifier = Modifier
@@ -69,31 +78,46 @@ fun ShelfViewContent(
             )
             .padding(padding)
     ) {
-        val coercedCurrentPage = remember { currentPage().coerceAtMost(uiState.categories.lastIndex) }
-        val pagerState = rememberPagerState(coercedCurrentPage) { uiState.categories.size }
+        val pagerState = rememberPagerState(0) { categories.size }
         val scope = rememberCoroutineScope()
-        if (showPageTabs && uiState.categories.size > 1) {
-            LaunchedEffect(uiState.categories) {
-                if (uiState.categories.size <= pagerState.currentPage) {
-                    pagerState.scrollToPage(uiState.categories.size - 1)
-                }
+
+        var isRefreshing by remember(pagerState.currentPage) { mutableStateOf(false) }
+
+        if (categories.isNotEmpty()) {
+            if (showPageTabs) {
+                ShelfTabs(
+                    categories = categories,
+                    pagerState = pagerState,
+                ) { scope.launch { pagerState.animateScrollToPage(it) } }
             }
-            ShelfTabs(
-                categories = uiState.categories,
-                pagerState = pagerState,
-                getNumberOfMangaForCategory = getNumberOfMangaForCategory,
-            ) { scope.launch { pagerState.animateScrollToPage(it) } }
         }
 
-        ShelfPager(
-            state = pagerState,
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
-            hasActiveFilters = false,
-            searchQuery = "",
-            onGlobalSearchClicked = {  },
-            getLibraryForPage = getLibraryForPage,
-        )
+        val onClickManga = { manga: ShelfManga ->
+            navigateToDetails(manga.id)
+        }
+
+        PullRefresh(
+            refreshing = isRefreshing,
+            onRefresh = {
+                val started = onRefresh(categories[currentPage()])
+                if (!started) return@PullRefresh
+                scope.launch {
+                    // Fake refresh status but hide it after a second as it's a long running task
+                    isRefreshing = true
+                    delay(1.seconds)
+                    isRefreshing = false
+                }
+            },
+            enabled = { true }
+        ) {
+            ShelfPager(
+                coil = coil,
+                state = pagerState,
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
+                searchQuery = "",
+                getShelfForPage = { mangas },
+                navigateToDetails = onClickManga
+            )
+        }
     }
 }
-
-typealias ShelfMap = Map<ShelfCategory, List<ShelfItem>>

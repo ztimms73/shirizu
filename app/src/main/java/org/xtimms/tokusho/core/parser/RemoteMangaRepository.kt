@@ -24,10 +24,12 @@ import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
+import org.koitharu.kotatsu.parsers.util.domain
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.xtimms.tokusho.BuildConfig
 import org.xtimms.tokusho.core.cache.ContentCache
 import org.xtimms.tokusho.core.cache.SafeDeferred
+import org.xtimms.tokusho.core.prefs.SourceSettings
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 import java.util.Locale
 
@@ -57,6 +59,12 @@ class RemoteMangaRepository(
 
     override val isTagsExclusionSupported: Boolean
         get() = parser.isTagsExclusionSupported
+
+    var domain: String
+        get() = parser.domain
+        set(value) {
+            getConfig()[parser.configKeyDomain] = value
+        }
 
     val domains: Array<out String>
         get() = parser.configKeyDomain.presetValues
@@ -118,6 +126,8 @@ class RemoteMangaRepository(
         }
         return details.await()
     }
+
+    private fun getConfig() = parser.config as SourceSettings
 
     @OptIn(ExperimentalStdlibApi::class)
     private suspend fun <T> asyncSafe(block: suspend CoroutineScope.() -> T): SafeDeferred<T> {

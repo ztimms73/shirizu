@@ -2,76 +2,68 @@ package org.xtimms.tokusho.sections.explore
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.ExtensionOff
 import androidx.compose.material.icons.outlined.SdStorage
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
-import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.ExploreButton
+import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.SourceItem
 import org.xtimms.tokusho.core.components.icons.Dice
-import org.xtimms.tokusho.core.parser.favicon.faviconUri
-import org.xtimms.tokusho.utils.system.toast
+import org.xtimms.tokusho.ui.theme.TokushoTheme
 
 const val EXPLORE_DESTINATION = "explore"
 
 @Composable
 fun ExploreView(
+    viewModel: ExploreViewModel = hiltViewModel(),
     coil: ImageLoader,
-    navigateToSource: (MangaSource) -> Unit,
-    topBarHeightPx: Float,
-    listState: LazyGridState,
-    padding: PaddingValues,
-) {
-    val viewModel: ExploreViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    ExploreViewContent(
-        coil = coil,
-        navigateToSource = navigateToSource,
-        uiState = uiState,
-        event = viewModel,
-        topBarHeightPx = topBarHeightPx,
-        listState = listState,
-        padding = padding
-    )
-}
-
-@Composable
-fun ExploreViewContent(
-    coil: ImageLoader,
-    navigateToSource: (MangaSource) -> Unit,
-    uiState: ExploreUiState,
-    event: ExploreEvent?,
+    navigateToSource: (SourceItemModel) -> Unit,
     nestedScrollConnection: NestedScrollConnection? = null,
     topBarHeightPx: Float = 0f,
     topBarOffsetY: Animatable<Float, AnimationVector1D> = Animatable(0f),
@@ -82,12 +74,7 @@ fun ExploreViewContent(
     val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
 
-    if (uiState.message != null) {
-        LaunchedEffect(uiState.message) {
-            context.toast(uiState.message)
-            event?.onMessageDisplayed()
-        }
-    }
+    val sources = viewModel.content.collectAsStateWithLifecycle(emptyList())
 
     Box(
         modifier = Modifier
@@ -104,7 +91,7 @@ fun ExploreViewContent(
                 else Modifier
             )
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 90.dp),
+            columns = GridCells.Fixed(4),
             modifier = listModifier,
             state = listState,
             contentPadding = PaddingValues(
@@ -154,9 +141,71 @@ fun ExploreViewContent(
                     )
                 }
             }
+            item(
+                span = { GridItemSpan(maxCurrentLineSpan) }
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .clip(MaterialTheme.shapes.extraLarge),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 4.dp),
+                            text = "Рекомендации",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(72.dp))
+                                    .aspectRatio(1f),
+                                contentScale = ContentScale.Crop,
+                                painter = painterResource(id = R.drawable.ookami),
+                                contentDescription = ""
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                            ) {
+                                Text(
+                                    text = "Text",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = "Text",
+                                    modifier = Modifier.padding(vertical = 2.dp),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                        Button(
+                            onClick = {},
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = "More")
+                        }
+                    }
+                }
+            }
             items(
-                items = uiState.sources,
-                key = { it.name },
+                items = sources.value,
+                key = { it.id },
                 contentType = { it }
             ) { item ->
                 Box(
@@ -165,12 +214,31 @@ fun ExploreViewContent(
                 ) {
                     SourceItem(
                         coil = coil,
-                        faviconUrl = item.faviconUri(),
+                        faviconUrl = item.favicon,
                         title = item.title
                     ) {
                         navigateToSource(item)
                     }
                 }
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun RecommendationPreview() {
+    TokushoTheme {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.manga_sources),
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.labelLarge
+            )
+            TextButton(onClick = { /*TODO*/ }) {
+                Text(text = stringResource(id = R.string.catalog))
             }
         }
     }

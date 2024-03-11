@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LightMode
+import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -65,6 +66,7 @@ import org.xtimms.tokusho.core.prefs.DarkThemePreference.Companion.ON
 import org.xtimms.tokusho.core.prefs.READING_TIME
 import org.xtimms.tokusho.core.prefs.STYLE_MONOCHROME
 import org.xtimms.tokusho.core.prefs.STYLE_TONAL_SPOT
+import org.xtimms.tokusho.core.prefs.TABS_MANGA_COUNT
 import org.xtimms.tokusho.core.prefs.paletteStyles
 import org.xtimms.tokusho.ui.harmonize.hct.Hct
 import org.xtimms.tokusho.ui.monet.LocalTonalPalettes
@@ -83,7 +85,6 @@ val colorList = ((4..10) + (1..3)).map { it * 35.0 }.map { Color(Hct.from(it, 40
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppearanceView(
-    coil: ImageLoader,
     navigateBack: () -> Unit,
     navigateToDarkTheme: () -> Unit,
     navigateToLanguages: () -> Unit

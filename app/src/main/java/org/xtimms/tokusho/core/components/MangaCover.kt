@@ -18,7 +18,7 @@ import org.xtimms.tokusho.core.AsyncImageImpl
 
 enum class MangaCover(val ratio: Float) {
     Square(1f / 1f),
-    Book(10f / 16f),
+    Book(2f / 3f),
     ;
 
     @Composable

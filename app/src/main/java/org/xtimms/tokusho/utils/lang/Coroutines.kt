@@ -3,70 +3,35 @@ package org.xtimms.tokusho.utils.lang
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.lifecycle.RetainedLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-/**
- * Think twice before using this. This is a delicate API. It is easy to accidentally create resource or memory leaks when GlobalScope is used.
- *
- * **Possible replacements**
- * - suspend function
- * - custom scope like view or presenter scope
- */
-@DelicateCoroutinesApi
-fun launchUI(block: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch(Dispatchers.Main, CoroutineStart.DEFAULT, block)
-
-/**
- * Think twice before using this. This is a delicate API. It is easy to accidentally create resource or memory leaks when GlobalScope is used.
- *
- * **Possible replacements**
- * - suspend function
- * - custom scope like view or presenter scope
- */
-@DelicateCoroutinesApi
-fun launchIO(block: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch(Dispatchers.IO, CoroutineStart.DEFAULT, block)
-
-/**
- * Think twice before using this. This is a delicate API. It is easy to accidentally create resource or memory leaks when GlobalScope is used.
- *
- * **Possible replacements**
- * - suspend function
- * - custom scope like view or presenter scope
- */
-@DelicateCoroutinesApi
-fun launchNow(block: suspend CoroutineScope.() -> Unit): Job =
-    GlobalScope.launch(Dispatchers.Main, CoroutineStart.UNDISPATCHED, block)
-
-fun CoroutineScope.launchUI(block: suspend CoroutineScope.() -> Unit): Job =
-    launch(Dispatchers.Main, block = block)
-
-fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit): Job =
-    launch(Dispatchers.IO, block = block)
-
-fun CoroutineScope.launchNonCancellable(block: suspend CoroutineScope.() -> Unit): Job =
-    launchIO { withContext(NonCancellable, block) }
-
-suspend fun <T> withUIContext(block: suspend CoroutineScope.() -> T) = withContext(
-    Dispatchers.Main,
-    block,
-)
-
-suspend fun <T> withIOContext(block: suspend CoroutineScope.() -> T) = withContext(
-    Dispatchers.IO,
-    block,
-)
+import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
+import org.xtimms.tokusho.utils.RetainedLifecycleCoroutineScope
 
 suspend fun <T> withNonCancellableContext(block: suspend CoroutineScope.() -> T) =
     withContext(NonCancellable, block)
 
 val processLifecycleScope: LifecycleCoroutineScope
     inline get() = ProcessLifecycleOwner.get().lifecycleScope
+
+val RetainedLifecycle.lifecycleScope: RetainedLifecycleCoroutineScope
+    inline get() = RetainedLifecycleCoroutineScope(this)
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun <T> Deferred<T>.peek(): T? = if (isCompleted) {
+    runCatchingCancellable {
+        getCompleted()
+    }.getOrNull()
+} else {
+    null
+}

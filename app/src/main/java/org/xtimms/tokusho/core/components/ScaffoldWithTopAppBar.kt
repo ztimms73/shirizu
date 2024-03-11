@@ -1,6 +1,7 @@
 package org.xtimms.tokusho.core.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -21,6 +22,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 fun ScaffoldWithTopAppBar(
     title: String,
     navigateBack: () -> Unit,
+    snackbarHost: @Composable (() -> Unit) = {},
     floatingActionButton: @Composable (() -> Unit) = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -40,6 +42,7 @@ fun ScaffoldWithTopAppBar(
                 navigateBack = navigateBack
             )
         },
+        snackbarHost = snackbarHost,
         floatingActionButton = floatingActionButton,
         contentWindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal),
         content = content
@@ -84,6 +87,7 @@ fun ScaffoldWithClassicTopAppBar(
     title: String,
     navigateBack: () -> Unit,
     floatingActionButton: @Composable (() -> Unit) = {},
+    actions: @Composable (RowScope.() -> Unit) = {},
     contentWindowInsets: WindowInsets = WindowInsets.systemBars,
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -99,6 +103,7 @@ fun ScaffoldWithClassicTopAppBar(
             ClassicTopAppBar(
                 title = title,
                 scrollBehavior = topAppBarScrollBehavior,
+                actions = actions,
                 navigateBack = navigateBack
             )
         },

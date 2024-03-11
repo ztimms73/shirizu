@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.xtimms.shiki.ui.theme.SEED
+import org.xtimms.tokusho.ui.theme.SEED
 import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.prefs.DarkThemePreference
 import org.xtimms.tokusho.core.prefs.paletteStyles

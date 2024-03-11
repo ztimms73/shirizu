@@ -2,9 +2,10 @@ package org.xtimms.tokusho.utils
 
 import android.content.Context
 import android.os.Build
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.xtimms.tokusho.BuildConfig
 import org.xtimms.tokusho.utils.lang.withNonCancellableContext
-import org.xtimms.tokusho.utils.lang.withUIContext
 import org.xtimms.tokusho.utils.system.createFileInCacheDir
 import org.xtimms.tokusho.utils.system.getUriCompat
 import org.xtimms.tokusho.utils.system.toShareIntent
@@ -25,7 +26,7 @@ class CrashLogUtil(
             val uri = file.getUriCompat(context)
             context.startActivity(uri.toShareIntent(context, "text/plain"))
         } catch (e: Throwable) {
-            withUIContext { context.toast("Failed to get logs") }
+            withContext(Dispatchers.IO) { context.toast("Failed to get logs") }
         }
     }
 

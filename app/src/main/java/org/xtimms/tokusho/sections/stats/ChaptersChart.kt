@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaSource
-import org.xtimms.shiki.ui.theme.colorMax
-import org.xtimms.shiki.ui.theme.colorMin
+import org.xtimms.tokusho.ui.theme.colorMax
+import org.xtimms.tokusho.ui.theme.colorMin
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 import org.xtimms.tokusho.utils.material.combineColors
 import org.xtimms.tokusho.utils.material.harmonize

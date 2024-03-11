@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.DeveloperBoard
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material.icons.outlined.UpdateDisabled
@@ -40,6 +41,7 @@ const val weblate = "https://hosted.weblate.org/engage/tokusho/"
 @Composable
 fun AboutView(
     navigateBack: () -> Unit,
+    navigateToLicensesPage: () -> Unit,
     navigateToUpdatePage: () -> Unit,
 ) {
 
@@ -93,6 +95,14 @@ fun AboutView(
                 ) {
                     clipboardManager.setText(AnnotatedString(info))
                     context.toast(R.string.info_copied)
+                }
+            }
+            item {
+                PreferenceItem(
+                    title = stringResource(id = R.string.open_source_licenses),
+                    icon = Icons.Outlined.DeveloperBoard
+                ) {
+                    navigateToLicensesPage()
                 }
             }
         }

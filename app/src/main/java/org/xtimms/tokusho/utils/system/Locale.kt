@@ -44,3 +44,22 @@ private const val RUSSIAN = 2
 val languageMap: Map<Int, String> = mapOf(
     RUSSIAN to "ru",
 )
+
+operator fun LocaleListCompat.iterator(): ListIterator<Locale> = LocaleListCompatIterator(this)
+
+private class LocaleListCompatIterator(private val list: LocaleListCompat) : ListIterator<Locale> {
+
+    private var index = 0
+
+    override fun hasNext() = index < list.size()
+
+    override fun hasPrevious() = index > 0
+
+    override fun next() = list.get(index++) ?: throw NoSuchElementException()
+
+    override fun nextIndex() = index
+
+    override fun previous() = list.get(--index) ?: throw NoSuchElementException()
+
+    override fun previousIndex() = index - 1
+}

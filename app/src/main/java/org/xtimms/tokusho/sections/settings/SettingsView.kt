@@ -22,12 +22,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BatterySaver
 import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.CollectionsBookmark
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.SettingsBackupRestore
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.Wifi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,60 +44,30 @@ import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.core.components.SettingItem
-import org.xtimms.tokusho.sections.settings.storage.StorageEvent
-import org.xtimms.tokusho.sections.settings.storage.StorageUiState
-import org.xtimms.tokusho.sections.settings.storage.StorageViewModel
 import org.xtimms.tokusho.utils.FileSize
-import org.xtimms.tokusho.utils.system.toast
 
 const val SETTINGS_DESTINATION = "settings"
 
-@Composable
-fun SettingsView(
-    navigateBack: () -> Unit,
-    navigateToAppearance: () -> Unit,
-    navigateToAbout: () -> Unit,
-    navigateToAdvanced: () -> Unit,
-    navigateToShelfSettings: () -> Unit,
-    navigateToStorage: () -> Unit
-) {
-
-    val viewModel: StorageViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    SettingsViewContent(
-        uiState = uiState,
-        event = viewModel,
-        navigateBack = navigateBack,
-        navigateToAppearance = navigateToAppearance,
-        navigateToAbout = navigateToAbout,
-        navigateToAdvanced = navigateToAdvanced,
-        navigateToShelfSettings = navigateToShelfSettings,
-        navigateToStorage = navigateToStorage
-    )
-}
-
 @SuppressLint("BatteryLife")
 @Composable
-private fun SettingsViewContent(
-    uiState: StorageUiState,
-    event: StorageEvent?,
+fun SettingsView(
+    viewModel: SettingsViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
     navigateToAppearance: () -> Unit,
     navigateToAbout: () -> Unit,
     navigateToAdvanced: () -> Unit,
+    navigateToBackupRestoreSettings: () -> Unit,
+    navigateToMangaSources: () -> Unit,
+    navigateToNetwork: () -> Unit,
     navigateToShelfSettings: () -> Unit,
     navigateToStorage: () -> Unit
 ) {
 
     val context = LocalContext.current
 
-    if (uiState.message != null) {
-        LaunchedEffect(uiState.message) {
-            context.toast(uiState.message)
-            event?.onMessageDisplayed()
-        }
-    }
+    val state by viewModel.viewStateFlow.collectAsState()
+    val total = viewModel.totalSourcesCount
+    val enabled = viewModel.enabledSourcesCount.collectAsStateWithLifecycle()
 
     val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
     var showBatteryHint by remember {
@@ -157,6 +130,18 @@ private fun SettingsViewContent(
             }
             item {
                 SettingItem(
+                    title = stringResource(id = R.string.manga_sources),
+                    description = if (enabled.value >= 0) stringResource(
+                        id = R.string.enabled_d_of_d,
+                        enabled.value,
+                        total
+                    ) else context.resources.getQuantityString(R.plurals.items, total, total),
+                    icon = Icons.Outlined.CollectionsBookmark,
+                    onClick = navigateToMangaSources
+                )
+            }
+            item {
+                SettingItem(
                     title = stringResource(id = R.string.nav_shelf),
                     description = stringResource(id = R.string.shelf_page),
                     icon = Icons.Outlined.LocalLibrary,
@@ -164,26 +149,42 @@ private fun SettingsViewContent(
                 )
             }
             item {
-                val allCaches = uiState.httpCacheSize +
-                        uiState.pagesCache +
-                        uiState.thumbnailsCache
+                SettingItem(
+                    title = stringResource(id = R.string.backup_and_restore),
+                    description = "TODO",
+                    icon = Icons.Outlined.SettingsBackupRestore,
+                    onClick = navigateToBackupRestoreSettings
+                )
+            }
+            item {
+                SettingItem(
+                    title = stringResource(id = R.string.network),
+                    description = stringResource(id = R.string.network_page),
+                    icon = Icons.Outlined.Wifi,
+                    onClick = navigateToNetwork
+                )
+            }
+            item {
+                val allCaches = state.httpCacheSize +
+                        state.pagesCache +
+                        state.thumbnailsCache
                 val desc = buildString {
-                    append((allCaches / uiState.availableSpace) * 100)
+                    append((allCaches / state.availableSpace) * 100)
                     append(context.getString(R.string.space_used))
                     append(" - ")
                     append(
                         FileSize.BYTES.freeFormat(
                             context,
-                            (uiState.availableSpace -
-                                    uiState.httpCacheSize -
-                                    uiState.pagesCache -
-                                    uiState.thumbnailsCache).toFloat()
+                            (state.availableSpace -
+                                    state.httpCacheSize -
+                                    state.pagesCache -
+                                    state.thumbnailsCache).toFloat()
                         )
                     )
                 }
                 SettingItem(
                     title = stringResource(id = R.string.storage),
-                    description = if (uiState.isLoading) context.getString(R.string.calculating_) else desc,
+                    description = desc,
                     icon = Icons.Outlined.Storage,
                     onClick = navigateToStorage
                 )

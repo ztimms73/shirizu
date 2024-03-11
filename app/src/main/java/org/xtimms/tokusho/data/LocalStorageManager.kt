@@ -59,6 +59,28 @@ class LocalStorageManager @Inject constructor(
         getCacheDirs(cache.dir).forEach { it.deleteRecursively() }
     }
 
+    suspend fun getReadableDirs(): List<File> = runInterruptible(Dispatchers.IO) {
+        getConfiguredStorageDirs()
+            .filter { it.isReadable() }
+    }
+
+    suspend fun getWriteableDirs(): List<File> = runInterruptible(Dispatchers.IO) {
+        getConfiguredStorageDirs()
+            .filter { it.isWriteable() }
+    }
+
+    suspend fun getDefaultWriteableDir(): File? = runInterruptible(Dispatchers.IO) {
+        val preferredDir = context.filesDir?.takeIf { it.isWriteable() }
+        preferredDir ?: getFallbackStorageDir()?.takeIf { it.isWriteable() }
+    }
+
+    @WorkerThread
+    private fun getConfiguredStorageDirs(): MutableSet<File> {
+        val set = getAvailableStorageDirs()
+        set.addAll(setOf(context.filesDir))
+        return set
+    }
+
     @WorkerThread
     private fun getAvailableStorageDirs(): MutableSet<File> {
         val result = LinkedHashSet<File>()
@@ -103,4 +125,11 @@ class LocalStorageManager @Inject constructor(
         }
     }
 
+    private fun File.isReadable() = runCatching {
+        canRead()
+    }.getOrDefault(false)
+
+    private fun File.isWriteable() = runCatching {
+        canWrite()
+    }.getOrDefault(false)
 }

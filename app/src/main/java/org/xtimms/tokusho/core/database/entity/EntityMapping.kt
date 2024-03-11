@@ -6,6 +6,7 @@ import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.koitharu.kotatsu.parsers.util.mapToSet
 import org.koitharu.kotatsu.parsers.util.toTitleCase
+import org.xtimms.tokusho.core.model.Bookmark
 import org.xtimms.tokusho.core.model.FavouriteCategory
 import org.xtimms.tokusho.core.model.ListSortOrder
 import org.xtimms.tokusho.core.model.MangaHistory
@@ -58,6 +59,24 @@ fun FavouriteManga.toManga() = manga.toManga(tags.toMangaTags())
 
 fun Collection<FavouriteManga>.toMangaList() = map { it.toManga() }
 
+fun BookmarkEntity.toBookmark(manga: Manga) = Bookmark(
+    manga = manga,
+    pageId = pageId,
+    chapterId = chapterId,
+    page = page,
+    scroll = scroll,
+    imageUrl = imageUrl,
+    createdAt = Instant.ofEpochMilli(createdAt),
+    percent = percent,
+)
+
+fun Collection<BookmarkEntity>.toBookmarks(manga: Manga) = map {
+    it.toBookmark(manga)
+}
+
+@JvmName("bookmarksIds")
+fun Collection<Bookmark>.ids() = map { it.pageId }
+
 // Model to entity
 
 fun Manga.toEntity() = MangaEntity(
@@ -83,6 +102,17 @@ fun MangaTag.toEntity() = TagEntity(
 )
 
 fun Collection<MangaTag>.toEntities() = map(MangaTag::toEntity)
+
+fun Bookmark.toEntity() = BookmarkEntity(
+    mangaId = manga.id,
+    pageId = pageId,
+    chapterId = chapterId,
+    page = page,
+    scroll = scroll,
+    imageUrl = imageUrl,
+    createdAt = createdAt.toEpochMilli(),
+    percent = percent,
+)
 
 // Other
 

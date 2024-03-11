@@ -26,3 +26,8 @@ fun CharSequence.sanitize(): CharSequence {
 }
 
 fun Char.isReplacement() = this in '\uFFF0'..'\uFFFF'
+
+fun Float?.toStringPositiveValueOrUnknown() =
+    if (this == 0f) "─" else this.toStringOrUnknown()
+
+fun Float?.toStringOrUnknown() = this?.toString() ?: "─"

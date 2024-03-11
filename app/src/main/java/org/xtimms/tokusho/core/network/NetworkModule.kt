@@ -15,9 +15,11 @@ import org.xtimms.tokusho.core.network.cookies.AndroidCookieJar
 import org.xtimms.tokusho.core.network.cookies.MutableCookieJar
 import org.xtimms.tokusho.core.network.cookies.PreferencesCookieJar
 import org.xtimms.tokusho.core.network.interceptors.CacheLimitInterceptor
+import org.xtimms.tokusho.core.network.interceptors.CloudflareInterceptor
 import org.xtimms.tokusho.core.network.interceptors.CommonHeadersInterceptor
 import org.xtimms.tokusho.core.network.interceptors.GZipInterceptor
 import org.xtimms.tokusho.core.network.interceptors.RateLimitInterceptor
+import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.data.LocalStorageManager
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -58,8 +60,12 @@ interface NetworkModule {
             readTimeout(60, TimeUnit.SECONDS)
             writeTimeout(20, TimeUnit.SECONDS)
             cookieJar(cookieJar)
+            if (AppSettings.isSSLBypassEnabled()) {
+                bypassSSLErrors()
+            }
             cache(cache)
             addInterceptor(GZipInterceptor())
+            addInterceptor(CloudflareInterceptor())
             addInterceptor(RateLimitInterceptor())
         }.build()
 

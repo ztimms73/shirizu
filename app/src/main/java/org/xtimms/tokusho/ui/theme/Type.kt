@@ -1,5 +1,6 @@
 package org.xtimms.tokusho.ui.theme
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,30 +13,89 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-)
+fun Typography(context: Context): Typography {
 
-val preferenceTitle = TextStyle(
-    fontFamily = FontFamily.Default,
-    fontWeight = FontWeight.Normal,
-    fontSize = 20.sp, lineHeight = 24.sp,
-    lineBreak = LineBreak.Paragraph,
-)
+    fun getFont(weight: Int) = FontFamily(
+        Font(
+            "font/manrope_variable.ttf", context.assets,
+            variationSettings = FontVariation.Settings(
+                FontVariation.weight(weight),
+            ),
+        )
+    )
+
+    return Typography(
+        displayLarge = TextStyle(
+            fontFamily = getFont(650),
+            fontSize = 57.sp
+        ),
+        displayMedium = TextStyle(
+            fontFamily = getFont(900),
+            fontSize = 45.sp
+        ),
+        displaySmall = TextStyle(
+            fontFamily = getFont(800),
+            fontSize = 22.sp
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = getFont(800),
+            fontSize = 36.sp
+        ),
+        headlineMedium = TextStyle(
+            fontFamily = getFont(700),
+            fontSize = 28.sp
+        ),
+        headlineSmall = TextStyle(
+            fontFamily = getFont(650),
+            fontSize = 24.sp
+        ),
+        titleLarge = TextStyle(
+            fontFamily = getFont(700),
+            fontSize = 22.sp
+        ),
+        titleMedium = TextStyle(
+            fontFamily = getFont(600),
+            fontSize = 16.sp
+        ),
+        titleSmall = TextStyle(
+            fontFamily = getFont(650),
+            fontSize = 14.sp
+        ),
+        bodyLarge = TextStyle(
+            fontFamily = getFont(700),
+            fontSize = 16.sp
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = getFont(600),
+            fontSize = 14.sp
+        ),
+        bodySmall = TextStyle(
+            fontFamily = getFont(500),
+            fontSize = 14.sp
+        ),
+        labelLarge = TextStyle(
+            fontFamily = getFont(700),
+            fontSize = 14.sp
+        ),
+        labelMedium = TextStyle(
+            fontFamily = getFont(700),
+            fontSize = 12.sp
+        ),
+        labelSmall = TextStyle(
+            fontFamily = getFont(600),
+            fontSize = 11.sp
+        )
+    )
+}
 
 @Composable
 fun FontCard(family: String, size: String, style: TextStyle) {

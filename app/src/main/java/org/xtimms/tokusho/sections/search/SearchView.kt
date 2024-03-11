@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -102,7 +104,11 @@ fun SearchView(
 ) {
     val context = LocalContext.current
 
-    EmptyScreen(title = R.string.nothing_here)
+    EmptyScreen(
+        icon = Icons.Outlined.SearchOff,
+        title = R.string.nothing_found,
+        description = R.string.nothing_found_summary
+    )
 }
 
 @Preview(showBackground = true)

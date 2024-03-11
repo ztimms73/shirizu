@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -28,6 +30,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -42,11 +46,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.collections.immutable.persistentListOf
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.initialOffset
 import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
 import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
 import org.xtimms.tokusho.sections.explore.EXPLORE_DESTINATION
+import org.xtimms.tokusho.sections.feed.FEED_DESTINATION
 import org.xtimms.tokusho.sections.history.HISTORY_DESTINATION
 import org.xtimms.tokusho.sections.search.SEARCH_DESTINATION
 import org.xtimms.tokusho.sections.settings.SETTINGS_DESTINATION
@@ -124,7 +130,7 @@ fun TopAppBar(
                 modifier = modifier.padding(end = 16.dp),
             ) {
                 IconButton(
-                    onClick = { },
+                    onClick = { navController.navigate(FEED_DESTINATION) },
                     modifier = Modifier.padding(0.dp),
                 ) {
                     Icon(
@@ -218,6 +224,7 @@ fun SmallTopAppBar(
 fun ClassicTopAppBar(
     title: String,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    actions: @Composable (RowScope.() -> Unit),
     navigateBack: () -> Unit,
 ) {
     androidx.compose.material3.TopAppBar(
@@ -225,6 +232,7 @@ fun ClassicTopAppBar(
         navigationIcon = {
             BackIconButton(onClick = navigateBack)
         },
+        actions = actions,
         scrollBehavior = scrollBehavior
     )
 }
@@ -248,7 +256,16 @@ fun DefaultTopAppBarWithChipsPreview() {
     TokushoTheme {
         SmallTopAppBarWithChips(
             title = "Tokusho",
-            chips = listOf("Chip 1", "Chip 2", "Chip 3", "Chip 4", "Chip 1", "Chip 2", "Chip 3", "Chip 4"),
+            chips = listOf(
+                "Chip 1",
+                "Chip 2",
+                "Chip 3",
+                "Chip 4",
+                "Chip 1",
+                "Chip 2",
+                "Chip 3",
+                "Chip 4"
+            ),
             navigateBack = {}
         )
     }
@@ -273,7 +290,15 @@ fun ClassicTopAppBarPreview() {
     TokushoTheme {
         ClassicTopAppBar(
             title = "Tokusho",
-            navigateBack = {}
+            navigateBack = {},
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Localized description"
+                    )
+                }
+            }
         )
     }
 }

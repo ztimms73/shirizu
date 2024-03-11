@@ -7,14 +7,19 @@ import android.text.style.ForegroundColorSpan
 import androidx.core.text.getSpans
 import androidx.core.text.parseAsHtml
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.runInterruptible
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
+import org.xtimms.tokusho.core.model.isLocal
 import org.xtimms.tokusho.core.parser.MangaDataRepository
+import org.xtimms.tokusho.core.parser.MangaIntent
 import org.xtimms.tokusho.core.parser.MangaRepository
+import org.xtimms.tokusho.core.parser.local.LocalMangaRepository
 import org.xtimms.tokusho.sections.details.data.MangaDetails
+import org.xtimms.tokusho.utils.lang.peek
 import org.xtimms.tokusho.utils.lang.sanitize
 import java.io.IOException
 import javax.inject.Inject
@@ -22,6 +27,7 @@ import javax.inject.Inject
 class DetailsLoadUseCase @Inject constructor(
     private val mangaRepositoryFactory: MangaRepository.Factory,
     private val mangaDataRepository: MangaDataRepository,
+    private val localMangaRepository: LocalMangaRepository,
     private val imageGetter: Html.ImageGetter,
 ) {
 
@@ -29,11 +35,18 @@ class DetailsLoadUseCase @Inject constructor(
         val manga = requireNotNull(mangaDataRepository.findMangaById(mangaId)) {
             "Cannot resolve id $mangaId"
         }
-        send(MangaDetails(manga, null, false))
+        val local = if (!manga.isLocal) {
+            async {
+                localMangaRepository.findSavedManga(manga)
+            }
+        } else {
+            null
+        }
+        send(MangaDetails(manga, null, null, false))
         try {
             val details = getDetails(manga)
-            send(MangaDetails(details, details.description?.parseAsHtml(withImages = false), false))
-            send(MangaDetails(details, details.description?.parseAsHtml(withImages = true), true))
+            send(MangaDetails(details, local?.peek(), details.description?.parseAsHtml(withImages = false), false))
+            send(MangaDetails(details, local?.await(), details.description?.parseAsHtml(withImages = true), true))
         } catch (e: IOException) {
             throw e
         }

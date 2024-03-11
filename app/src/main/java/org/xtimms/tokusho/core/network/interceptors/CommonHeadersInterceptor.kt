@@ -13,6 +13,7 @@ import org.xtimms.tokusho.BuildConfig
 import org.xtimms.tokusho.core.network.CommonHeaders
 import org.xtimms.tokusho.core.parser.MangaRepository
 import org.xtimms.tokusho.core.parser.RemoteMangaRepository
+import java.net.IDN
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,6 +40,10 @@ class CommonHeadersInterceptor @Inject constructor(
         if (headersBuilder[CommonHeaders.USER_AGENT] == null) {
             headersBuilder[CommonHeaders.USER_AGENT] = UserAgents.CHROME_MOBILE
         }
+        if (headersBuilder[CommonHeaders.REFERER] == null && repository != null) {
+            val idn = IDN.toASCII(repository.domain)
+            headersBuilder.trySet(CommonHeaders.REFERER, "https://$idn/")
+        }
         val newRequest = request.newBuilder().headers(headersBuilder.build()).build()
         return repository?.intercept(ProxyChain(chain, newRequest)) ?: chain.proceed(newRequest)
     }
@@ -46,7 +51,7 @@ class CommonHeadersInterceptor @Inject constructor(
     private fun Headers.Builder.trySet(name: String, value: String) = try {
         set(name, value)
     } catch (e: IllegalArgumentException) {
-
+        e.printStackTrace()
     }
 
     private class ProxyChain(

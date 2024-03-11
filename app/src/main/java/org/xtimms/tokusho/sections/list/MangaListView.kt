@@ -1,14 +1,18 @@
 package org.xtimms.tokusho.sections.list
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -30,7 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
-import org.xtimms.tokusho.core.components.MangaCompactGridItem
+import org.xtimms.tokusho.core.components.MangaGridItem
 import org.xtimms.tokusho.core.components.ScaffoldWithSmallTopAppBarWithChips
 import org.xtimms.tokusho.utils.composable.onBottomReached
 import org.xtimms.tokusho.utils.system.toast
@@ -78,7 +82,16 @@ private fun MangaListViewContent(
 
     ScaffoldWithSmallTopAppBarWithChips(
         title = source.title,
-        chips = listOf("Chip 1", "Chip 2", "Chip 3", "Chip 4", "Chip 1", "Chip 2", "Chip 3", "Chip 4"),
+        chips = listOf(
+            "Chip 1",
+            "Chip 2",
+            "Chip 3",
+            "Chip 4",
+            "Chip 1",
+            "Chip 2",
+            "Chip 3",
+            "Chip 4"
+        ),
         navigateBack = navigateBack,
         contentWindowInsets = WindowInsets.systemBars
             .only(WindowInsetsSides.Horizontal)
@@ -87,45 +100,59 @@ private fun MangaListViewContent(
         listState.onBottomReached(buffer = 5) {
             event?.loadMore()
         }
-        Column(
+        Box(
             modifier = Modifier
                 .padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
-            if (!uiState.isLoading) LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 100.dp),
-                state = listState,
-                modifier = Modifier.fillMaxHeight(),
-                contentPadding = PaddingValues(
-                    start = 8.dp,
-                    top = 8.dp,
-                    end = 8.dp,
-                    bottom = WindowInsets.navigationBars.asPaddingValues()
-                        .calculateBottomPadding()
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+            AnimatedVisibility(
+                visible = uiState.isLoading,
+                exit = fadeOut(),
             ) {
-                items(
-                    items = uiState.manga,
-                    key = { it.id },
-                    contentType = { it }
-                ) { item ->
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        MangaCompactGridItem(
-                            coil = coil,
-                            imageUrl = item.coverUrl,
-                            title = item.title,
-                            onClick = { navigateToDetails(item.id) },
-                            onLongClick = { },
-                        )
+                CircularProgressIndicator()
+            }
+            AnimatedVisibility(
+                visible = !uiState.isLoading,
+                enter = slideInVertically(tween(500)) { 64 } + fadeIn(),
+                exit = fadeOut()
+            ) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 100.dp),
+                    state = listState,
+                    modifier = Modifier.fillMaxHeight(),
+                    contentPadding = PaddingValues(
+                        start = 8.dp,
+                        top = 8.dp,
+                        end = 8.dp,
+                        bottom = WindowInsets.navigationBars.asPaddingValues()
+                            .calculateBottomPadding()
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        8.dp,
+                        Alignment.CenterHorizontally
+                    ),
+                ) {
+                    items(
+                        items = uiState.manga,
+                        key = { it.id },
+                        contentType = { it }
+                    ) { item ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            MangaGridItem(
+                                coil = coil,
+                                manga = item,
+                                onClick = {
+                                    navigateToDetails(item.id)
+                                },
+                                onLongClick = { },
+                            )
+                        }
                     }
                 }
-            } else Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
             }
         }
     }

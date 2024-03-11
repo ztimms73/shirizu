@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
-import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +21,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaSource
-import org.xtimms.shiki.ui.theme.colorMax
-import org.xtimms.shiki.ui.theme.colorMin
+import org.xtimms.tokusho.ui.theme.colorMax
+import org.xtimms.tokusho.ui.theme.colorMin
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.utils.material.combineColors
 import org.xtimms.tokusho.utils.material.harmonize
 import org.xtimms.tokusho.utils.material.toPalette
-import java.math.BigDecimal
 
 @Composable
 fun MinMaxReadCard(

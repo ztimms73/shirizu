@@ -20,3 +20,6 @@ inline val String.intState
     @Composable get() = remember {
         mutableIntStateOf(this.getInt())
     }
+
+// clamp(3.5f, 6.7f) > [0.0f, 1.0f]
+fun Float.clamp(min: Float, max: Float): Float = (1f - ((this.coerceIn(min, max) - min) / (max - min)))

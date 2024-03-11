@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.xtimms.shiki.ui.theme.SEED
+import org.xtimms.tokusho.ui.theme.SEED
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.ui.monet.PaletteStyle
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
@@ -35,6 +35,10 @@ const val PRE_RELEASE = 1
 
 const val ACRA = "acra"
 const val LOGGING = "logging"
+
+const val SSL_BYPASS = "ssl_bypass"
+const val NSFW = "nsfw"
+const val TABS_MANGA_COUNT = "tabs_manga_count"
 
 val paletteStyles = listOf(
     PaletteStyle.TonalSpot,
@@ -91,11 +95,17 @@ object AppSettings {
 
     fun isAutoUpdateEnabled() = AUTO_UPDATE.getBoolean(false)
 
-    fun isACRAEnabled() = ACRA.getBoolean(false)
+    fun isACRAEnabled() = ACRA.getBoolean(true)
 
     fun isLoggingEnabled() = LOGGING.getBoolean(false)
 
     fun isReadingTimeEstimationEnabled() = READING_TIME.getBoolean(true)
+
+    fun isNSFWEnabled() = NSFW.getBoolean(false)
+
+    fun isSSLBypassEnabled() = SSL_BYPASS.getBoolean(false)
+
+    fun isMangaCountInTabsEnabled() = TABS_MANGA_COUNT.getBoolean(false)
 
     fun getLanguageConfiguration(languageNumber: Int = kv.decodeInt(LANGUAGE)) =
         languageMap.getOrElse(languageNumber) { "" }

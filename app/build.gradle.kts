@@ -11,6 +11,7 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("com.google.devtools.ksp")
+    id("com.mikepenz.aboutlibraries.plugin")
     id("dagger.hilt.android.plugin")
 }
 
@@ -36,7 +37,7 @@ android {
         buildConfigField("String", "ACRA_AUTH_LOGIN", acraAuthLogin)
         buildConfigField("String", "ACRA_AUTH_PASSWORD", acraAuthPassword)
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "org.xtimms.tokusho.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -85,20 +86,22 @@ android {
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-process:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2024.01.00"))
+    implementation(platform("dev.chrisbanes.compose:compose-bom:2024.02.00-alpha02"))
     implementation("androidx.compose.animation:animation-graphics")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material-icons-extended:1.6.0")
-    implementation("androidx.compose.material3:material3-android:1.2.0")
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")
+    implementation("androidx.compose.material3:material3-android:1.2.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -112,12 +115,15 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.32.0")
     implementation("com.google.dagger:hilt-android:2.50")
     kapt("com.google.dagger:hilt-compiler:2.50")
-    implementation("androidx.hilt:hilt-work:1.1.0")
-    kapt("androidx.hilt:hilt-compiler:1.1.0")
-    implementation("com.github.KotatsuApp:kotatsu-parsers:a8f9423307")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("com.github.KotatsuApp:kotatsu-parsers:3ff028c4e9") {
+        exclude(group = "org.json", module = "json")
+    }
+    implementation("com.mikepenz:aboutlibraries-compose-m3:10.10.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0")
-    implementation("com.squareup.okio:okio:3.7.0")
+    implementation("com.squareup.okio:okio:3.8.0")
     implementation("com.tencent:mmkv:1.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
@@ -128,6 +134,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.50")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.50")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

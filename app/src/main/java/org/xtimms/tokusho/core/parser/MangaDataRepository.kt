@@ -1,8 +1,11 @@
 package org.xtimms.tokusho.core.parser
 
+import androidx.room.withTransaction
 import dagger.Reusable
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.xtimms.tokusho.core.database.TokushoDatabase
+import org.xtimms.tokusho.core.database.entity.toEntities
+import org.xtimms.tokusho.core.database.entity.toEntity
 import org.xtimms.tokusho.core.database.entity.toManga
 import javax.inject.Inject
 import javax.inject.Provider
@@ -26,6 +29,14 @@ class MangaDataRepository @Inject constructor(
         intent.mangaId != 0L -> findMangaById(intent.mangaId)
         intent.uri != null -> resolverProvider.get().resolve(intent.uri)
         else -> null
+    }
+
+    suspend fun storeManga(manga: Manga) {
+        db.withTransaction {
+            val tags = manga.tags.toEntities()
+            db.getTagsDao().upsert(tags)
+            db.getMangaDao().upsert(manga.toEntity(), tags)
+        }
     }
 
 }

@@ -86,6 +86,9 @@ abstract class FavouritesDao {
     @Query("SELECT COUNT(DISTINCT manga_id) FROM favourites WHERE deleted_at = 0")
     abstract fun observeMangaCount(): Flow<Int>
 
+    @Query("SELECT COUNT(DISTINCT manga_id) FROM favourites WHERE deleted_at = 0 AND category_id = :categoryId")
+    abstract fun observeMangaCountInCategory(categoryId: Long): Flow<Int>
+
     @Query("SELECT * FROM manga WHERE manga_id IN (SELECT manga_id FROM favourites WHERE deleted_at = 0)")
     abstract suspend fun findAllManga(): List<MangaEntity>
 

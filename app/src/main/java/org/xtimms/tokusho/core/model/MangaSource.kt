@@ -1,5 +1,6 @@
 package org.xtimms.tokusho.core.model
 
+import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaSource
 
 fun MangaSource(name: String): MangaSource {
@@ -8,3 +9,5 @@ fun MangaSource(name: String): MangaSource {
     }
     return MangaSource.DUMMY
 }
+
+fun MangaSource.isNsfw() = contentType == ContentType.HENTAI

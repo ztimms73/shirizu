@@ -70,7 +70,7 @@ fun StorageView(
                 PreferenceStorageItem(
                     total = uiState.availableSpace.toFloat(),
                     title = stringResource(id = R.string.saved_manga),
-                    icon = Icons.Outlined.SdStorage
+                    icon = Icons.Outlined.SdStorage,
                 )
             }
             item {

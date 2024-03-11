@@ -31,8 +31,8 @@ import java.util.regex.Pattern
 
 object Updater {
 
-    private const val OWNER = "ztimms73"
-    private const val REPO = "Tokusho"
+    private const val OWNER = "KotatsuApp"
+    private const val REPO = "Kotatsu"
     private const val TAG = "Updates"
 
     private val client = OkHttpClient()

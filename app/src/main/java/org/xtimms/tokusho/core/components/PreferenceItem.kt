@@ -65,14 +65,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.xtimms.shiki.ui.theme.FixedAccentColors
+import org.xtimms.tokusho.ui.theme.FixedAccentColors
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.ui.monet.LocalTonalPalettes
 import org.xtimms.tokusho.ui.monet.TonalPalettes.Companion.toTonalPalettes
 import org.xtimms.tokusho.ui.theme.PreviewThemeLight
 import org.xtimms.tokusho.ui.theme.TokushoTheme
 import org.xtimms.tokusho.ui.theme.applyOpacity
-import org.xtimms.tokusho.ui.theme.preferenceTitle
 import org.xtimms.tokusho.utils.FileSize
 
 private const val horizontal = 8
@@ -170,7 +169,6 @@ internal fun PreferenceItemTitle(
     modifier: Modifier = Modifier,
     text: String,
     maxLines: Int = 2,
-    style: TextStyle = preferenceTitle,
     enabled: Boolean,
     color: Color = MaterialTheme.colorScheme.onBackground,
     overflow: TextOverflow = TextOverflow.Ellipsis
@@ -179,7 +177,6 @@ internal fun PreferenceItemTitle(
         modifier = modifier,
         text = text,
         maxLines = maxLines,
-        style = style,
         color = color.applyOpacity(enabled),
         overflow = overflow
     )
@@ -349,7 +346,6 @@ fun PreferenceSwitchWithContainer(
                 Text(
                     text = title,
                     maxLines = 2,
-                    style = preferenceTitle,
                     color = if (isChecked) FixedAccentColors.onPrimaryFixed else colorScheme.surface
                 )
             }

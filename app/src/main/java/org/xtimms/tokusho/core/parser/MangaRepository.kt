@@ -12,6 +12,7 @@ import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.xtimms.tokusho.core.cache.ContentCache
+import org.xtimms.tokusho.core.parser.local.LocalMangaRepository
 import java.lang.ref.WeakReference
 import java.util.EnumMap
 import java.util.Locale
@@ -50,6 +51,7 @@ interface MangaRepository {
 
     @Singleton
     class Factory @Inject constructor(
+        private val localMangaRepository: LocalMangaRepository,
         private val loaderContext: MangaLoaderContext,
         private val contentCache: ContentCache,
     ) {
@@ -58,6 +60,9 @@ interface MangaRepository {
 
         @AnyThread
         fun create(source: MangaSource): MangaRepository {
+            if (source == MangaSource.LOCAL) {
+                return localMangaRepository
+            }
             cache[source]?.get()?.let { return it }
             return synchronized(cache) {
                 cache[source]?.get()?.let { return it }

@@ -29,8 +29,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
+import org.xtimms.tokusho.core.AsyncImageImpl
 import org.xtimms.tokusho.core.components.BackIconButton
 import org.xtimms.tokusho.core.components.ViewInBrowserButton
 import org.xtimms.tokusho.ui.theme.TokushoTheme
@@ -41,6 +43,7 @@ const val FULL_POSTER_DESTINATION = "full_poster/$PICTURES_ARGUMENT"
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FullImageView(
+    coil: ImageLoader,
     pictures: Array<String>,
     navigateBack: () -> Unit,
 ) {
@@ -86,7 +89,8 @@ fun FullImageView(
                     modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AsyncImage(
+                    AsyncImageImpl(
+                        coil = coil,
                         model = pictures[page],
                         contentDescription = "image$page",
                         modifier = Modifier.fillMaxSize(),
@@ -101,21 +105,23 @@ fun FullImageView(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                pictures.forEachIndexed { index, _ ->
-                    val color =
-                        if (pagerState.currentPage == index)
-                            MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.primaryContainer
-                    Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .size(8.dp)
-                            .clickable {
-                                coroutineScope.launch { pagerState.animateScrollToPage(index) }
-                            }
-                    )
+                if (pictures.size > 1) {
+                    pictures.forEachIndexed { index, _ ->
+                        val color =
+                            if (pagerState.currentPage == index)
+                                MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.primaryContainer
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .clip(CircleShape)
+                                .background(color)
+                                .size(8.dp)
+                                .clickable {
+                                    coroutineScope.launch { pagerState.animateScrollToPage(index) }
+                                }
+                        )
+                    }
                 }
             }
         }
@@ -127,6 +133,7 @@ fun FullImageView(
 fun FullPosterPreview() {
     TokushoTheme {
         FullImageView(
+            coil = ImageLoader(LocalContext.current),
             pictures = arrayOf("", ""),
             navigateBack = {}
         )

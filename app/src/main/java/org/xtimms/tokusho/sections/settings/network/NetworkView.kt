@@ -1,0 +1,76 @@
+package org.xtimms.tokusho.sections.settings.network
+
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Dns
+import androidx.compose.material.icons.outlined.VpnLock
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import org.xtimms.tokusho.R
+import org.xtimms.tokusho.core.components.PreferenceItem
+import org.xtimms.tokusho.core.components.PreferenceSwitch
+import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
+import org.xtimms.tokusho.core.components.icons.ArrowDecisionOutline
+import org.xtimms.tokusho.core.prefs.AppSettings
+import org.xtimms.tokusho.core.prefs.SSL_BYPASS
+
+const val NETWORK_DESTINATION = "network"
+
+@Composable
+fun NetworkView(
+    navigateBack: () -> Unit,
+) {
+
+    var isSSLBypassEnabled by remember {
+        mutableStateOf(AppSettings.isSSLBypassEnabled())
+    }
+
+    ScaffoldWithTopAppBar(
+        title = stringResource(R.string.network),
+        navigateBack = navigateBack
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.padding(padding),
+            contentPadding = PaddingValues(
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            )
+        ) {
+            item {
+                PreferenceItem(
+                    title = stringResource(id = R.string.proxy),
+                    description = "",
+                    icon = Icons.Outlined.ArrowDecisionOutline
+                )
+            }
+            item {
+                PreferenceItem(
+                    title = stringResource(id = R.string.dns_over_https),
+                    description = "",
+                    icon = Icons.Outlined.Dns
+                )
+            }
+            item {
+                PreferenceSwitch(
+                    title = stringResource(id = R.string.ignore_ssl_errors),
+                    description = stringResource(id = R.string.ignore_ssl_errors_desc),
+                    icon = Icons.Outlined.VpnLock,
+                    isChecked = isSSLBypassEnabled,
+                ) {
+                    isSSLBypassEnabled = !isSSLBypassEnabled
+                    AppSettings.updateValue(SSL_BYPASS, isSSLBypassEnabled)
+                }
+            }
+        }
+    }
+
+}

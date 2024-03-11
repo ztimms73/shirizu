@@ -28,6 +28,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -58,6 +60,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val isReady: MutableState<Boolean> = mutableStateOf(false)
+    private val isDone: MutableState<Boolean> = mutableStateOf(false)
+
     @Inject
     lateinit var coil: ImageLoader
 
@@ -65,6 +70,7 @@ class MainActivity : ComponentActivity() {
     lateinit var loggers: Set<@JvmSuppressWildcards FileLogger>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().setKeepOnScreenCondition { !isDone.value }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -77,18 +83,26 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val windowSizeClass = calculateWindowSizeClass(this)
             val isCompactScreen = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
-            SettingsProvider {
-                TokushoTheme(
-                    darkTheme = LocalDarkTheme.current.isDarkTheme(),
-                    isDynamicColorEnabled = LocalDynamicColorSwitch.current,
-                    isHighContrastModeEnabled = LocalDarkTheme.current.isHighContrastModeEnabled,
-                ) {
-                    MainView(
-                        coil = coil,
-                        loggers = loggers,
-                        isCompactScreen = isCompactScreen,
-                        navController = navController
-                    )
+            LaunchedEffect(Unit) {
+                isReady.value = true
+            }
+            if (isReady.value) {
+                SettingsProvider {
+                    TokushoTheme(
+                        darkTheme = LocalDarkTheme.current.isDarkTheme(),
+                        isDynamicColorEnabled = LocalDynamicColorSwitch.current,
+                        isHighContrastModeEnabled = LocalDarkTheme.current.isHighContrastModeEnabled,
+                    ) {
+                        MainView(
+                            coil = coil,
+                            loggers = loggers,
+                            isCompactScreen = isCompactScreen,
+                            navController = navController
+                        )
+                        LaunchedEffect(Unit) {
+                            isDone.value = true
+                        }
+                    }
                 }
             }
         }

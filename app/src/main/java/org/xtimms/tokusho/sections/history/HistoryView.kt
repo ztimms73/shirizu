@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -47,7 +49,11 @@ fun HistoryViewContent(
             )
             .padding(padding)
     ) {
-        EmptyScreen(title = R.string.nothing_here)
+        EmptyScreen(
+            icon = Icons.Outlined.History,
+            title = R.string.empty_history_title,
+            description = R.string.empty_history_description
+        )
     }
 }
 

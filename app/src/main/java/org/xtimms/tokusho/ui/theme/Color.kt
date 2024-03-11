@@ -1,4 +1,4 @@
-package org.xtimms.shiki.ui.theme
+package org.xtimms.tokusho.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
