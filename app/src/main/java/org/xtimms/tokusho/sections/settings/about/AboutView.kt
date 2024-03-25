@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material.icons.outlined.UpdateDisabled
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,6 +52,8 @@ fun AboutView(
 
     val info = App.getVersionReport()
     val versionName = packageInfo.versionName
+
+    var versionClicks by remember { mutableIntStateOf(0) }
 
     val uriHandler = LocalUriHandler.current
     fun openUrl(url: String) {
@@ -91,10 +94,16 @@ fun AboutView(
                 PreferenceItem(
                     title = stringResource(id = R.string.version),
                     description = versionName,
-                    icon = Icons.Outlined.Info
+                    icon = Icons.Outlined.Info,
+                    onLongClick = {
+                        clipboardManager.setText(AnnotatedString(info))
+                        context.toast(R.string.info_copied)
+                    }
                 ) {
-                    clipboardManager.setText(AnnotatedString(info))
-                    context.toast(R.string.info_copied)
+                    if (versionClicks >= 7) {
+                        context.toast("✧◝(⁰▿⁰)◜✧")
+                        versionClicks = 0
+                    } else versionClicks++
                 }
             }
             item {
