@@ -77,6 +77,8 @@ import org.xtimms.tokusho.sections.settings.storage.StorageView
 import org.xtimms.tokusho.sections.shelf.ShelfView
 import org.xtimms.tokusho.sections.stats.STATS_DESTINATION
 import org.xtimms.tokusho.sections.stats.StatsView
+import org.xtimms.tokusho.sections.suggestions.SUGGESTIONS_DESTINATION
+import org.xtimms.tokusho.sections.suggestions.SuggestionsView
 import org.xtimms.tokusho.utils.StringArrayNavType
 import org.xtimms.tokusho.utils.lang.removeFirstAndLast
 
@@ -101,6 +103,12 @@ fun Navigation(
 ) {
 
     val navigateBack: () -> Unit = { navController.popBackStack() }
+
+    val navigateToDetails: (Long) -> Unit = {
+        navController.navigate(
+            DETAILS_DESTINATION.replace(MANGA_ID_ARGUMENT, it.toString())
+        )
+    }
 
     val navigateToLicense: (String, String?, String?) -> Unit = { name, website, content ->
         navController.navigate(
@@ -142,11 +150,7 @@ fun Navigation(
                 showPageTabs = true,
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
-                navigateToDetails = {
-                    navController.navigate(
-                        DETAILS_DESTINATION.replace(MANGA_ID_ARGUMENT, it.toString())
-                    )
-                },
+                navigateToDetails = navigateToDetails,
                 onRefresh = { true }
             )
         }
@@ -161,11 +165,13 @@ fun Navigation(
         composable(BottomNavDestination.Explore.route) {
             ExploreView(
                 coil = coil,
+                navigateToDetails = navigateToDetails,
                 navigateToSource = {
                     navController.navigate(
                         LIST_DESTINATION.replace(PROVIDER_ARGUMENT, it.name)
                     )
                 },
+                navigateToSuggestions = { navController.navigate(SUGGESTIONS_DESTINATION) },
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
                 listState = listState
@@ -184,6 +190,14 @@ fun Navigation(
             FeedView(
                 navigateBack = navigateBack,
                 navigateToShelf = { navController.navigate(SHELF_SETTINGS_DESTINATION) }
+            )
+        }
+
+        composable(SUGGESTIONS_DESTINATION) {
+            SuggestionsView(
+                coil = coil,
+                navigateBack = navigateBack,
+                navigateToDetails = navigateToDetails
             )
         }
 
@@ -314,13 +328,7 @@ fun Navigation(
                 source = navEntry.arguments?.getString(PROVIDER_ARGUMENT.removeFirstAndLast())
                     ?.let { source -> MangaSource.valueOf(source) } ?: MangaSource.DUMMY,
                 navigateBack = navigateBack,
-                navigateToDetails = {
-                    navController.navigate(
-                        DETAILS_DESTINATION.replace(
-                            MANGA_ID_ARGUMENT, it.toString()
-                        )
-                    )
-                }
+                navigateToDetails = navigateToDetails
             )
         }
 
@@ -387,11 +395,7 @@ fun Navigation(
                         FULL_POSTER_DESTINATION.replace(PICTURES_ARGUMENT, pictures)
                     )
                 },
-                navigateToDetails = {
-                    navController.navigate(
-                        DETAILS_DESTINATION.replace(MANGA_ID_ARGUMENT, it.toString())
-                    )
-                },
+                navigateToDetails = navigateToDetails,
                 navigateToSource = {
                     navController.navigate(
                         LIST_DESTINATION.replace(PROVIDER_ARGUMENT, it.name)

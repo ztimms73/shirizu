@@ -83,6 +83,7 @@ fun DetailsView(
     val relatedManga by viewModel.relatedManga.collectAsStateWithLifecycle(emptyList())
     val readingTime by viewModel.readingTime.collectAsStateWithLifecycle(null)
     val favouriteCategories by viewModel.favouriteCategories.collectAsStateWithLifecycle()
+    val details by viewModel.details.collectAsStateWithLifecycle(null)
 
     LaunchedEffect(mangaId) {
         if (viewModel.details.value == null) viewModel.doLoad(mangaId)
@@ -140,29 +141,30 @@ fun DetailsView(
                 bottom = contentPadding.calculateBottomPadding(),
             ),
         ) {
+            val manga = details?.toManga()
             item(
                 key = DetailsViewItem.INFO_BOX,
                 contentType = DetailsViewItem.INFO_BOX
             ) {
                 DetailsInfoBox(
                     coil = coil,
-                    imageUrl = viewModel.details.value?.toManga()?.largeCoverUrl.orEmpty(),
-                    favicon = viewModel.details.value?.toManga()?.source?.faviconUri() ?: Uri.EMPTY,
-                    title = viewModel.details.value?.toManga()?.title.orEmpty(),
-                    altTitle = viewModel.details.value?.toManga()?.altTitle.orEmpty(),
-                    score = viewModel.details.value?.toManga()?.rating ?: RATING_UNKNOWN,
-                    author = viewModel.details.value?.toManga()?.author.orEmpty(),
+                    imageUrl = manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
+                    favicon = manga?.source?.faviconUri() ?: Uri.EMPTY,
+                    title = manga?.title.orEmpty(),
+                    altTitle = manga?.altTitle.orEmpty(),
+                    score = manga?.rating ?: RATING_UNKNOWN,
+                    author = manga?.author.orEmpty(),
                     artist = "",
-                    isNsfw = viewModel.details.value?.toManga()?.isNsfw ?: true,
-                    state = viewModel.details.value?.toManga()?.state ?: MangaState.FINISHED,
-                    source = viewModel.details.value?.toManga()?.source ?: MangaSource.DUMMY,
+                    isNsfw = manga?.isNsfw ?: true,
+                    state = manga?.state ?: MangaState.FINISHED,
+                    source = manga?.source ?: MangaSource.DUMMY,
                     chapters = chapters.size.toString(),
                     isTabletUi = false,
                     appBarPadding = topPadding,
                     onCoverClick = {
                         navigateToFullImage(
                             arrayOf(
-                                viewModel.details.value?.toManga()?.largeCoverUrl.orEmpty()
+                                manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
                             ).toNavArgument()
                         )
                     },
@@ -172,7 +174,7 @@ fun DetailsView(
                     },
                     onSourceClicked = {
                         navigateToSource(
-                            viewModel.details.value?.toManga()?.source ?: MangaSource.DUMMY
+                            manga?.source ?: MangaSource.DUMMY
                         )
                     }
                 )

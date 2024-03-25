@@ -6,8 +6,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.google.android.material.color.DynamicColors
 import com.tencent.mmkv.MMKV
 import dagger.hilt.android.HiltAndroidApp
@@ -24,17 +25,32 @@ import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.prefs.KotatsuAppSettings
 import org.xtimms.tokusho.core.updates.Updater
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
+import org.xtimms.tokusho.work.WorkScheduleManager
 import javax.inject.Inject
 import javax.inject.Provider
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), Configuration.Provider {
 
     @Inject
     lateinit var database: Provider<TokushoDatabase>
 
     @Inject
     lateinit var settings: KotatsuAppSettings
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var workScheduleManager: WorkScheduleManager
+
+    @Inject
+    lateinit var workManagerProvider: Provider<WorkManager>
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     override fun onCreate() {
         super.onCreate()
@@ -78,6 +94,7 @@ class App : Application() {
                 )
             }
         }
+        workScheduleManager.init()
     }
 
     override fun attachBaseContext(base: Context?) {

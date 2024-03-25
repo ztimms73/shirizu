@@ -16,6 +16,7 @@ import org.xtimms.tokusho.core.database.dao.FavouritesDao
 import org.xtimms.tokusho.core.database.dao.HistoryDao
 import org.xtimms.tokusho.core.database.dao.MangaDao
 import org.xtimms.tokusho.core.database.dao.MangaSourcesDao
+import org.xtimms.tokusho.core.database.dao.SuggestionDao
 import org.xtimms.tokusho.core.database.dao.TagsDao
 import org.xtimms.tokusho.core.database.entity.BookmarkEntity
 import org.xtimms.tokusho.core.database.entity.FavouriteCategoryEntity
@@ -24,6 +25,7 @@ import org.xtimms.tokusho.core.database.entity.HistoryEntity
 import org.xtimms.tokusho.core.database.entity.MangaEntity
 import org.xtimms.tokusho.core.database.entity.MangaSourceEntity
 import org.xtimms.tokusho.core.database.entity.MangaTagsEntity
+import org.xtimms.tokusho.core.database.entity.SuggestionEntity
 import org.xtimms.tokusho.core.database.entity.TagEntity
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 
@@ -38,7 +40,8 @@ const val DATABASE_VERSION = 1
         HistoryEntity::class,
         FavouriteEntity::class,
         FavouriteCategoryEntity::class,
-        BookmarkEntity::class
+        BookmarkEntity::class,
+        SuggestionEntity::class
     ],
     version = DATABASE_VERSION
 )
@@ -57,6 +60,8 @@ abstract class TokushoDatabase : RoomDatabase() {
     abstract fun getFavouriteCategoriesDao(): FavouriteCategoriesDao
 
     abstract fun getBookmarksDao(): BookmarksDao
+
+    abstract fun getSuggestionDao(): SuggestionDao
 
 }
 

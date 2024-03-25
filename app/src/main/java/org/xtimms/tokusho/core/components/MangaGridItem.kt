@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
@@ -29,16 +27,13 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.xtimms.tokusho.core.AsyncImageImpl
-import org.xtimms.tokusho.ui.theme.TokushoTheme
 
 private const val GridSelectedCoverAlpha = 0.76f
 
@@ -46,11 +41,12 @@ private const val GridSelectedCoverAlpha = 0.76f
 fun MangaGridItem(
     coil: ImageLoader,
     manga: Manga,
-    onClick: () -> Unit,
+    onClick: (Manga) -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
 ) {
     GridItemSelectable(
+        manga = manga,
         isSelected = isSelected,
         onClick = onClick,
         onLongClick = onLongClick,
@@ -87,13 +83,14 @@ fun MangaGridItem(
 fun MangaHorizontalItem(
     coil: ImageLoader,
     manga: Manga,
-    onClick: () -> Unit,
+    onClick: (Manga) -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
 ) {
     GridItemSelectable(
+        manga = manga,
         isSelected = isSelected,
-        onClick = onClick,
+        onClick = { onClick(manga) },
         onLongClick = onLongClick,
         modifier = Modifier.width(IntrinsicSize.Min)
     ) {
@@ -211,8 +208,9 @@ private fun GridItemTitle(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GridItemSelectable(
+    manga: Manga,
     isSelected: Boolean,
-    onClick: () -> Unit,
+    onClick: (Manga) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -221,7 +219,7 @@ private fun GridItemSelectable(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .combinedClickable(
-                onClick = onClick,
+                onClick = { onClick(manga) },
                 onLongClick = onLongClick,
             )
             .selectedOutline(isSelected = isSelected, color = MaterialTheme.colorScheme.secondary)

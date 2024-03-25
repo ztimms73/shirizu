@@ -3,6 +3,7 @@ package org.xtimms.tokusho
 import android.app.Application
 import android.content.Context
 import android.text.Html
+import androidx.work.WorkManager
 import coil.ComponentRegistry
 import coil.ImageLoader
 import coil.disk.DiskCache
@@ -113,6 +114,11 @@ interface TokushoModule {
         fun provideLocalStorageChangesFlow(
             @LocalStorageChanges flow: MutableSharedFlow<LocalManga?>,
         ): SharedFlow<LocalManga?> = flow.asSharedFlow()
+
+        @Provides
+        fun provideWorkManager(
+            @ApplicationContext context: Context,
+        ): WorkManager = WorkManager.getInstance(context)
     }
 
 }

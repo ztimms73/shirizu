@@ -121,17 +121,6 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val TAG = "MainActivity"
         const val EXTRA_DATA = "data"
-
-        fun setLanguage(locale: String) {
-            Log.d(TAG, "setLanguage: $locale")
-            val localeListCompat =
-                if (locale.isEmpty()) LocaleListCompat.getEmptyLocaleList()
-                else LocaleListCompat.forLanguageTags(locale)
-            processLifecycleScope.launch(Dispatchers.Main) {
-                AppCompatDelegate.setApplicationLocales(localeListCompat)
-            }
-        }
-
     }
 }
 

@@ -1,6 +1,7 @@
 package org.xtimms.tokusho.utils.lang
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -18,4 +19,12 @@ fun <T> Flow<T>.onEachWhile(action: suspend (T) -> Boolean): Flow<T> {
 
 inline fun <T, R> Flow<List<T>>.mapItems(crossinline transform: (T) -> R): Flow<List<R>> {
     return map { list -> list.map(transform) }
+}
+
+fun <T> Flow<Collection<T>>.flatten(): Flow<T> = flow {
+    collect { value ->
+        for (item in value) {
+            emit(item)
+        }
+    }
 }

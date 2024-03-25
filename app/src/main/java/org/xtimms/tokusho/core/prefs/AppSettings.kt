@@ -39,6 +39,7 @@ const val LOGGING = "logging"
 const val SSL_BYPASS = "ssl_bypass"
 const val NSFW = "nsfw"
 const val TABS_MANGA_COUNT = "tabs_manga_count"
+const val SUGGESTIONS = "suggestions"
 
 val paletteStyles = listOf(
     PaletteStyle.TonalSpot,
@@ -107,8 +108,7 @@ object AppSettings {
 
     fun isMangaCountInTabsEnabled() = TABS_MANGA_COUNT.getBoolean(false)
 
-    fun getLanguageConfiguration(languageNumber: Int = kv.decodeInt(LANGUAGE)) =
-        languageMap.getOrElse(languageNumber) { "" }
+    fun isSuggestionsEnabled() = SUGGESTIONS.getBoolean(true)
 
 
     private fun getLanguageNumberByCode(languageCode: String): Int =

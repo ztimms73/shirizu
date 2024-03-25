@@ -204,4 +204,19 @@
     <string name="in_favourites">In favourites</string>
     <string name="in_shelf">In shelf</string>
     <string name="add_to_shelf">Add to shelf</string>
+    <string name="suggestions">Suggestions</string>
+    <string name="suggestions_summary">Suggest manga based on your preferences</string>
+    <string name="suggestion_manga">Suggestion: %s</string>
+    <string name="just_now">Just now</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="this_month">This month</string>
+    <string name="long_ago">Long ago</string>
+    <string name="delete_from_history_summary">Are you sure you want to remove %s from your reading history?</string>
+    <string name="continue_reading">Continue</string>
+    <string name="suggestions_updating">Updating suggestions</string>
+    <string name="images_optimization_proxy">Images optimization proxy</string>
+    <string name="images_optimization_proxy_desc">Use the wsrv.nl service to reduce traffic usage and speed up image loading if possible</string>
+    <string name="grid_columns_count">Grid columns count</string>
+    <string name="grid_columns_count_desc">%d column(s) would be used for manga grids</string>
 </resources>

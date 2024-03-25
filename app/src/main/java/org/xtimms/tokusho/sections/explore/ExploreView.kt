@@ -1,8 +1,9 @@
 package org.xtimms.tokusho.sections.explore
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmarks
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.ExtensionOff
 import androidx.compose.material.icons.outlined.SdStorage
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,16 +44,16 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
 import org.xtimms.tokusho.R
+import org.xtimms.tokusho.core.AsyncImageImpl
 import org.xtimms.tokusho.core.components.ExploreButton
-import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.SourceItem
 import org.xtimms.tokusho.core.components.icons.Dice
 import org.xtimms.tokusho.ui.theme.TokushoTheme
@@ -63,7 +64,9 @@ const val EXPLORE_DESTINATION = "explore"
 fun ExploreView(
     viewModel: ExploreViewModel = hiltViewModel(),
     coil: ImageLoader,
+    navigateToDetails: (Long) -> Unit,
     navigateToSource: (SourceItemModel) -> Unit,
+    navigateToSuggestions: () -> Unit,
     nestedScrollConnection: NestedScrollConnection? = null,
     topBarHeightPx: Float = 0f,
     topBarOffsetY: Animatable<Float, AnimationVector1D> = Animatable(0f),
@@ -75,6 +78,7 @@ fun ExploreView(
     val layoutDirection = LocalLayoutDirection.current
 
     val sources = viewModel.content.collectAsStateWithLifecycle(emptyList())
+    val recommendation by viewModel.getSuggestionFlow().collectAsStateWithLifecycle(null)
 
     Box(
         modifier = Modifier
@@ -137,7 +141,7 @@ fun ExploreView(
                         text = stringResource(R.string.downloads),
                         icon = Icons.Outlined.Download,
                         modifier = Modifier.weight(1f),
-                        onClick = { throw IllegalAccessException() },
+                        onClick = { },
                     )
                 }
             }
@@ -148,7 +152,9 @@ fun ExploreView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp)
-                        .clip(MaterialTheme.shapes.extraLarge),
+                        .clip(MaterialTheme.shapes.extraLarge)
+                        .clickable { recommendation?.id?.let { navigateToDetails(it) } }
+                        .animateContentSize(),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
                     )
@@ -167,13 +173,14 @@ fun ExploreView(
                                 .padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(
+                            AsyncImageImpl(
+                                coil = coil,
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(RoundedCornerShape(72.dp))
                                     .aspectRatio(1f),
                                 contentScale = ContentScale.Crop,
-                                painter = painterResource(id = R.drawable.ookami),
+                                model = recommendation?.coverUrl,
                                 contentDescription = ""
                             )
                             Column(
@@ -182,20 +189,26 @@ fun ExploreView(
                                     .padding(horizontal = 16.dp),
                             ) {
                                 Text(
-                                    text = "Text",
+                                    text = recommendation?.title ?: "",
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 2
                                 )
-                                Text(
-                                    text = "Text",
-                                    modifier = Modifier.padding(vertical = 2.dp),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                recommendation?.tags?.joinToString(", ") { it.title }?.let {
+                                    Text(
+                                        text = it,
+                                        modifier = Modifier.padding(vertical = 2.dp),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 1
+                                    )
+                                }
                             }
                         }
                         Button(
-                            onClick = {},
+                            onClick = { navigateToSuggestions() },
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(text = "More")

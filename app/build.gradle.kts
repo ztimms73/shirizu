@@ -118,7 +118,7 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.50")
     implementation("androidx.hilt:hilt-work:1.2.0")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
-    implementation("com.github.KotatsuApp:kotatsu-parsers:3ff028c4e9") {
+    implementation("com.github.KotatsuApp:kotatsu-parsers:fec60955ed") {
         exclude(group = "org.json", module = "json")
     }
     implementation("com.mikepenz:aboutlibraries-compose-m3:10.10.0")

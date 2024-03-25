@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.core.components.MangaGridItem
 import org.xtimms.tokusho.core.components.ScaffoldWithSmallTopAppBarWithChips
@@ -142,12 +142,13 @@ private fun MangaListViewContent(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.TopCenter
                         ) {
+                            val onClickManga = { manga: Manga ->
+                                navigateToDetails(manga.id)
+                            }
                             MangaGridItem(
                                 coil = coil,
                                 manga = item,
-                                onClick = {
-                                    navigateToDetails(item.id)
-                                },
+                                onClick = onClickManga,
                                 onLongClick = { },
                             )
                         }

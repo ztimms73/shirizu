@@ -603,7 +603,7 @@ fun PreferenceStorageHeader(
                 modifier = Modifier
                     .weight(1f)
                     .align(Alignment.Bottom)
-                    .padding(PaddingValues(start = 4.dp, bottom = 8.dp)),
+                    .padding(PaddingValues(start = 4.dp, bottom = 12.dp)),
                 label = "Unit"
             ) { targetUsed ->
                 Text(text = FileSize.BYTES.showUnit(LocalContext.current, targetUsed))
@@ -619,7 +619,7 @@ fun PreferenceStorageHeader(
                 },
                 modifier = Modifier
                     .align(Alignment.Bottom)
-                    .padding(PaddingValues(bottom = 8.dp)),
+                    .padding(PaddingValues(bottom = 12.dp)),
                 label = "Total used"
             ) { targetTotal ->
                 Text(
