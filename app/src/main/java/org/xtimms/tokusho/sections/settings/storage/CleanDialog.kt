@@ -116,7 +116,7 @@ fun CleanDialog(
 
 @Preview
 @Composable
-private fun DirectoryPreferenceDialogPreview() {
+private fun CleanDialogPreview() {
     CleanDialog(
         onDismissRequest = {},
         isPagesCacheSelected = false,

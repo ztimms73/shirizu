@@ -83,11 +83,28 @@ class DatabasePrePopulateCallback(private val resources: Resources) : RoomDataba
                 "https://mangadex.org/title/822c9883-385c-4fd0-9523-16e7789cbeae",
                 -1.0,
                 0,
-                "https://uploads.mangadex.org/covers/822c9883-385c-4fd0-9523-16e7789cbeae/542f379f-adee-4d27-bdd1-ffd81b140851.jpg.256.jpg",
-                "https://uploads.mangadex.org/covers/822c9883-385c-4fd0-9523-16e7789cbeae/542f379f-adee-4d27-bdd1-ffd81b140851.jpg",
+                "https://mangadex.org/covers/822c9883-385c-4fd0-9523-16e7789cbeae/f886822a-80c3-484c-ad75-9aa32abedc18.jpg.256.jpg",
+                "https://mangadex.org/covers/822c9883-385c-4fd0-9523-16e7789cbeae/f886822a-80c3-484c-ad75-9aa32abedc18.jpg",
                 "FINISHED",
                 "Muchi Maro",
                 "MANGADEX",
+            )
+        )
+        db.execSQL(
+            "INSERT INTO manga (manga_id, title, alt_title, url, public_url, rating, nsfw, cover_url, large_cover_url, state, author, source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            arrayOf(
+                -5513532524243987690,
+                "Тотальный гарем",
+                "Shuumatsu no Harem",
+                "/manga/api/694",
+                "https://desu.me/manga/z-shuumatsu-no-harem.694/",
+                1.0,
+                1,
+                "https://desu.me/data/manga/covers/preview/694.jpg",
+                "https://desu.me/data/manga/covers/original/694.jpg",
+                "ONGOING",
+                "",
+                "DESUME",
             )
         )
         db.execSQL(
@@ -98,6 +115,29 @@ class DatabasePrePopulateCallback(private val resources: Resources) : RoomDataba
                 0,
                 1705944302882,
                 0,
+            )
+        )
+        db.execSQL(
+            "INSERT INTO favourites (manga_id, category_id, sort_key, created_at, deleted_at) VALUES (?,?,?,?,?)",
+            arrayOf(
+                -5513532524243987690,
+                1,
+                0,
+                1705944302882,
+                0,
+            )
+        )
+        db.execSQL(
+            "INSERT into history (manga_id, created_at, updated_at, chapter_id, page, scroll, percent, deleted_at) VALUES (?,?,?,?,?,?,?,?)",
+            arrayOf(
+                -5513532524243987690,
+                1710617414,
+                1710617414,
+                1,
+                3,
+                0.3,
+                0.4,
+                0
             )
         )
     }

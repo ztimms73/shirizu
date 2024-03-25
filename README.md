@@ -7,8 +7,8 @@ An attempt to write an Android manga reading application on Jetpack Compose usin
 No, nothing works.
 
 ## Screens
-|                                        Shelf                                        |                                          Details                                          | History                                                                                 |
-|:-----------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|-----------------------------------------------------------------------------------------|
+|                                        Shelf                                        |                                          Details                                          |                                         History                                         |
+|:-----------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------:|
 | ![Shelf](https://git.kotatsu.app/Xtimms/Tokusho/raw/branch/master/images/shelf.png) |  ![Details](https://git.kotatsu.app/Xtimms/Tokusho/raw/branch/master/images/details.png)  | ![History](https://git.kotatsu.app/Xtimms/Tokusho/raw/branch/master/images/history.png) |
 
 ## Acknowledgements

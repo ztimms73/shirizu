@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Print
@@ -76,9 +74,9 @@ fun AdvancedView(
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
         ) {
-            item {
+            /*item {
                 PreferenceItem(title = "STATS", onClick = { navigateToStats() } )
-            }
+            }*/
             item {
                 PreferenceSwitch(
                     title = stringResource(id = R.string.send_crash_reports),

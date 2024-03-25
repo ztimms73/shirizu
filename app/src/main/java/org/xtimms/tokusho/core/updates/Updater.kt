@@ -19,7 +19,6 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
-import org.xtimms.tokusho.App
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.prefs.AppSettings.getInt
 import org.xtimms.tokusho.core.prefs.STABLE
@@ -31,8 +30,8 @@ import java.util.regex.Pattern
 
 object Updater {
 
-    private const val OWNER = "KotatsuApp"
-    private const val REPO = "Kotatsu"
+    private const val OWNER = "ztimms73"
+    private const val REPO = "tokusho"
     private const val TAG = "Updates"
 
     private val client = OkHttpClient()
