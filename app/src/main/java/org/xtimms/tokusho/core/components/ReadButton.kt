@@ -8,6 +8,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -113,7 +114,12 @@ fun RowScope.ReadButton() {
                     horizontalArrangement = Arrangement.Start,
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(text = "Continue reading", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "Continue reading", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text(text = "Chap. 123 - Test", style = MaterialTheme.typography.labelMedium) // TODO
+                    }
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
