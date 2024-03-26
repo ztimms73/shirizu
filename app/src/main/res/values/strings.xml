@@ -219,4 +219,11 @@
     <string name="images_optimization_proxy_desc">Use the wsrv.nl service to reduce traffic usage and speed up image loading if possible</string>
     <string name="grid_columns_count">Grid columns count</string>
     <string name="grid_columns_count_desc">%d column(s) would be used for manga grids</string>
+    <string name="fraction_pattern">%1$d/%2$d</string>
+    <string name="check_for_new_chapters">Check for new chapters</string>
+    <string name="new_chapters">New chapters</string>
+    <string name="clear_updates_feed">Clear updates feed</string>
+    <string name="clear_info_about_new_chapters">Also clear information about new chapters</string>
+    <string name="clear_updates_feed_desc">Clear all update history permanently?</string>
+    <string name="no_recent_updates">No recent updates</string>
 </resources>

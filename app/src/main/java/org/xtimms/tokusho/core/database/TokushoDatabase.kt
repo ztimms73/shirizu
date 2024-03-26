@@ -18,6 +18,8 @@ import org.xtimms.tokusho.core.database.dao.MangaDao
 import org.xtimms.tokusho.core.database.dao.MangaSourcesDao
 import org.xtimms.tokusho.core.database.dao.SuggestionDao
 import org.xtimms.tokusho.core.database.dao.TagsDao
+import org.xtimms.tokusho.core.database.dao.TrackLogsDao
+import org.xtimms.tokusho.core.database.dao.TracksDao
 import org.xtimms.tokusho.core.database.entity.BookmarkEntity
 import org.xtimms.tokusho.core.database.entity.FavouriteCategoryEntity
 import org.xtimms.tokusho.core.database.entity.FavouriteEntity
@@ -27,6 +29,8 @@ import org.xtimms.tokusho.core.database.entity.MangaSourceEntity
 import org.xtimms.tokusho.core.database.entity.MangaTagsEntity
 import org.xtimms.tokusho.core.database.entity.SuggestionEntity
 import org.xtimms.tokusho.core.database.entity.TagEntity
+import org.xtimms.tokusho.core.database.entity.TrackEntity
+import org.xtimms.tokusho.core.database.entity.TrackLogEntity
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
 
 const val DATABASE_VERSION = 1
@@ -41,7 +45,9 @@ const val DATABASE_VERSION = 1
         FavouriteEntity::class,
         FavouriteCategoryEntity::class,
         BookmarkEntity::class,
-        SuggestionEntity::class
+        SuggestionEntity::class,
+        TrackEntity::class,
+        TrackLogEntity::class
     ],
     version = DATABASE_VERSION
 )
@@ -62,6 +68,10 @@ abstract class TokushoDatabase : RoomDatabase() {
     abstract fun getBookmarksDao(): BookmarksDao
 
     abstract fun getSuggestionDao(): SuggestionDao
+
+    abstract fun getTracksDao(): TracksDao
+
+    abstract fun getTrackLogsDao(): TrackLogsDao
 
 }
 

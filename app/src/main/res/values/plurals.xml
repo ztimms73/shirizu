@@ -36,4 +36,8 @@
         <item quantity="one">%1$d month ago</item>
         <item quantity="other">%1$d months ago</item>
     </plurals>
+    <plurals name="new_chapters">
+        <item quantity="one">%1$d new chapter</item>
+        <item quantity="other">%1$d new chapters</item>
+    </plurals>
 </resources>

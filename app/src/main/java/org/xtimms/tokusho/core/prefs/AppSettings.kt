@@ -45,6 +45,7 @@ const val SSL_BYPASS = "ssl_bypass"
 const val NSFW = "nsfw"
 const val TABS_MANGA_COUNT = "tabs_manga_count"
 const val SUGGESTIONS = "suggestions"
+const val TRACKER = "tracker"
 
 val paletteStyles = listOf(
     PaletteStyle.TonalSpot,
@@ -115,6 +116,8 @@ object AppSettings {
     fun isMangaCountInTabsEnabled() = TABS_MANGA_COUNT.getBoolean(false)
 
     fun isSuggestionsEnabled() = SUGGESTIONS.getBoolean(true)
+
+    fun isTrackerEnabled() = TRACKER.getBoolean(true)
 
     fun isSwipeTutorialEnabled() = SWIPE_TUTORIAL.getBoolean(true)
 

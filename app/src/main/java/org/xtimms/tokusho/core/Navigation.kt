@@ -208,6 +208,7 @@ fun Navigation(
 
         composable(FEED_DESTINATION) {
             FeedView(
+                coil = coil,
                 navigateBack = navigateBack,
                 navigateToShelf = { navController.navigate(SHELF_SETTINGS_DESTINATION) }
             )

@@ -11,6 +11,7 @@ import org.xtimms.tokusho.core.model.FavouriteCategory
 import org.xtimms.tokusho.core.model.ListSortOrder
 import org.xtimms.tokusho.core.model.MangaHistory
 import org.xtimms.tokusho.core.model.MangaSource
+import org.xtimms.tokusho.core.tracker.model.TrackingLogItem
 import org.xtimms.tokusho.sections.shelf.FavouriteManga
 import org.xtimms.tokusho.utils.lang.longHashCode
 import java.time.Instant
@@ -76,6 +77,30 @@ fun Collection<BookmarkEntity>.toBookmarks(manga: Manga) = map {
 
 @JvmName("bookmarksIds")
 fun Collection<Bookmark>.ids() = map { it.pageId }
+
+fun TrackLogWithManga.toTrackingLogItem(counters: MutableMap<Long, Int>): TrackingLogItem {
+    val chaptersList = trackLog.chapters.split('\n').filterNot { x -> x.isEmpty() }
+    return TrackingLogItem(
+        id = trackLog.id,
+        chapters = chaptersList,
+        manga = manga.toManga(tags.toMangaTags()),
+        createdAt = Instant.ofEpochMilli(trackLog.createdAt),
+        isNew = counters.decrement(trackLog.mangaId, chaptersList.size),
+    )
+}
+
+private fun MutableMap<Long, Int>.decrement(key: Long, count: Int): Boolean = synchronized(this) {
+    val counter = get(key)
+    if (counter == null || counter <= 0) {
+        return false
+    }
+    if (counter < count) {
+        remove(key)
+    } else {
+        put(key, counter - count)
+    }
+    return true
+}
 
 // Model to entity
 
