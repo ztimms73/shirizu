@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tokusho</string>
+    <string name="app_name" translatable="false">Tokusho</string>
     <string name="settings">Settings</string>
     <string name="feed">Feed</string>
     <string name="search">Search</string>
@@ -35,13 +35,13 @@
     <string name="check_for_updates">Check for updates</string>
     <string name="app_up_to_date">No new updates</string>
     <string name="app_update_failed">An error occurred while checking updates</string>
-    <string name="update_channel_desc">Install pre-release builds to preview new features and changes.\n\nThere will be some instability in there versions, so please don\'t hesitate to give us feedback if you experience any problems to help us improve the app for the future.</string>
+    <string name="update_channel_desc">Install pre-release builds to preview new features and changes.  There will be some instability in there versions, so please don\'t hesitate to give us feedback if you experience any problems to help us improve the app for the future.</string>
     <string name="language">Language</string>
     <string name="dark_theme">Dark theme</string>
     <string name="dynamic_color">Dynamic color</string>
     <string name="dynamic_color_desc">Apply colors from wallpapers to the app theme</string>
-    <string name="la_en_US">English (United States)</string>
-    <string name="la_ru">Русский</string>
+    <string name="la_en_US" translatable="false">English (United States)</string>
+    <string name="la_ru" translatable="false">Русский</string>
     <string name="cancel">Cancel</string>
     <string name="additional_settings">Additional settings</string>
     <string name="high_contrast">High contrast dark theme</string>

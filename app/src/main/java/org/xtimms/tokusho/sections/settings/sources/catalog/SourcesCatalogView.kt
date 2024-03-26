@@ -11,15 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
 import kotlinx.coroutines.launch
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.ScaffoldWithClassicTopAppBar
 
 const val CATALOG_DESTINATION = "catalog"
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SourcesCatalogView(
+    coil: ImageLoader,
     sourcesCatalogViewModel: SourcesCatalogViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
 ) {
@@ -41,6 +42,14 @@ fun SourcesCatalogView(
                     pagerState = pagerState,
                 ) { scope.launch { pagerState.animateScrollToPage(it) } }
             }
+
+            SourcesCatalogPager(
+                coil = coil,
+                state = pagerState,
+                contentPadding = padding,
+                searchQuery = null,
+                getSourcesForPage = { categories }
+            )
         }
     }
 }

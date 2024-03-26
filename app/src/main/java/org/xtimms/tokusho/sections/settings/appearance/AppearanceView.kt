@@ -1,17 +1,23 @@
 package org.xtimms.tokusho.sections.settings.appearance
 
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.pager.HorizontalPager
@@ -26,15 +32,14 @@ import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LightMode
-import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Timelapse
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,12 +47,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
-import coil.ImageLoader
+import androidx.compose.ui.zIndex
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.android.material.color.DynamicColors
 import org.xtimms.tokusho.LocalDarkTheme
@@ -66,8 +75,8 @@ import org.xtimms.tokusho.core.prefs.DarkThemePreference.Companion.ON
 import org.xtimms.tokusho.core.prefs.READING_TIME
 import org.xtimms.tokusho.core.prefs.STYLE_MONOCHROME
 import org.xtimms.tokusho.core.prefs.STYLE_TONAL_SPOT
-import org.xtimms.tokusho.core.prefs.TABS_MANGA_COUNT
 import org.xtimms.tokusho.core.prefs.paletteStyles
+import org.xtimms.tokusho.sections.stats.Size
 import org.xtimms.tokusho.ui.harmonize.hct.Hct
 import org.xtimms.tokusho.ui.monet.LocalTonalPalettes
 import org.xtimms.tokusho.ui.monet.PaletteStyle
@@ -76,26 +85,21 @@ import org.xtimms.tokusho.ui.monet.TonalPalettes.Companion.toTonalPalettes
 import org.xtimms.tokusho.ui.monet.a1
 import org.xtimms.tokusho.ui.monet.a2
 import org.xtimms.tokusho.ui.monet.a3
-import org.xtimms.tokusho.utils.system.getLanguageDesc
+import org.xtimms.tokusho.utils.material.combineColors
+import org.xtimms.tokusho.utils.system.toDisplayName
+import java.util.Locale
 
 const val APPEARANCE_DESTINATION = "appearance"
 
 val colorList = ((4..10) + (1..3)).map { it * 35.0 }.map { Color(Hct.from(it, 40.0, 40.0).toInt()) }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppearanceView(
     navigateBack: () -> Unit,
     navigateToDarkTheme: () -> Unit,
     navigateToLanguages: () -> Unit
 ) {
-    val image by remember {
-        mutableIntStateOf(
-            listOf(
-                R.drawable.ookami, R.drawable.sample1
-            ).random()
-        )
-    }
+    val localDensity = LocalDensity.current
 
     var isReadingTimeEstimationEnabled by remember {
         mutableStateOf(AppSettings.isReadingTimeEstimationEnabled())
@@ -106,21 +110,78 @@ fun AppearanceView(
         navigateBack = navigateBack
     ) { padding ->
         Column(
-            Modifier
+            modifier = Modifier
                 .padding(padding)
                 .verticalScroll(rememberScrollState()),
         ) {
-            MangaCard(
-                modifier = Modifier.padding(18.dp),
-                thumbnailUrl = image
-            )
+            Card(
+                modifier = Modifier.padding(18.dp)
+            ) {
+                var headerSize by remember { mutableStateOf(Size(0.dp, 0.dp)) }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned {
+                            headerSize = Size(
+                                width = with(localDensity) { it.size.width.toDp() },
+                                height = with(localDensity) { it.size.height.toDp() }
+                            )
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    val halfWidth = headerSize.width / 2
+                    val halfHeight = headerSize.height / 2
+
+                    val angleStar1 by rememberInfiniteTransition("angleStar1").animateFloat(
+                        label = "angleStar1",
+                        initialValue = -20f,
+                        targetValue = 20f,
+                        animationSpec = infiniteRepeatable(tween(5000), RepeatMode.Reverse)
+                    )
+
+                    val angleStar2 by rememberInfiniteTransition("angleStar2").animateFloat(
+                        label = "angleStar2",
+                        initialValue = -50f,
+                        targetValue = 50f,
+                        animationSpec = infiniteRepeatable(tween(9000), RepeatMode.Reverse)
+                    )
+
+                    Icon(
+                        modifier = Modifier
+                            .requiredSize(256.dp)
+                            .absoluteOffset(
+                                x = halfWidth * 0.7f,
+                                y = -halfHeight * 0.6f
+                            )
+                            .rotate(angleStar1)
+                            .zIndex(-1f),
+                        painter = painterResource(R.drawable.shape_soft_star_1),
+                        tint = MaterialTheme.colorScheme.primary,
+                        contentDescription = null,
+                    )
+                    Icon(
+                        modifier = Modifier
+                            .requiredSize(256.dp)
+                            .absoluteOffset(
+                                x = -halfWidth * 0.7f,
+                                y = halfHeight * 0.6f
+                            )
+                            .rotate(angleStar2)
+                            .zIndex(-1f),
+                        painter = painterResource(R.drawable.shape_soft_star_2),
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null,
+                    )
+                }
+            }
 
             val pageCount = colorList.size + 1
-            val pagerState = rememberPagerState(initialPage = if (LocalPaletteStyleIndex.current == STYLE_MONOCHROME) pageCount else colorList.indexOf(
-                Color(LocalSeedColor.current)
-            ).run { if (this == -1) 0 else this }) {
-                pageCount
-            }
+            val pagerState =
+                rememberPagerState(initialPage = if (LocalPaletteStyleIndex.current == STYLE_MONOCHROME) pageCount else colorList.indexOf(
+                    Color(LocalSeedColor.current)
+                ).run { if (this == -1) 0 else this }) {
+                    pageCount
+                }
 
             HorizontalPager(
                 modifier = Modifier
@@ -187,7 +248,7 @@ fun AppearanceView(
             PreferenceItem(
                 title = stringResource(id = R.string.language),
                 icon = Icons.Outlined.Language,
-                description = getLanguageDesc(),
+                description = Locale.getDefault().toDisplayName(),
                 onClick = { navigateToLanguages() })
             PreferenceSubtitle(text = stringResource(id = R.string.details))
             PreferenceSwitch(

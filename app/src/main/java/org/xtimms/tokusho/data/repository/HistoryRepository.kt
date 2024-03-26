@@ -11,6 +11,7 @@ import org.xtimms.tokusho.core.database.entity.toManga
 import org.xtimms.tokusho.core.database.entity.toMangaHistory
 import org.xtimms.tokusho.core.database.entity.toMangaTags
 import org.xtimms.tokusho.core.model.MangaHistory
+import org.xtimms.tokusho.core.model.MangaWithHistory
 import org.xtimms.tokusho.core.model.findById
 import org.xtimms.tokusho.core.model.isNsfw
 import org.xtimms.tokusho.core.parser.MangaDataRepository
@@ -24,6 +25,11 @@ class HistoryRepository @Inject constructor(
     private val db: TokushoDatabase,
     private val mangaRepository: MangaDataRepository,
 ) {
+
+    suspend fun getList(offset: Int, limit: Int): List<Manga> {
+        val entities = db.getHistoryDao().findAll(offset, limit)
+        return entities.map { it.manga.toManga(it.tags.toMangaTags()) }
+    }
 
     suspend fun getLastOrNull(): Manga? {
         val entity = db.getHistoryDao().findAll(0, 1).firstOrNull() ?: return null
@@ -42,8 +48,21 @@ class HistoryRepository @Inject constructor(
         }
     }
 
+    fun observeAllWithHistory(): Flow<List<MangaWithHistory>> {
+        return db.getHistoryDao().observeAll().mapItems {
+            MangaWithHistory(
+                it.manga.toManga(it.tags.toMangaTags()),
+                it.history.toMangaHistory(),
+            )
+        }
+    }
+
     suspend fun getOne(manga: Manga): MangaHistory? {
         return db.getHistoryDao().find(manga.id)?.recoverIfNeeded(manga)?.toMangaHistory()
+    }
+
+    suspend fun delete(manga: Manga) {
+        db.getHistoryDao().delete(manga.id)
     }
 
     fun observeOne(id: Long): Flow<MangaHistory?> {

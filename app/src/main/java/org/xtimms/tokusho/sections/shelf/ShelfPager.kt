@@ -1,6 +1,5 @@
 package org.xtimms.tokusho.sections.shelf
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import org.xtimms.tokusho.R
+import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.screens.EmptyScreen
 import org.xtimms.tokusho.utils.system.plus
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShelfPager(
     coil: ImageLoader,
@@ -51,7 +50,7 @@ fun ShelfPager(
         ShelfGrid(
             coil = coil,
             items = library,
-            columns = 2,
+            columns = AppSettings.getGridColumnsCount().toInt(),
             contentPadding = contentPadding,
             selection = listOf(),
             onClick = navigateToDetails,

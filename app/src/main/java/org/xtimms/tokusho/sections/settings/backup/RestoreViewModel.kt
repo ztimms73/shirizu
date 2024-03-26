@@ -15,7 +15,7 @@ import org.xtimms.tokusho.data.repository.backup.BackupZipInput
 import org.xtimms.tokusho.data.repository.backup.CompositeResult
 import org.xtimms.tokusho.utils.lang.MutableEventFlow
 import org.xtimms.tokusho.utils.lang.call
-import org.xtimms.tokusho.utils.lang.toUriOrNull
+import org.xtimms.tokusho.utils.system.toUriOrNull
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.Date

@@ -1,6 +1,5 @@
 package org.xtimms.tokusho.sections.details
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +29,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.AsyncImageImpl
 import org.xtimms.tokusho.core.components.BackIconButton
@@ -40,7 +38,7 @@ import org.xtimms.tokusho.ui.theme.TokushoTheme
 const val PICTURES_ARGUMENT = "{pictures}"
 const val FULL_POSTER_DESTINATION = "full_poster/$PICTURES_ARGUMENT"
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullImageView(
     coil: ImageLoader,

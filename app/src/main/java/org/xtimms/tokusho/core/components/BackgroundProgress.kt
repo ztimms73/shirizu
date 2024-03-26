@@ -37,7 +37,7 @@ fun BackgroundProgress(
     color: Color,
 ) {
 
-    val percentWithNewSpent = 0.3f
+    val percentWithNewSpent = 0.5f
 
     val percentWithNewSpentAnimated = animateFloatAsState(
         label = "percentWithNewSpentAnimated",

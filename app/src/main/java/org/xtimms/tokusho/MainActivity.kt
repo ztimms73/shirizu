@@ -1,12 +1,16 @@
 package org.xtimms.tokusho
 
+import android.Manifest
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,26 +38,35 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.xtimms.tokusho.core.Navigation
 import org.xtimms.tokusho.core.components.BottomNavBar
+import org.xtimms.tokusho.core.components.ContinueReadingButton
+import org.xtimms.tokusho.core.components.NavigationRail
 import org.xtimms.tokusho.core.components.TopAppBar
 import org.xtimms.tokusho.core.logs.FileLogger
+import org.xtimms.tokusho.core.prefs.AppSettings
+import org.xtimms.tokusho.core.screens.UpdateDialogImpl
+import org.xtimms.tokusho.core.updates.Updater
 import org.xtimms.tokusho.ui.theme.TokushoTheme
-import org.xtimms.tokusho.utils.lang.processLifecycleScope
+import org.xtimms.tokusho.utils.system.setLanguage
+import org.xtimms.tokusho.utils.system.suspendToast
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -79,10 +92,48 @@ class MainActivity : ComponentActivity() {
             return
         }
 
+        runBlocking {
+            if (Build.VERSION.SDK_INT < 33) {
+                setLanguage(AppSettings.getLocaleFromPreference())
+            }
+        }
+
         setContent {
+            val context = LocalContext.current
+
+            val scope = rememberCoroutineScope()
+            var updateJob: Job? = null
+            var latestRelease by remember { mutableStateOf(Updater.LatestRelease()) }
+            var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
+            var currentDownloadStatus by remember { mutableStateOf(Updater.DownloadStatus.NotYet as Updater.DownloadStatus) }
+
             val navController = rememberNavController()
             val windowSizeClass = calculateWindowSizeClass(this)
             val isCompactScreen = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+
+            val settings =
+                rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    Updater.installLatestApk(context)
+                }
+
+            val launcher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { result ->
+                if (result) {
+                    Updater.installLatestApk(context)
+                } else {
+                    if (!context.packageManager.canRequestPackageInstalls())
+                        settings.launch(
+                            Intent(
+                                Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                Uri.parse("package:${context.packageName}"),
+                            )
+                        )
+                    else
+                        Updater.installLatestApk(context)
+                }
+            }
+
             LaunchedEffect(Unit) {
                 isReady.value = true
             }
@@ -101,6 +152,49 @@ class MainActivity : ComponentActivity() {
                         )
                         LaunchedEffect(Unit) {
                             isDone.value = true
+                        }
+                        LaunchedEffect(Unit) {
+                            if (!AppSettings.isAutoUpdateEnabled())
+                                return@LaunchedEffect
+                            launch(Dispatchers.IO) {
+                                runCatching {
+                                    Updater.checkForUpdate(context)?.let {
+                                        latestRelease = it
+                                        showUpdateDialog = true
+                                    }
+                                }.onFailure {
+                                    it.printStackTrace()
+                                }
+                            }
+                        }
+                        if (showUpdateDialog) {
+                            UpdateDialogImpl(
+                                onDismissRequest = {
+                                    showUpdateDialog = false
+                                    updateJob?.cancel()
+                                },
+                                title = latestRelease.name.toString(),
+                                onConfirmUpdate = {
+                                    updateJob = scope.launch(Dispatchers.IO) {
+                                        runCatching {
+                                            Updater.downloadApk(context, latestRelease)
+                                                .collect { downloadStatus ->
+                                                    currentDownloadStatus = downloadStatus
+                                                    if (downloadStatus is Updater.DownloadStatus.Finished) {
+                                                        launcher.launch(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+                                                    }
+                                                }
+                                        }.onFailure {
+                                            it.printStackTrace()
+                                            currentDownloadStatus = Updater.DownloadStatus.NotYet
+                                            context.suspendToast(R.string.app_update_failed)
+                                            return@launch
+                                        }
+                                    }
+                                },
+                                releaseNote = latestRelease.body.toString(),
+                                downloadStatus = currentDownloadStatus
+                            )
                         }
                     }
                 }
@@ -167,6 +261,9 @@ fun MainView(
                 )
             }
         },
+        floatingActionButton = {
+            ContinueReadingButton(navController = navController)
+        },
         contentWindowInsets = WindowInsets.systemBars
             .only(WindowInsetsSides.Horizontal)
     ) { padding ->
@@ -175,6 +272,9 @@ fun MainView(
             Row(
                 modifier = Modifier.padding(padding)
             ) {
+                NavigationRail(
+                    navController = navController
+                )
                 Navigation(
                     coil = coil,
                     loggers = loggers,

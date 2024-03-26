@@ -22,8 +22,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 fun ScaffoldWithTopAppBar(
     title: String,
     navigateBack: () -> Unit,
-    snackbarHost: @Composable (() -> Unit) = {},
-    floatingActionButton: @Composable (() -> Unit) = {},
+    snackbarHost: @Composable () -> Unit = {},
+    floatingActionButton: @Composable () -> Unit = {},
+    actions: @Composable (RowScope.() -> Unit) = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -39,6 +40,7 @@ fun ScaffoldWithTopAppBar(
             DefaultTopAppBar(
                 title = title,
                 scrollBehavior = topAppBarScrollBehavior,
+                actions = actions,
                 navigateBack = navigateBack
             )
         },

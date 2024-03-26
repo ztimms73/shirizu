@@ -9,12 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Restore
-import androidx.compose.material.icons.outlined.Update
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,16 +22,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
-import org.xtimms.tokusho.core.updates.Updater
 import org.xtimms.tokusho.sections.settings.about.ProgressIndicatorButton
 import org.xtimms.tokusho.utils.DeviceUtil
-import org.xtimms.tokusho.utils.system.suspendToast
 
 const val RESTORE_ARGUMENT = "{source}"
 const val RESTORE_DESTINATION = "restore/?file=${RESTORE_ARGUMENT}"

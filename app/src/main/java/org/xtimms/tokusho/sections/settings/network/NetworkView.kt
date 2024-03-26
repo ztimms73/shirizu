@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Dns
+import androidx.compose.material.icons.outlined.PhotoSizeSelectSmall
 import androidx.compose.material.icons.outlined.VpnLock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +24,7 @@ import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.core.components.icons.ArrowDecisionOutline
 import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.prefs.SSL_BYPASS
+import org.xtimms.tokusho.core.prefs.WSRV
 
 const val NETWORK_DESTINATION = "network"
 
@@ -33,6 +35,10 @@ fun NetworkView(
 
     var isSSLBypassEnabled by remember {
         mutableStateOf(AppSettings.isSSLBypassEnabled())
+    }
+
+    var isImageOptimizationEnabled by remember {
+        mutableStateOf(AppSettings.isImagesProxyEnabled())
     }
 
     ScaffoldWithTopAppBar(
@@ -58,6 +64,17 @@ fun NetworkView(
                     description = "",
                     icon = Icons.Outlined.Dns
                 )
+            }
+            item {
+                PreferenceSwitch(
+                    title = stringResource(id = R.string.images_optimization_proxy),
+                    description = stringResource(id = R.string.images_optimization_proxy_desc),
+                    icon = Icons.Outlined.PhotoSizeSelectSmall,
+                    isChecked = isImageOptimizationEnabled,
+                ) {
+                    isImageOptimizationEnabled = !isImageOptimizationEnabled
+                    AppSettings.updateValue(WSRV, isImageOptimizationEnabled)
+                }
             }
             item {
                 PreferenceSwitch(

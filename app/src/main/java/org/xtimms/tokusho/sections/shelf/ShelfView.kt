@@ -2,7 +2,6 @@ package org.xtimms.tokusho.sections.shelf
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -23,8 +22,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.xtimms.tokusho.core.collapsable
 import org.xtimms.tokusho.core.components.PullRefresh
-import org.xtimms.tokusho.core.model.FavouriteCategory
-import org.xtimms.tokusho.core.model.ShelfCategory
 import kotlin.time.Duration.Companion.seconds
 
 const val SHELF_DESTINATION = "shelf"
@@ -47,11 +44,10 @@ fun ShelfView(
         topBarHeightPx = topBarHeightPx,
         padding = padding,
         navigateToDetails = navigateToDetails,
-        onRefresh = onRefresh
+        onRefresh = onRefresh,
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShelfViewContent(
     coil: ImageLoader,

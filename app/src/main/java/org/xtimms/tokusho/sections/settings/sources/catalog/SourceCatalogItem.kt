@@ -12,10 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.tokusho.core.AsyncImageImpl
+import org.xtimms.tokusho.core.parser.favicon.faviconUri
 
 @Composable
 fun SourceCatalogItem(
-    source: String,
+    coil: ImageLoader,
+    source: MangaSource,
     modifier: Modifier = Modifier,
 ) {
 
@@ -32,13 +37,16 @@ fun SourceCatalogItem(
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(imageVector = Icons.AutoMirrored.Outlined.Label, contentDescription = null)
+            AsyncImageImpl(
+                coil = coil,
+                contentDescription = null,
+                model = source.faviconUri()
+            )
             Text(
-                text = source,
+                text = source.title,
                 modifier = Modifier
                     .padding(start = 16.dp),
             )
         }
     }
-
 }

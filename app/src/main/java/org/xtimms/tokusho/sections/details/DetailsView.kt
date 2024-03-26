@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -65,7 +64,8 @@ fun DetailsView(
     navigateBack: () -> Unit,
     navigateToFullImage: (String) -> Unit,
     navigateToDetails: (Long) -> Unit,
-    navigateToSource: (MangaSource) -> Unit
+    navigateToSource: (MangaSource) -> Unit,
+    navigateToReader: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -255,7 +255,7 @@ fun DetailsView(
                     bookmark = false,
                     selected = false,
                     onLongClick = { /*TODO*/ },
-                    onClick = { /*TODO*/ }
+                    onClick = { navigateToReader() }
                 )
             }
         }

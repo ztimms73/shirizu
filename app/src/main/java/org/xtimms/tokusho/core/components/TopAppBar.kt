@@ -1,7 +1,15 @@
 package org.xtimms.tokusho.core.components
 
+import android.graphics.Path
+import android.view.animation.PathInterpolator
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -42,15 +50,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.collections.immutable.persistentListOf
 import org.xtimms.tokusho.R
+import org.xtimms.tokusho.core.DURATION_ENTER
+import org.xtimms.tokusho.core.DURATION_EXIT
 import org.xtimms.tokusho.core.initialOffset
 import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
 import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
+import org.xtimms.tokusho.core.toEasing
 import org.xtimms.tokusho.sections.explore.EXPLORE_DESTINATION
 import org.xtimms.tokusho.sections.feed.FEED_DESTINATION
 import org.xtimms.tokusho.sections.history.HISTORY_DESTINATION
@@ -78,10 +91,27 @@ fun TopAppBar(
         }
     }
 
+    val path = Path().apply {
+        moveTo(0f, 0f)
+        cubicTo(0.05F, 0F, 0.133333F, 0.06F, 0.166666F, 0.4F)
+        cubicTo(0.208333F, 0.82F, 0.25F, 1F, 1F, 1F)
+    }
+
+    val emphasizePathInterpolator = PathInterpolator(path)
+    val emphasizeEasing = emphasizePathInterpolator.toEasing()
+
+    val enterTween = tween<IntOffset>(durationMillis = DURATION_ENTER, easing = emphasizeEasing)
+    val exitTween = tween<IntOffset>(durationMillis = DURATION_ENTER, easing = emphasizeEasing)
+    val fadeTween = tween<Float>(durationMillis = DURATION_EXIT)
+
     AnimatedVisibility(
         visible = isVisible,
-        enter = materialSharedAxisXIn(initialOffsetX = { -(it * initialOffset).toInt() }),
-        exit = materialSharedAxisXOut(targetOffsetX = { -(it * initialOffset).toInt() })
+        enter = slideInHorizontally(
+            enterTween,
+            initialOffsetX = { -(it * initialOffset).toInt() }) + fadeIn(fadeTween),
+        exit = slideOutHorizontally(
+            exitTween,
+            targetOffsetX = { -(it * initialOffset).toInt() }) + fadeOut(fadeTween)
     ) {
         Row(
             modifier = Modifier
@@ -158,6 +188,7 @@ fun TopAppBar(
 @Composable
 fun DefaultTopAppBar(
     title: String,
+    actions: @Composable (RowScope.() -> Unit),
     scrollBehavior: TopAppBarScrollBehavior? = null,
     navigateBack: () -> Unit,
 ) {
@@ -166,6 +197,7 @@ fun DefaultTopAppBar(
         navigationIcon = {
             BackIconButton(onClick = navigateBack)
         },
+        actions = actions,
         scrollBehavior = scrollBehavior
     )
 }
@@ -237,6 +269,34 @@ fun ClassicTopAppBar(
     )
 }
 
+@Composable
+fun AppBarTitle(
+    title: String?,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    Column(modifier = modifier) {
+        title?.let {
+            Text(
+                text = it,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        subtitle?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.basicMarquee(
+                    delayMillis = 2_000,
+                ),
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
@@ -244,6 +304,14 @@ fun DefaultTopAppBarPreview() {
     TokushoTheme {
         DefaultTopAppBar(
             title = "Tokusho",
+            actions = {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Localized description"
+                    )
+                }
+            },
             navigateBack = {}
         )
     }

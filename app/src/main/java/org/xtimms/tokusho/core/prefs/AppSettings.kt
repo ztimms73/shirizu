@@ -1,6 +1,7 @@
 package org.xtimms.tokusho.core.prefs
 
 import android.os.Build
+import androidx.annotation.DeprecatedSinceApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -16,7 +17,8 @@ import org.xtimms.tokusho.ui.theme.SEED
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.ui.monet.PaletteStyle
 import org.xtimms.tokusho.utils.lang.processLifecycleScope
-import org.xtimms.tokusho.utils.system.languageMap
+import org.xtimms.tokusho.utils.system.LocaleLanguageCodeMap
+import java.util.Locale
 
 private const val DYNAMIC_COLOR = "dynamic_color"
 const val DARK_THEME_VALUE = "dark_theme_value"
@@ -27,6 +29,7 @@ private const val THEME_COLOR = "theme_color"
 const val PALETTE_STYLE = "palette_style"
 const val LANGUAGE = "language"
 const val READING_TIME = "reading_time"
+const val GRID_COLUMNS = "grid_columns"
 
 const val SYSTEM_DEFAULT = 0
 
@@ -36,6 +39,8 @@ const val PRE_RELEASE = 1
 const val ACRA = "acra"
 const val LOGGING = "logging"
 
+const val SWIPE_TUTORIAL = "swipe_tutorial"
+const val WSRV = "image_optimization"
 const val SSL_BYPASS = "ssl_bypass"
 const val NSFW = "nsfw"
 const val TABS_MANGA_COUNT = "tabs_manga_count"
@@ -66,6 +71,7 @@ private val BooleanPreferenceDefaults = mapOf(
 )
 
 private val IntPreferenceDefaults = mapOf(
+    GRID_COLUMNS to 3,
     LANGUAGE to SYSTEM_DEFAULT,
     PALETTE_STYLE to 0,
     DARK_THEME_VALUE to DarkThemePreference.FOLLOW_SYSTEM,
@@ -110,16 +116,33 @@ object AppSettings {
 
     fun isSuggestionsEnabled() = SUGGESTIONS.getBoolean(true)
 
+    fun isSwipeTutorialEnabled() = SWIPE_TUTORIAL.getBoolean(true)
 
-    private fun getLanguageNumberByCode(languageCode: String): Int =
-        languageMap.entries.find { it.value == languageCode }?.key ?: SYSTEM_DEFAULT
+    fun isImagesProxyEnabled() = WSRV.getBoolean(false)
 
+    fun getGridColumnsCount(columns: Int = GRID_COLUMNS.getInt()): Float {
+        return when (columns) {
+            1 -> 1f
+            2 -> 2f
+            3 -> 3f
+            4 -> 4f
+            5 -> 5f
+            else -> 3f
+        }
+    }
 
-    fun getLanguageNumber(): Int {
-        return if (Build.VERSION.SDK_INT >= 33) getLanguageNumberByCode(
-            LocaleListCompat.getAdjustedDefault()[0]?.toLanguageTag().toString()
-        )
-        else LANGUAGE.getInt()
+    @DeprecatedSinceApi(api = 33)
+    fun getLocaleFromPreference(): Locale? {
+        val languageCode = LANGUAGE.getInt()
+        return LocaleLanguageCodeMap.entries.find { it.value == languageCode }?.key
+    }
+
+    fun saveLocalePreference(locale: Locale?) {
+        if (Build.VERSION.SDK_INT >= 33) {
+            // No op
+        } else {
+            LANGUAGE.updateInt(LocaleLanguageCodeMap[locale] ?: SYSTEM_DEFAULT)
+        }
     }
 
     data class Settings(

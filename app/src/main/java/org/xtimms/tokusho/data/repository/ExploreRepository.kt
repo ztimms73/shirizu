@@ -34,7 +34,7 @@ class ExploreRepository @Inject constructor(
         list.shuffle()
         list
     }.onFailure {
-        // TODO
+        it.printStackTrace()
     }.getOrDefault(emptyList())
 
 }

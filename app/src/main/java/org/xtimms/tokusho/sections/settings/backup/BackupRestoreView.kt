@@ -43,8 +43,8 @@ import org.xtimms.tokusho.core.components.PreferenceSwitchWithContainer
 import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.core.components.icons.Kotatsu
-import org.xtimms.tokusho.utils.lang.tryLaunch
 import org.xtimms.tokusho.utils.system.toast
+import org.xtimms.tokusho.utils.system.tryLaunch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -116,13 +116,13 @@ fun BackupRestoreView(
 
     ScaffoldWithTopAppBar(
         title = stringResource(R.string.backup_and_restore),
+        navigateBack = navigateBack,
         snackbarHost = {
             SnackbarHost(
                 modifier = Modifier.systemBarsPadding(),
                 hostState = snackbarHostState
             )
-        },
-        navigateBack = navigateBack
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding),

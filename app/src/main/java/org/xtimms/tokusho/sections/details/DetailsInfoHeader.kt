@@ -1,6 +1,7 @@
 package org.xtimms.tokusho.sections.details
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -15,14 +16,11 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -31,40 +29,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DoneAll
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Upcoming
-import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.ChipColors
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
@@ -103,7 +93,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
@@ -112,12 +101,9 @@ import org.xtimms.tokusho.core.AsyncImageImpl
 import org.xtimms.tokusho.core.components.AnimatedButton
 import org.xtimms.tokusho.core.components.ButtonType
 import org.xtimms.tokusho.core.components.MangaCover
-import org.xtimms.tokusho.core.components.MangaHorizontalItem
 import org.xtimms.tokusho.core.components.ReadButton
 import org.xtimms.tokusho.core.parser.favicon.faviconUri
 import org.xtimms.tokusho.ui.theme.TokushoTheme
-import org.xtimms.tokusho.ui.theme.applyOpacity
-import org.xtimms.tokusho.ui.theme.disabledIconOpacity
 import org.xtimms.tokusho.utils.composable.clickableNoIndication
 import org.xtimms.tokusho.utils.composable.secondaryItemAlpha
 import kotlin.math.roundToInt
@@ -147,24 +133,41 @@ fun DetailsInfoBox(
     onSourceClicked: () -> Unit,
 ) {
     Column(modifier = modifier) {
-        val backdropGradientColors = listOf(
-            Color.Transparent,
-            MaterialTheme.colorScheme.background,
-        )
-        AsyncImageImpl(
-            coil = coil,
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        Box(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .aspectRatio(1f)
-                .clickable(
-                    role = Role.Button,
-                    onClick = onCoverClick
+                .fillMaxWidth(),
+            contentAlignment = Alignment.BottomEnd,
+        ) {
+            AsyncImageImpl(
+                coil = coil,
+                model = imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .aspectRatio(1f)
+                    .clickable(
+                        role = Role.Button,
+                        onClick = onCoverClick
+                    )
+                    .clip(MaterialTheme.shapes.large)
+            )
+            if (isNsfw) {
+                ElevatedAssistChip(
+                    modifier = Modifier.padding(end = 32.dp, bottom = 8.dp),
+                    onClick = { /*TODO*/ },
+                    label = {
+                        Text(
+                            text = "18+",
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    },
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.errorContainer),
+                    colors = AssistChipDefaults.elevatedAssistChipColors()
+                        .copy(containerColor = MaterialTheme.colorScheme.errorContainer)
                 )
-                .clip(MaterialTheme.shapes.large)
-        )
+            }
+        }
 
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             if (!isTabletUi) {
@@ -312,7 +315,8 @@ private fun MangaAndSourceTitlesSmall(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalLayoutApi::class,
+@OptIn(
+    ExperimentalLayoutApi::class,
     ExperimentalMaterial3Api::class
 )
 @Composable
@@ -355,9 +359,8 @@ private fun DetailsContentInfo(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
                 )
+                Spacer(modifier = Modifier.height(4.dp))
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             if (author.isNotEmpty()) {
                 Row(
@@ -379,6 +382,39 @@ private fun DetailsContentInfo(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
             }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = when (state) {
+                        MangaState.ONGOING -> Icons.Outlined.Schedule
+                        MangaState.FINISHED -> Icons.Outlined.DoneAll
+                        MangaState.ABANDONED -> Icons.Outlined.Close
+                        MangaState.PAUSED -> Icons.Outlined.Pause
+                        MangaState.UPCOMING -> Icons.Outlined.Upcoming
+                        else -> Icons.Outlined.Block
+                    },
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(MaterialTheme.typography.bodyLarge.fontSize.value.dp),
+                )
+                Text(
+                    text = when (state) {
+                        MangaState.ONGOING -> stringResource(id = R.string.ongoing)
+                        MangaState.FINISHED -> stringResource(id = R.string.finished)
+                        MangaState.ABANDONED -> stringResource(id = R.string.abandoned)
+                        MangaState.PAUSED -> stringResource(id = R.string.paused)
+                        MangaState.UPCOMING -> stringResource(id = R.string.upcoming)
+                        else -> stringResource(id = R.string.unknown)
+                    },
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             FlowRow(
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -442,54 +478,6 @@ private fun DetailsContentInfo(
                         },
                         label = { Text(text = sourceTitle) },
                     )
-                    AssistChip(
-                        onClick = { /*TODO*/ },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = when (state) {
-                                    MangaState.ONGOING -> Icons.Outlined.Schedule
-                                    MangaState.FINISHED -> Icons.Outlined.DoneAll
-                                    MangaState.ABANDONED -> Icons.Outlined.Close
-                                    MangaState.PAUSED -> Icons.Outlined.Pause
-                                    MangaState.UPCOMING -> Icons.Outlined.Upcoming
-                                    else -> Icons.Outlined.Block
-                                },
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(MaterialTheme.typography.bodyLarge.fontSize.value.dp),
-                                tint = MaterialTheme.colorScheme.outline
-                            )
-                        },
-                        label = {
-                            Text(
-                                text = when (state) {
-                                    MangaState.ONGOING -> stringResource(id = R.string.ongoing)
-                                    MangaState.FINISHED -> stringResource(id = R.string.finished)
-                                    MangaState.ABANDONED -> stringResource(id = R.string.abandoned)
-                                    MangaState.PAUSED -> stringResource(id = R.string.paused)
-                                    MangaState.UPCOMING -> stringResource(id = R.string.upcoming)
-                                    else -> stringResource(id = R.string.unknown)
-                                },
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                        },
-                    )
-                    if (isNsfw) {
-                        AssistChip(
-                            onClick = { /*TODO*/ },
-                            leadingIcon = {
-                                Icon(
-                                    modifier = Modifier.size(18.dp),
-                                    imageVector = Icons.Outlined.WarningAmber,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            },
-                            label = { Text(text = "18+", color = MaterialTheme.colorScheme.error) },
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-                        )
-                    }
                     OutlinedIconButton(
                         modifier = Modifier
                             .height(32.dp)
@@ -677,14 +665,19 @@ fun ExpandableMangaDescription(
             text = stringResource(id = R.string.description),
             style = MaterialTheme.typography.titleLarge
         )
-        MangaSummary(
-            expandedDescription = desc,
-            shrunkDescription = trimmedDescription,
-            expanded = expanded,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .clickableNoIndication { onExpanded(!expanded) },
-        )
+        AnimatedContent(
+            targetState = desc,
+            label = "description"
+        ) {
+            MangaSummary(
+                expandedDescription = it,
+                shrunkDescription = trimmedDescription,
+                expanded = expanded,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .clickableNoIndication { onExpanded(!expanded) },
+            )
+        }
         if (!tags.isNullOrEmpty()) {
             Box(
                 modifier = Modifier
@@ -849,7 +842,7 @@ fun DetailsInfoBoxPreview() {
                     author = "Kotoyama",
                     artist = null,
                     isNsfw = true,
-                    state = null,
+                    state = MangaState.UPCOMING,
                     source = MangaSource.MANGADEX,
                     chapters = "22",
                     isTabletUi = false,

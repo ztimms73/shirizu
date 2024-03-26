@@ -69,30 +69,12 @@ class SourcesCatalogListProducer @AssistedInject constructor(
             "" -> return emptyList()
             else -> sources.retainAll { it.title.contains(q, ignoreCase = true) }
         }
-        return if (sources.isEmpty()) {
-            listOf(
-                if (query == null) {
-                    SourceCatalogItemModel.Hint(
-                        icon = Icons.Outlined.SearchOff,
-                        title = R.string.no_manga_sources,
-                        text = R.string.no_manga_sources_catalog_text,
-                    )
-                } else {
-                    SourceCatalogItemModel.Hint(
-                        icon = Icons.Outlined.SearchOff,
-                        title = R.string.nothing_found,
-                        text = R.string.no_manga_sources_found,
-                    )
-                },
+        sources.sortBy { it.title }
+        return sources.map {
+            SourceCatalogItemModel(
+                source = it,
+                showSummary = query != null,
             )
-        } else {
-            sources.sortBy { it.title }
-            sources.map {
-                SourceCatalogItemModel.Source(
-                    source = it,
-                    showSummary = query != null,
-                )
-            }
         }
     }
 

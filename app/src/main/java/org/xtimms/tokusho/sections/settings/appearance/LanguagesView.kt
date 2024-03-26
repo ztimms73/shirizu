@@ -25,9 +25,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,19 +38,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.xtimms.tokusho.MainActivity
 import org.xtimms.tokusho.R
 import org.xtimms.tokusho.core.components.PreferenceSingleChoiceItem
 import org.xtimms.tokusho.core.components.PreferencesHintCard
 import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.core.prefs.AppSettings
-import org.xtimms.tokusho.core.prefs.AppSettings.getLanguageConfiguration
-import org.xtimms.tokusho.core.prefs.LANGUAGE
-import org.xtimms.tokusho.core.prefs.SYSTEM_DEFAULT
 import org.xtimms.tokusho.sections.settings.about.weblate
 import org.xtimms.tokusho.ui.theme.TokushoTheme
-import org.xtimms.tokusho.utils.system.getLanguageDesc
-import org.xtimms.tokusho.utils.system.languageMap
+import org.xtimms.tokusho.utils.system.LocaleLanguageCodeMap
+import org.xtimms.tokusho.utils.system.setLanguage
+import org.xtimms.tokusho.utils.system.toDisplayName
+import java.util.Locale
 
 const val LANGUAGES_DESTINATION = "languages"
 
@@ -58,7 +56,8 @@ const val LANGUAGES_DESTINATION = "languages"
 fun LanguagesView(
     navigateBack: () -> Unit
 ) {
-    var language by remember { mutableStateOf(AppSettings.getLanguageNumber()) }
+    val selectedLocale by remember { mutableStateOf(Locale.getDefault()) }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         Intent(android.provider.Settings.ACTION_APP_LOCALE_SETTINGS).apply {
@@ -79,29 +78,28 @@ fun LanguagesView(
         }
     LanguageViewImpl(
         navigateBack = navigateBack,
-        languageMap = languageMap,
+        localeSet = LocaleLanguageCodeMap.keys,
         isSystemLocaleSettingsAvailable = isSystemLocaleSettingsAvailable,
         onNavigateToSystemLocaleSettings = {
             if (isSystemLocaleSettingsAvailable) {
                 context.startActivity(intent)
             }
         },
-        selectedLanguage = language,
+        selectedLocale = selectedLocale,
     ) {
-        language = it
-        AppSettings.encodeInt(LANGUAGE, language)
-        MainActivity.setLanguage(getLanguageConfiguration())
+        AppSettings.saveLocalePreference(it)
+        setLanguage(it)
     }
 }
 
 @Composable
 private fun LanguageViewImpl(
     navigateBack: () -> Unit = {},
-    languageMap: Map<Int, String>,
+    localeSet: Set<Locale>,
     isSystemLocaleSettingsAvailable: Boolean = false,
     onNavigateToSystemLocaleSettings: () -> Unit,
-    selectedLanguage: Int,
-    onLanguageSelected: (Int) -> Unit = {}
+    selectedLocale: Locale,
+    onLanguageSelected: (Locale?) -> Unit = {}
 ) {
 
     val uriHandler = LocalUriHandler.current
@@ -126,17 +124,17 @@ private fun LanguageViewImpl(
             item {
                 PreferenceSingleChoiceItem(
                     text = stringResource(R.string.follow_system),
-                    selected = selectedLanguage == SYSTEM_DEFAULT,
+                    selected = !localeSet.contains(selectedLocale),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 18.dp)
-                ) { onLanguageSelected(SYSTEM_DEFAULT) }
+                ) { onLanguageSelected(null) }
             }
-            for (languageData in languageMap) {
+            for (locale in localeSet) {
                 item {
                     PreferenceSingleChoiceItem(
-                        text = getLanguageDesc(languageData.key),
-                        selected = selectedLanguage == languageData.key,
+                        text = locale.toDisplayName(),
+                        selected = selectedLocale == locale,
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 18.dp)
-                    ) { onLanguageSelected(languageData.key) }
+                    ) { onLanguageSelected(locale) }
                 }
             }
             if (isSystemLocaleSettingsAvailable) {
@@ -185,19 +183,15 @@ private fun LanguageViewImpl(
 @Composable
 private fun LanguagePagePreview() {
     var language by remember {
-        mutableIntStateOf(1)
+        mutableStateOf(Locale.KOREAN)
     }
-    val map = buildMap<Int, String> {
-        repeat(38) {
-            put(it + 1, "")
-        }
-    }
+    val map = setOf(Locale.forLanguageTag("ru"))
     TokushoTheme {
         LanguageViewImpl(
-            languageMap = map,
+            localeSet = map,
             isSystemLocaleSettingsAvailable = true,
             onNavigateToSystemLocaleSettings = { /*TODO*/ },
-            selectedLanguage = language
+            selectedLocale = language
         ) {
             language = it
         }

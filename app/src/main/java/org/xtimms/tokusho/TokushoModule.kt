@@ -27,11 +27,13 @@ import org.xtimms.tokusho.core.cache.StubContentCache
 import org.xtimms.tokusho.core.database.TokushoDatabase
 import org.xtimms.tokusho.core.model.LocalManga
 import org.xtimms.tokusho.core.network.MangaHttpClient
+import org.xtimms.tokusho.core.network.interceptors.ImageProxyInterceptor
 import org.xtimms.tokusho.core.os.NetworkState
 import org.xtimms.tokusho.core.parser.MangaLoaderContextImpl
 import org.xtimms.tokusho.core.parser.MangaRepository
 import org.xtimms.tokusho.core.parser.favicon.FaviconFetcher
 import org.xtimms.tokusho.core.parser.local.LocalStorageChanges
+import org.xtimms.tokusho.sections.reader.thumbnails.MangaPageFetcher
 import org.xtimms.tokusho.utils.CoilImageGetter
 import org.xtimms.tokusho.utils.system.connectivityManager
 import org.xtimms.tokusho.utils.system.isLowRamDevice
@@ -69,6 +71,8 @@ interface TokushoModule {
             @ApplicationContext context: Context,
             @MangaHttpClient okHttpClient: OkHttpClient,
             mangaRepositoryFactory: MangaRepository.Factory,
+            imageProxyInterceptor: ImageProxyInterceptor,
+            pageFetcherFactory: MangaPageFetcher.Factory,
         ): ImageLoader {
             val diskCacheFactory = {
                 val rootDir = context.externalCacheDir ?: context.cacheDir
@@ -85,9 +89,12 @@ interface TokushoModule {
                 .transformationDispatcher(Dispatchers.Default)
                 .diskCache(diskCacheFactory)
                 .logger(if (BuildConfig.DEBUG) DebugLogger() else null)
+                .allowRgb565(context.isLowRamDevice())
                 .components(
                     ComponentRegistry.Builder()
                         .add(FaviconFetcher.Factory(context, okHttpClient, mangaRepositoryFactory))
+                        .add(pageFetcherFactory)
+                        .add(imageProxyInterceptor)
                         .build(),
                 ).build()
         }

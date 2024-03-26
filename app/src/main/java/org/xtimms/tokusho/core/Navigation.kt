@@ -6,6 +6,8 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -19,8 +21,6 @@ import androidx.navigation.navArgument
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.tokusho.core.logs.FileLogger
-import org.xtimms.tokusho.core.motion.materialSharedAxisXIn
-import org.xtimms.tokusho.core.motion.materialSharedAxisXOut
 import org.xtimms.tokusho.sections.details.DETAILS_DESTINATION
 import org.xtimms.tokusho.sections.details.DetailsView
 import org.xtimms.tokusho.sections.details.FULL_POSTER_DESTINATION
@@ -34,6 +34,8 @@ import org.xtimms.tokusho.sections.history.HistoryView
 import org.xtimms.tokusho.sections.list.LIST_DESTINATION
 import org.xtimms.tokusho.sections.list.MangaListView
 import org.xtimms.tokusho.sections.list.PROVIDER_ARGUMENT
+import org.xtimms.tokusho.sections.reader.READER_DESTINATION
+import org.xtimms.tokusho.sections.reader.ReaderView
 import org.xtimms.tokusho.sections.search.SEARCH_DESTINATION
 import org.xtimms.tokusho.sections.search.SearchHostView
 import org.xtimms.tokusho.sections.settings.SETTINGS_DESTINATION
@@ -131,16 +133,31 @@ fun Navigation(
     val enterTween = tween<IntOffset>(durationMillis = DURATION_ENTER, easing = emphasizeEasing)
     val exitTween = tween<IntOffset>(durationMillis = DURATION_ENTER, easing = emphasizeEasing)
     val fadeTween = tween<Float>(durationMillis = DURATION_EXIT)
-    val fadeSpec = fadeTween
 
     NavHost(
         navController = navController,
         startDestination = BottomNavDestination.Shelf.route,
         modifier = modifier,
-        enterTransition = { materialSharedAxisXIn(initialOffsetX = { (it * initialOffset).toInt() }) },
-        exitTransition = { materialSharedAxisXOut(targetOffsetX = { -(it * initialOffset).toInt() }) },
-        popEnterTransition = { materialSharedAxisXIn(initialOffsetX = { -(it * initialOffset).toInt() }) },
-        popExitTransition = { materialSharedAxisXOut(targetOffsetX = { (it * initialOffset).toInt() }) }
+        enterTransition = {
+            slideInHorizontally(
+                enterTween,
+                initialOffsetX = { (it * initialOffset).toInt() }) + fadeIn(fadeTween)
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                exitTween,
+                targetOffsetX = { -(it * initialOffset).toInt() }) + fadeOut(fadeTween)
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                enterTween,
+                initialOffsetX = { -(it * initialOffset).toInt() }) + fadeIn(fadeTween)
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                exitTween,
+                targetOffsetX = { (it * initialOffset).toInt() }) + fadeOut(fadeTween)
+        }
     ) {
 
         composable(BottomNavDestination.Shelf.route) {
@@ -157,8 +174,11 @@ fun Navigation(
 
         composable(BottomNavDestination.History.route) {
             HistoryView(
+                coil = coil,
                 padding = padding,
                 topBarHeightPx = topBarHeightPx,
+                navigateToDetails = navigateToDetails,
+                navigateToReader = { navController.navigate(READER_DESTINATION) }
             )
         }
 
@@ -249,6 +269,7 @@ fun Navigation(
 
         composable(CATALOG_DESTINATION) {
             SourcesCatalogView(
+                coil = coil,
                 navigateBack = navigateBack,
             )
         }
@@ -400,7 +421,14 @@ fun Navigation(
                     navController.navigate(
                         LIST_DESTINATION.replace(PROVIDER_ARGUMENT, it.name)
                     )
-                }
+                },
+                navigateToReader = { navController.navigate(READER_DESTINATION) }
+            )
+        }
+
+        composable(READER_DESTINATION) {
+            ReaderView(
+                navigateBack = navigateBack
             )
         }
 
