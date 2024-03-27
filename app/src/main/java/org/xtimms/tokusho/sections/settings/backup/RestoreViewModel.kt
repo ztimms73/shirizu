@@ -1,6 +1,7 @@
 package org.xtimms.tokusho.sections.settings.backup
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,13 +26,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RestoreViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val repository: BackupRepository,
-    @ApplicationContext context: Context,
+    @ApplicationContext val context: Context,
 ) : KotatsuBaseViewModel() {
 
     private val backupInput = SuspendLazy {
-        val uri = savedStateHandle.get<String>(RESTORE_ARGUMENT)?.toUriOrNull() ?: throw FileNotFoundException()
+        val uri = savedStateHandle.get<String>(RESTORE_ARGUMENT)?.toUriOrNull()
+            ?: throw FileNotFoundException()
         val contentResolver = context.contentResolver
         runInterruptible(Dispatchers.IO) {
             val tempFile = File.createTempFile("backup_", ".tmp")
@@ -74,57 +76,68 @@ class RestoreViewModel @Inject constructor(
     }
 
     fun onItemClick(item: BackupEntryModel) {
-        val map = availableEntries.value.associateByTo(EnumMap(BackupEntry.Name::class.java)) { it.name }
+        val map =
+            availableEntries.value.associateByTo(EnumMap(BackupEntry.Name::class.java)) { it.name }
         map[item.name] = item.copy(isChecked = !item.isChecked)
         map.validate()
         availableEntries.value = map.values.sortedBy { it.name.ordinal }
     }
 
-    fun restore() {
+    fun restore(uri: Uri) {
         launchLoadingJob {
-            val backup = backupInput.get()
-            val checkedItems = availableEntries.value.mapNotNullTo(EnumSet.noneOf(BackupEntry.Name::class.java)) {
-                if (it.isChecked) it.name else null
-            }
+            val contentResolver = context.contentResolver
+                val tempFile = File.createTempFile("backup_", ".tmp")
+                (contentResolver.openInputStream(uri) ?: throw FileNotFoundException()).use { input ->
+                    tempFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                val backupInput = BackupZipInput(tempFile)
+            val backup: BackupZipInput = backupInput
+            val checkedItems =
+                availableEntries.value.mapNotNullTo(EnumSet.noneOf(BackupEntry.Name::class.java)) {
+                    if (it.isChecked) it.name else null
+                }
             val result = CompositeResult()
             val step = 1f / 5f
 
             progress.value = 0f
-            if (BackupEntry.Name.HISTORY in checkedItems) {
-                backup.getEntry(BackupEntry.Name.HISTORY)?.let {
-                    result += repository.restoreHistory(it)
-                }
+            //if (BackupEntry.Name.HISTORY in checkedItems) {
+            backup.getEntry(BackupEntry.Name.HISTORY)?.let {
+                result += repository.restoreHistory(it)
             }
+            //}
 
             progress.value += step
-            if (BackupEntry.Name.CATEGORIES in checkedItems) {
-                backup.getEntry(BackupEntry.Name.CATEGORIES)?.let {
-                    result += repository.restoreCategories(it)
-                }
+            //if (BackupEntry.Name.CATEGORIES in checkedItems) {
+            backup.getEntry(BackupEntry.Name.CATEGORIES)?.let {
+                result += repository.restoreCategories(it)
             }
+            //}
 
             progress.value += step
-            if (BackupEntry.Name.FAVOURITES in checkedItems) {
-                backup.getEntry(BackupEntry.Name.FAVOURITES)?.let {
-                    result += repository.restoreFavourites(it)
-                }
+            //if (BackupEntry.Name.FAVOURITES in checkedItems) {
+            backup.getEntry(BackupEntry.Name.FAVOURITES)?.let {
+                result += repository.restoreFavourites(it)
             }
+            //}
 
             progress.value += step
-            if (BackupEntry.Name.BOOKMARKS in checkedItems) {
-                backup.getEntry(BackupEntry.Name.BOOKMARKS)?.let {
-                    result += repository.restoreBookmarks(it)
-                }
+            //if (BackupEntry.Name.BOOKMARKS in checkedItems) {
+            backup.getEntry(BackupEntry.Name.BOOKMARKS)?.let {
+                result += repository.restoreBookmarks(it)
             }
+            //}
 
             progress.value += step
-            if (BackupEntry.Name.SOURCES in checkedItems) {
-                backup.getEntry(BackupEntry.Name.SOURCES)?.let {
-                    result += repository.restoreSources(it)
-                }
+            //if (BackupEntry.Name.SOURCES in checkedItems) {
+            backup.getEntry(BackupEntry.Name.SOURCES)?.let {
+                result += repository.restoreSources(it)
             }
+            //}
 
             progress.value = 1f
+            backup.cleanupAsync()
             onRestoreDone.call(result)
         }
     }
@@ -142,7 +155,8 @@ class RestoreViewModel @Inject constructor(
             }
         } else {
             if (favorites.isEnabled) {
-                this[BackupEntry.Name.FAVOURITES] = favorites.copy(isEnabled = false, isChecked = false)
+                this[BackupEntry.Name.FAVOURITES] =
+                    favorites.copy(isEnabled = false, isChecked = false)
             }
         }
     }

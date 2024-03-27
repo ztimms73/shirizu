@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -110,7 +109,6 @@ fun ShelfViewContent(
                 coil = coil,
                 state = pagerState,
                 contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()),
-                searchQuery = "",
                 getShelfForPage = { mangas },
                 navigateToDetails = onClickManga
             )

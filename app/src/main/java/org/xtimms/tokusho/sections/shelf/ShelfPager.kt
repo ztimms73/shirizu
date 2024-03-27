@@ -25,7 +25,6 @@ fun ShelfPager(
     coil: ImageLoader,
     state: PagerState,
     contentPadding: PaddingValues,
-    searchQuery: String?,
     getShelfForPage: (Int) -> List<ShelfManga>,
     navigateToDetails: (ShelfManga) -> Unit,
 ) {
@@ -41,7 +40,6 @@ fun ShelfPager(
         val library = getShelfForPage(page)
         if (library.isEmpty()) {
             ShelfPagerEmptyScreen(
-                searchQuery = searchQuery,
                 contentPadding = contentPadding,
             )
             return@HorizontalPager
@@ -61,14 +59,8 @@ fun ShelfPager(
 
 @Composable
 private fun ShelfPagerEmptyScreen(
-    searchQuery: String?,
     contentPadding: PaddingValues,
 ) {
-    val msg = when {
-        !searchQuery.isNullOrEmpty() -> R.string.no_results_found
-        else -> R.string.information_no_manga_category
-    }
-
     Column(
         modifier = Modifier
             .padding(contentPadding + PaddingValues(8.dp))
@@ -78,7 +70,7 @@ private fun ShelfPagerEmptyScreen(
         EmptyScreen(
             icon = Icons.Outlined.Close,
             title = R.string.empty_here,
-            description = msg,
+            description = R.string.information_no_manga_category,
             modifier = Modifier.weight(1f),
         )
     }

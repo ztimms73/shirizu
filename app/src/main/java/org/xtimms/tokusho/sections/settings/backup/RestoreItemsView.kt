@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +30,7 @@ import org.xtimms.tokusho.core.components.ScaffoldWithTopAppBar
 import org.xtimms.tokusho.sections.settings.about.ProgressIndicatorButton
 import org.xtimms.tokusho.utils.DeviceUtil
 
-const val RESTORE_ARGUMENT = "{source}"
+const val RESTORE_ARGUMENT = "{file}"
 const val RESTORE_DESTINATION = "restore/?file=${RESTORE_ARGUMENT}"
 
 @Composable
@@ -38,7 +40,8 @@ fun RestoreItemsView(
     navigateBack: () -> Unit,
 ) {
 
-    val items = restoreViewModel.availableEntries.collectAsStateWithLifecycle()
+    val items by restoreViewModel.availableEntries.collectAsStateWithLifecycle(emptyList())
+    val backupDate by restoreViewModel.backupDate.collectAsStateWithLifecycle(null)
 
     ScaffoldWithTopAppBar(
         title = stringResource(R.string.restore_from_backup),
@@ -61,16 +64,16 @@ fun RestoreItemsView(
             item {
                 PreferencesHintCard(
                     title = stringResource(id = R.string.backup_creation_date),
-                    description = restoreViewModel.backupDate.value.toString(),
+                    description = backupDate.toString(),
                     icon = Icons.Outlined.AccessTime
                 )
             }
-            items(
-                count = 5
-            ) {
-                BackupItem(
-                    title = it.toString()
-                )
+            for (item in items) {
+                item {
+                    BackupItem(
+                        title = item.name.name
+                    )
+                }
             }
             item {
                 var isLoading by remember { mutableStateOf(false) }
@@ -89,7 +92,7 @@ fun RestoreItemsView(
                         icon = Icons.Outlined.Restore,
                         isLoading = isLoading
                     ) {
-                        restoreViewModel.restore()
+                        // restoreViewModel.restore()
                     }
                 }
             }

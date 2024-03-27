@@ -48,6 +48,7 @@ import org.xtimms.tokusho.core.components.effects.updateAnimatedItemsState
 import org.xtimms.tokusho.core.prefs.AppSettings
 import org.xtimms.tokusho.core.prefs.SWIPE_TUTORIAL
 import org.xtimms.tokusho.core.screens.EmptyScreen
+import org.xtimms.tokusho.core.screens.LoadingScreen
 import org.xtimms.tokusho.utils.lang.calculateTimeAgo
 import org.xtimms.tokusho.utils.lang.isSameDay
 import java.time.Instant
@@ -70,11 +71,11 @@ fun HistoryView(
     val scrollState = rememberScrollState()
     var isUserTrySwipe by remember { mutableStateOf(false) }
 
-    val history by viewModel.content.collectAsStateWithLifecycle(emptyList())
+    val history by viewModel.content.collectAsStateWithLifecycle(null)
 
     DisposableEffect(Unit) {
         onDispose {
-            if (history.isNotEmpty() && isUserTrySwipe) {
+            if (history?.isNotEmpty() == true && isUserTrySwipe) {
                 AppSettings.updateValue(SWIPE_TUTORIAL, isUserTrySwipe)
             }
         }
@@ -83,7 +84,7 @@ fun HistoryView(
     val animatedList = run {
         val list = emptyList<RowEntity>().toMutableList()
         var readDate: Instant? = null
-        history.forEach { item ->
+        history?.forEach { item ->
 
             if (readDate === null || !isSameDay(
                     item.history.updatedAt.toEpochMilli(),
@@ -116,127 +117,133 @@ fun HistoryView(
     Box(
         Modifier.fillMaxSize()
     ) {
-        Column(Modifier.fillMaxSize()) {
-            LazyColumn(
-                modifier = Modifier
-                    .collapsable(
-                        state = scrollState,
-                        topBarHeightPx = topBarHeightPx,
-                        topBarOffsetY = topBarOffsetY
-                    )
-                    .padding(padding)
-            ) {
-                animatedItemsIndexed(
-                    state = animatedList.value,
-                    key = { rowItem -> rowItem.key },
-                ) { index, item ->
-                    when (item.type) {
-                        RowEntityType.Header -> ListGroupHeader(
-                            calculateTimeAgo(item.day).format(
-                                LocalContext.current.resources
+        history.let {
+            if (it == null) {
+                LoadingScreen(Modifier.padding(padding))
+            } else if (it.isEmpty()) {
+                EmptyScreen(
+                    icon = Icons.Outlined.History,
+                    title = R.string.empty_history_title,
+                    description = R.string.empty_history_description
+                )
+            } else {
+                Column(Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .collapsable(
+                                state = scrollState,
+                                topBarHeightPx = topBarHeightPx,
+                                topBarOffsetY = topBarOffsetY
                             )
-                        )
-                        RowEntityType.Item -> SwipeActions(
-                            startActionsConfig = SwipeActionsConfig(
-                                threshold = 0.33f,
-                                background = MaterialTheme.colorScheme.errorContainer,
-                                backgroundActive = MaterialTheme.colorScheme.error,
-                                iconTint = MaterialTheme.colorScheme.onError,
-                                icon = Icons.Outlined.DeleteForever,
-                                stayDismissed = true,
-                                onDismiss = {
-                                    viewModel.removeFromHistory(item.historyItemModel!!)
-                                }
-                            ),
-                            endActionsConfig = SwipeActionsConfig(
-                                threshold = 0.33f,
-                                background = MaterialTheme.colorScheme.tertiaryContainer,
-                                backgroundActive = MaterialTheme.colorScheme.tertiary,
-                                iconTint = MaterialTheme.colorScheme.onTertiary,
-                                icon = Icons.Outlined.PlayArrow,
-                                stayDismissed = false,
-                                onDismiss = {
-                                    navigateToReader()
-                                }
-                            ),
-                            onTried = { isUserTrySwipe = true },
-                            showTutorial = false,
-                        ) { state ->
-                            val size = with(LocalDensity.current) {
-                                java.lang.Float.max(
-                                    java.lang.Float.min(
-                                        16.dp.toPx(),
-                                        abs(state.offset.value)
-                                    ), 0f
-                                ).toDp()
-                            }
-
-                            val animateCorners by remember {
-                                derivedStateOf {
-                                    state.offset.value.absoluteValue > 30
-                                }
-                            }
-                            val startCorners by animateDpAsState(
-                                targetValue = when {
-                                    state.dismissDirection == DismissDirection.StartToEnd &&
-                                            animateCorners -> 8.dp
-
-                                    else -> 0.dp
-                                }, label = "startCorners"
-                            )
-                            val endCorners by animateDpAsState(
-                                targetValue = when {
-                                    state.dismissDirection == DismissDirection.EndToStart &&
-                                            animateCorners -> 8.dp
-
-                                    else -> 0.dp
-                                }, label = "endCorners"
-                            )
-
-                            Box(
-                                modifier = Modifier.height(IntrinsicSize.Min)
-                            ) {
-                                Surface(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(
-                                            vertical = min(
-                                                size / 4f,
-                                                4.dp
-                                            )
-                                        )
-                                        .clip(RoundedCornerShape(size)),
-                                    color = MaterialTheme.colorScheme.surface,
-                                    shape = RoundedCornerShape(
-                                        topStart = startCorners,
-                                        bottomStart = startCorners,
-                                        topEnd = endCorners,
-                                        bottomEnd = endCorners,
-                                    ),
-                                ) {
-                                    // nothing
-                                }
-                                Box(
-                                    modifier = Modifier.padding(vertical = 4.dp)
-                                ) {
-                                    HistoryItem(
-                                        coil = coil,
-                                        history = item.historyItemModel!!,
-                                        onClick = { navigateToDetails(item.historyItemModel!!.manga.id) },
+                            .padding(padding)
+                    ) {
+                        animatedItemsIndexed(
+                            state = animatedList.value,
+                            key = { rowItem -> rowItem.key },
+                        ) { index, item ->
+                            when (item.type) {
+                                RowEntityType.Header -> ListGroupHeader(
+                                    calculateTimeAgo(item.day).format(
+                                        LocalContext.current.resources
                                     )
+                                )
+
+                                RowEntityType.Item -> SwipeActions(
+                                    startActionsConfig = SwipeActionsConfig(
+                                        threshold = 0.33f,
+                                        background = MaterialTheme.colorScheme.errorContainer,
+                                        backgroundActive = MaterialTheme.colorScheme.error,
+                                        iconTint = MaterialTheme.colorScheme.onError,
+                                        icon = Icons.Outlined.DeleteForever,
+                                        stayDismissed = true,
+                                        onDismiss = {
+                                            viewModel.removeFromHistory(item.historyItemModel!!)
+                                        }
+                                    ),
+                                    endActionsConfig = SwipeActionsConfig(
+                                        threshold = 0.33f,
+                                        background = MaterialTheme.colorScheme.tertiaryContainer,
+                                        backgroundActive = MaterialTheme.colorScheme.tertiary,
+                                        iconTint = MaterialTheme.colorScheme.onTertiary,
+                                        icon = Icons.Outlined.PlayArrow,
+                                        stayDismissed = false,
+                                        onDismiss = {
+                                            navigateToReader()
+                                        }
+                                    ),
+                                    onTried = { isUserTrySwipe = true },
+                                    showTutorial = false,
+                                ) { state ->
+                                    val size = with(LocalDensity.current) {
+                                        java.lang.Float.max(
+                                            java.lang.Float.min(
+                                                16.dp.toPx(),
+                                                abs(state.offset.value)
+                                            ), 0f
+                                        ).toDp()
+                                    }
+
+                                    val animateCorners by remember {
+                                        derivedStateOf {
+                                            state.offset.value.absoluteValue > 30
+                                        }
+                                    }
+                                    val startCorners by animateDpAsState(
+                                        targetValue = when {
+                                            state.dismissDirection == DismissDirection.StartToEnd &&
+                                                    animateCorners -> 8.dp
+
+                                            else -> 0.dp
+                                        }, label = "startCorners"
+                                    )
+                                    val endCorners by animateDpAsState(
+                                        targetValue = when {
+                                            state.dismissDirection == DismissDirection.EndToStart &&
+                                                    animateCorners -> 8.dp
+
+                                            else -> 0.dp
+                                        }, label = "endCorners"
+                                    )
+
+                                    Box(
+                                        modifier = Modifier.height(IntrinsicSize.Min)
+                                    ) {
+                                        Surface(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(
+                                                    vertical = min(
+                                                        size / 4f,
+                                                        4.dp
+                                                    )
+                                                )
+                                                .clip(RoundedCornerShape(size)),
+                                            color = MaterialTheme.colorScheme.surface,
+                                            shape = RoundedCornerShape(
+                                                topStart = startCorners,
+                                                bottomStart = startCorners,
+                                                topEnd = endCorners,
+                                                bottomEnd = endCorners,
+                                            ),
+                                        ) {
+                                            // nothing
+                                        }
+                                        Box(
+                                            modifier = Modifier.padding(vertical = 4.dp)
+                                        ) {
+                                            HistoryItem(
+                                                coil = coil,
+                                                history = item.historyItemModel!!,
+                                                onClick = { navigateToDetails(item.historyItemModel!!.manga.id) },
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-        if (history.isEmpty()) {
-            EmptyScreen(
-                icon = Icons.Outlined.History,
-                title = R.string.empty_history_title,
-                description = R.string.empty_history_description
-            )
         }
     }
 }

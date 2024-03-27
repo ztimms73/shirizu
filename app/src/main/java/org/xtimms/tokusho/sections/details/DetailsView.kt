@@ -251,7 +251,7 @@ fun DetailsView(
                     title = it.chapter.name,
                     date = it.chapter.uploadDate,
                     scanlator = it.chapter.scanlator,
-                    read = it.isUnread,
+                    read = !it.isUnread,
                     bookmark = false,
                     selected = false,
                     onLongClick = { /*TODO*/ },

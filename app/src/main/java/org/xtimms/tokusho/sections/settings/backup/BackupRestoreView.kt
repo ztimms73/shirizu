@@ -108,7 +108,7 @@ fun BackupRestoreView(
             return@rememberLauncherForActivityResult
         }
 
-        navigateToRestoreScreen(uri.toString())
+        restoreViewModel.restore(uri)
     }
 
     val showDirectoryAlert =
