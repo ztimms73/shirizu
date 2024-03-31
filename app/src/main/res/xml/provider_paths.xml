@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <!-- https://issuetracker.google.com/issues/37125252 -->
+    <!--suppress AndroidElementNotAllowed -->
+    <root-path
+        name="root"
+        path="." />
     <external-path
         name="external_files"
         path="." />
