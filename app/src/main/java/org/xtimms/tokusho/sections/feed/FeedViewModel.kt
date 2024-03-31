@@ -54,18 +54,4 @@ class FeedViewModel @Inject constructor(
     fun updateFeed() {
         trackScheduler.startNow()
     }
-
-    fun getUiModel(): List<FeedUiModel> {
-        return content.value
-            .map { FeedUiModel.Item(it) }
-            .insertSeparators { before, after ->
-                val beforeDate = before?.item?.createdAt
-                val afterDate = after?.item?.createdAt
-                when {
-                    beforeDate != afterDate && afterDate != null -> FeedUiModel.Header(afterDate)
-                    // Return null to avoid adding a separator between two items.
-                    else -> null
-                }
-            }
-    }
 }

@@ -46,7 +46,7 @@ fun FeedViewItem(
 ) {
 
     val haptic = LocalHapticFeedback.current
-    val textAlpha = if (!feed.isNew) 1f else ReadItemAlpha
+    val textAlpha = if (feed.isNew) 1f else ReadItemAlpha
 
     Row(
         modifier = modifier
@@ -85,7 +85,7 @@ fun FeedViewItem(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 var textHeight by remember { mutableIntStateOf(0) }
-                if (!feed.isNew) {
+                if (feed.isNew) {
                     Icon(
                         imageVector = Icons.Filled.Circle,
                         contentDescription = stringResource(R.string.unread),

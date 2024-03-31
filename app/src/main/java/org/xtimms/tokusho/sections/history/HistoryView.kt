@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -97,7 +98,7 @@ fun HistoryView(
                     RowEntity(
                         type = RowEntityType.Header,
                         key = "header-${readDate}",
-                        historyItemModel = null,
+                        itemModel = null,
                         day = readDate!!,
                     )
                 )
@@ -107,7 +108,7 @@ fun HistoryView(
                     type = RowEntityType.Item,
                     key = "item-${item.manga.id}",
                     day = readDate!!,
-                    historyItemModel = item
+                    itemModel = item
                 )
             )
         }
@@ -115,7 +116,9 @@ fun HistoryView(
     }
 
     Box(
-        Modifier.fillMaxSize()
+        modifier = Modifier
+            .clipToBounds()
+            .fillMaxSize(),
     ) {
         history.let {
             if (it == null) {
@@ -140,7 +143,7 @@ fun HistoryView(
                         animatedItemsIndexed(
                             state = animatedList.value,
                             key = { rowItem -> rowItem.key },
-                        ) { index, item ->
+                        ) { _, item ->
                             when (item.type) {
                                 RowEntityType.Header -> ListGroupHeader(
                                     calculateTimeAgo(item.day).format(
@@ -157,7 +160,7 @@ fun HistoryView(
                                         icon = Icons.Outlined.DeleteForever,
                                         stayDismissed = true,
                                         onDismiss = {
-                                            viewModel.removeFromHistory(item.historyItemModel!!)
+                                            viewModel.removeFromHistory(item.itemModel!! as HistoryItemModel)
                                         }
                                     ),
                                     endActionsConfig = SwipeActionsConfig(
@@ -233,8 +236,8 @@ fun HistoryView(
                                         ) {
                                             HistoryItem(
                                                 coil = coil,
-                                                history = item.historyItemModel!!,
-                                                onClick = { navigateToDetails(item.historyItemModel!!.manga.id) },
+                                                history = (item.itemModel!! as HistoryItemModel),
+                                                onClick = { navigateToDetails((item.itemModel!! as HistoryItemModel).manga.id) },
                                             )
                                         }
                                     }

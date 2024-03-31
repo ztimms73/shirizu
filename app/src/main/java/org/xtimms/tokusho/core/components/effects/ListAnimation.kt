@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.xtimms.tokusho.sections.history.HistoryItemModel
+import org.xtimms.tokusho.core.model.ListModel
 import java.time.Instant
 
 enum class RowEntityType { Header, Item }
@@ -32,7 +32,7 @@ data class RowEntity(
     val key: String,
     var contentHash: String? = null,
     val day: Instant,
-    var historyItemModel: HistoryItemModel?,
+    var itemModel: ListModel?,
 )
 
 @SuppressLint("ComposableNaming", "UnusedTransitionTargetStateParameter")
@@ -126,7 +126,7 @@ fun updateAnimatedItemsState(
 
             override fun onChanged(position: Int, count: Int, payload: Any?) {
                 for (i in 0 until count) {
-                    compositeList[position + i].item.historyItemModel = (payload as RowEntity).historyItemModel
+                    compositeList[position + i].item.itemModel = (payload as RowEntity).itemModel
                     compositeList[position + i].item.contentHash = payload.contentHash
                 }
             }

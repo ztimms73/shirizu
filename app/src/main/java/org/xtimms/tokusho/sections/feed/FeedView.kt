@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ClearAll
 import androidx.compose.material.icons.outlined.Refresh
@@ -39,10 +37,15 @@ import org.xtimms.tokusho.core.components.DismissButton
 import org.xtimms.tokusho.core.components.ListGroupHeader
 import org.xtimms.tokusho.core.components.ScaffoldWithClassicTopAppBar
 import org.xtimms.tokusho.core.components.TokushoDialog
+import org.xtimms.tokusho.core.components.effects.RowEntity
+import org.xtimms.tokusho.core.components.effects.RowEntityType
+import org.xtimms.tokusho.core.components.effects.animatedItemsIndexed
+import org.xtimms.tokusho.core.components.effects.updateAnimatedItemsState
 import org.xtimms.tokusho.core.screens.EmptyScreen
 import org.xtimms.tokusho.core.tracker.model.TrackingLogItem
 import org.xtimms.tokusho.sections.feed.model.toFeedItem
 import org.xtimms.tokusho.utils.lang.calculateTimeAgo
+import org.xtimms.tokusho.utils.lang.isSameDay
 import java.time.Instant
 
 const val FEED_DESTINATION = "feed"
@@ -59,6 +62,39 @@ fun FeedView(
     var showClearDialog by remember { mutableStateOf(false) }
 
     val feed by viewModel.content.collectAsStateWithLifecycle(emptyList())
+
+    val animatedList = run {
+        val list = emptyList<RowEntity>().toMutableList()
+        var createdAt: Instant? = null
+        feed.forEach { item ->
+
+            if (createdAt === null || !isSameDay(
+                    item.createdAt.toEpochMilli(),
+                    createdAt!!.toEpochMilli()
+                )
+            ) {
+                createdAt = item.createdAt
+
+                list.add(
+                    RowEntity(
+                        type = RowEntityType.Header,
+                        key = "header-${createdAt}",
+                        itemModel = null,
+                        day = createdAt!!,
+                    )
+                )
+            }
+            list.add(
+                RowEntity(
+                    type = RowEntityType.Item,
+                    key = "item-${item.manga.id}-${item.createdAt}",
+                    day = createdAt!!,
+                    itemModel = item
+                )
+            )
+        }
+        updateAnimatedItemsState(newList = list.toList().map { it })
+    }
 
     ScaffoldWithClassicTopAppBar(
         title = stringResource(R.string.feed),
@@ -93,7 +129,29 @@ fun FeedView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = padding
                 ) {
-                    feedUiItems(coil, viewModel.getUiModel())
+
+
+                    animatedItemsIndexed(
+                        state = animatedList.value,
+                        key = { rowItem -> rowItem.key },
+                    ) { _, item ->
+                        when (item.type) {
+                            RowEntityType.Header -> ListGroupHeader(
+                                calculateTimeAgo(item.day).format(
+                                    LocalContext.current.resources
+                                )
+                            )
+
+                            RowEntityType.Item -> FeedViewItem(
+                                modifier = Modifier.animateItemPlacement(),
+                                coil = coil,
+                                selected = false,
+                                feed = (item.itemModel as TrackingLogItem).toFeedItem(),
+                                onClick = { /*TODO*/ },
+                                onLongClick = { /*TODO*/ }
+                            )
+                        }
+                    }
                 }
             }
             if (feed.isEmpty()) {
@@ -179,52 +237,4 @@ private fun ClearFeedDialogPreview() {
         onDismissRequest = {},
         isClearInfoAboutNewChaptersSelected = false
     )
-}
-
-sealed interface FeedUiModel {
-    data class Header(val date: Instant) : FeedUiModel
-    data class Item(val item: TrackingLogItem) : FeedUiModel
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-internal fun LazyListScope.feedUiItems(
-    coil: ImageLoader,
-    uiModels: List<FeedUiModel>
-) {
-    items(
-        items = uiModels,
-        contentType = {
-            when (it) {
-                is FeedUiModel.Header -> "header"
-                is FeedUiModel.Item -> "item"
-            }
-        },
-        key = {
-            when (it) {
-                is FeedUiModel.Header -> "feedHeader-${it.hashCode()}"
-                is FeedUiModel.Item -> "feed-${it.item.manga.id}"
-            }
-        },
-    ) { item ->
-        when (item) {
-            is FeedUiModel.Header -> {
-                ListGroupHeader(
-                    modifier = Modifier.animateItemPlacement(),
-                    text = calculateTimeAgo(item.date).format(
-                        LocalContext.current.resources
-                    )
-                )
-            }
-            is FeedUiModel.Item -> {
-                val track = item.item
-                FeedViewItem(
-                    modifier = Modifier.animateItemPlacement(),
-                    coil = coil,
-                    selected = false,
-                    feed = track.toFeedItem(),
-                    onClick = { /*TODO*/ },
-                    onLongClick = { /*TODO*/ })
-            }
-        }
-    }
 }
