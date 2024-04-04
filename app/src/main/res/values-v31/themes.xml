@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Tokusho" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Etsudoku" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Theme.Tokusho.Starting" parent="Theme.SplashScreen.IconBackground">
+    <style name="Theme.Etsudoku.Starting" parent="Theme.SplashScreen.IconBackground">
         <item name="windowSplashScreenBackground">@android:color/system_accent1_500</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
-        <item name="postSplashScreenTheme">@style/Theme.Tokusho</item>
+        <item name="postSplashScreenTheme">@style/Theme.Etsudoku</item>
     </style>
 </resources>

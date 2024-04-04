@@ -35,7 +35,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Tokusho.Starting"
+        android:theme="@style/Theme.Etsudoku.Starting"
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="tiramisu">
 
@@ -43,7 +43,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Tokusho">
+            android:theme="@style/Theme.Etsudoku">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

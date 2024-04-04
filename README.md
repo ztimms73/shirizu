@@ -1,4 +1,4 @@
-# Tokusho
+# Etsudoku
 
 An attempt to write an Android manga reading application on Jetpack Compose using the [Kotatsu parser library](https://github.com/KotatsuApp/kotatsu-parsers).
 

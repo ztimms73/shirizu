@@ -19,11 +19,11 @@ val acraAuthLogin: String = gradleLocalProperties(rootDir).getProperty("authLogi
 val acraAuthPassword: String = gradleLocalProperties(rootDir).getProperty("authPassword") ?: "\"acra_password\""
 
 android {
-    namespace = "org.xtimms.tokusho"
+    namespace = "org.xtimms.etsudoku"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.xtimms.tokusho"
+        applicationId = "org.xtimms.etsudoku"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -37,7 +37,7 @@ android {
         buildConfigField("String", "ACRA_AUTH_LOGIN", acraAuthLogin)
         buildConfigField("String", "ACRA_AUTH_PASSWORD", acraAuthPassword)
 
-        testInstrumentationRunner = "org.xtimms.tokusho.HiltTestRunner"
+        testInstrumentationRunner = "org.xtimms.etsudoku.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -73,6 +73,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
         buildConfig = true
     }
     composeOptions {
@@ -100,7 +101,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material-icons-extended:1.6.3")
+    implementation("androidx.compose.material:material-icons-extended:1.6.5")
     implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
