@@ -4,9 +4,9 @@
     <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Etsudoku logo" title="Etsudoku logo" width="80"/>
 </a>
 
-</div>
-
 # Etsudoku
+
+</div>
 
 Etsudoku (閲読) - An attempt to write an Android manga reading application on Jetpack Compose using the [Kotatsu parser library](https://github.com/KotatsuApp/kotatsu-parsers).
 
