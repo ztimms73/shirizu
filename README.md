@@ -15,9 +15,10 @@ Etsudoku (閲読) - An attempt to write an Android manga reading application on 
 No, nothing works.
 
 ## Screens
-|            Shelf             |             Details              |             History              |            Feed            |
-|:----------------------------:|:--------------------------------:|:--------------------------------:|:--------------------------:|
-| ![Shelf](./images/shelf.png) | ![Details](./images/details.png) | ![History](./images/history.png) | ![Feed](./images/feed.png) |
+|                    Shelf                     |                     Details                      |                     History                      |
+|:--------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+|   ![Shelf light theme](./images/shelf.png)   |   ![Details light theme](./images/details.png)   |   ![History light theme](./images/history.png)   |
+| ![Shelf dark theme](./images/shelf_dark.png) | ![Details dark theme](./images/details_dark.png) | ![History dark theme](./images/history_dark.png) |
 
 ## Acknowledgements
 
