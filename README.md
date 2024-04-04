@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://mihon.app">
+<a>
     <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Etsudoku logo" title="Etsudoku logo" width="80"/>
 </a>
 
