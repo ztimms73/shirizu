@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Etsudoku"
+rootProject.name = "Shirizu"
 include(":app")
  

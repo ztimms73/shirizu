@@ -1,14 +1,14 @@
 <div align="center">
 
 <a>
-    <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Etsudoku logo" title="Etsudoku logo" width="80"/>
+    <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Shirizu logo" title="Shirizu logo" width="80"/>
 </a>
 
-# Etsudoku
+# Shirizu
 
 </div>
 
-Etsudoku (閲読) - An attempt to write an Android manga reading application on Jetpack Compose using the [Kotatsu parser library](https://github.com/KotatsuApp/kotatsu-parsers).
+Shirizu (シリーズ, from Japanese - series) - An attempt to write an Android manga reading application on Jetpack Compose using the [Kotatsu parser library](https://github.com/KotatsuApp/kotatsu-parsers).
 
 ## Is it possible to use it now?
 

@@ -57,7 +57,7 @@
     <string name="file_create_backup">Создать файл резервной копии</string>
     <string name="backup_saved">Резервная копия сохранена</string>
     <string name="supports_kotatsu_backups">Поддержка бэкапов Kotatsu</string>
-    <string name="supports_kotatsu_backups_desc">Etsudoku также может обрабатывать резервные копии Kotatsu</string>
+    <string name="supports_kotatsu_backups_desc">Shirizu также может обрабатывать резервные копии Kotatsu</string>
     <string name="open_source_licenses">Лицензии с открытым исходным кодом</string>
     <string name="no_manga_sources">Нет источников манги</string>
     <string name="no_manga_sources_desc">Включите источники манги, чтобы читать мангу онлайн</string>

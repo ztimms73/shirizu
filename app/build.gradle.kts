@@ -19,11 +19,11 @@ val acraAuthLogin: String = gradleLocalProperties(rootDir).getProperty("authLogi
 val acraAuthPassword: String = gradleLocalProperties(rootDir).getProperty("authPassword") ?: "\"acra_password\""
 
 android {
-    namespace = "org.xtimms.etsudoku"
+    namespace = "org.xtimms.shirizu"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.xtimms.etsudoku"
+        applicationId = "org.xtimms.shirizu"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -37,7 +37,7 @@ android {
         buildConfigField("String", "ACRA_AUTH_LOGIN", acraAuthLogin)
         buildConfigField("String", "ACRA_AUTH_PASSWORD", acraAuthPassword)
 
-        testInstrumentationRunner = "org.xtimms.etsudoku.HiltTestRunner"
+        testInstrumentationRunner = "org.xtimms.shirizu.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="account_type_sync" translatable="false">app.etsudoku.sync</string>
-    <string name="sync_authority_history" translatable="false">org.xtimms.etsudoku.history</string>
-    <string name="sync_authority_favourites" translatable="false">org.xtimms.etsudoku.favourites</string>
+    <string name="account_type_sync" translatable="false">app.shirizu.sync</string>
+    <string name="sync_authority_history" translatable="false">org.xtimms.shirizu.history</string>
+    <string name="sync_authority_favourites" translatable="false">org.xtimms.shirizu.favourites</string>
     <string name="sync_host_default" translatable="false">sync.kotatsu.app</string>
     <string-array name="sync_host_list" translatable="false">
         <item>@string/sync_host_default</item>
