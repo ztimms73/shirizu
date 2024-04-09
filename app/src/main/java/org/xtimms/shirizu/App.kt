@@ -4,8 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.StrictMode
+import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
@@ -21,9 +23,10 @@ import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
 import org.xtimms.shirizu.core.database.ShirizuDatabase
-import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.prefs.KotatsuAppSettings
 import org.xtimms.shirizu.core.updates.Updater
+import org.xtimms.shirizu.crash.CrashActivity
+import org.xtimms.shirizu.crash.GlobalExceptionHandler
 import org.xtimms.shirizu.utils.lang.processLifecycleScope
 import org.xtimms.shirizu.work.WorkScheduleManager
 import javax.inject.Inject
@@ -61,6 +64,7 @@ class App : Application(), Configuration.Provider {
             ) else getPackageInfo(packageName, 0)
         }
         DynamicColors.applyToActivitiesIfAvailable(this)
+        connectivityManager = getSystemService()!!
 
         processLifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -70,30 +74,29 @@ class App : Application(), Configuration.Provider {
             }
         }
 
-        // GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
-        if (AppSettings.isACRAEnabled()) {
-            initAcra {
-                buildConfigClass = BuildConfig::class.java
-                reportFormat = StringFormat.JSON
-                httpSender {
-                    uri = BuildConfig.ACRA_URI
-                    basicAuthLogin = BuildConfig.ACRA_AUTH_LOGIN
-                    basicAuthPassword = BuildConfig.ACRA_AUTH_PASSWORD
-                    httpMethod = HttpSender.Method.POST
-                }
-                reportContent = listOf(
-                    ReportField.PACKAGE_NAME,
-                    ReportField.INSTALLATION_ID,
-                    ReportField.APP_VERSION_CODE,
-                    ReportField.APP_VERSION_NAME,
-                    ReportField.ANDROID_VERSION,
-                    ReportField.PHONE_MODEL,
-                    ReportField.STACK_TRACE,
-                    ReportField.CRASH_CONFIGURATION,
-                    ReportField.CUSTOM_DATA,
-                )
+        initAcra {
+            buildConfigClass = BuildConfig::class.java
+            reportFormat = StringFormat.JSON
+            httpSender {
+                uri = BuildConfig.ACRA_URI
+                basicAuthLogin = BuildConfig.ACRA_AUTH_LOGIN
+                basicAuthPassword = BuildConfig.ACRA_AUTH_PASSWORD
+                httpMethod = HttpSender.Method.POST
             }
+            reportContent = listOf(
+                ReportField.PACKAGE_NAME,
+                ReportField.INSTALLATION_ID,
+                ReportField.APP_VERSION_CODE,
+                ReportField.APP_VERSION_NAME,
+                ReportField.ANDROID_VERSION,
+                ReportField.PHONE_MODEL,
+                ReportField.STACK_TRACE,
+                ReportField.CRASH_CONFIGURATION,
+                ReportField.CUSTOM_DATA,
+            )
         }
+
+        GlobalExceptionHandler.initialize(applicationContext, CrashActivity::class.java)
         workScheduleManager.init()
     }
 
@@ -123,8 +126,8 @@ class App : Application(), Configuration.Provider {
     companion object {
 
         lateinit var packageInfo: PackageInfo
+        lateinit var connectivityManager: ConnectivityManager
 
-        @Suppress("DEPRECATION")
         fun getVersionReport(): String {
             val versionName = packageInfo.versionName
             val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

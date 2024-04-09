@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
 import org.xtimms.shirizu.LocalDarkTheme
 import org.xtimms.shirizu.LocalDynamicColorSwitch
+import org.xtimms.shirizu.LocalWindowWidthState
 import org.xtimms.shirizu.MainActivity
 import org.xtimms.shirizu.SettingsProvider
 import org.xtimms.shirizu.ui.theme.ShirizuTheme
@@ -21,7 +22,7 @@ class CrashActivity : ComponentActivity() {
 
         val exception = GlobalExceptionHandler.getThrowableFromIntent(intent)
         setContent {
-            SettingsProvider {
+            SettingsProvider(LocalWindowWidthState.current) {
                 ShirizuTheme(
                     darkTheme = LocalDarkTheme.current.isDarkTheme(),
                     isDynamicColorEnabled = LocalDynamicColorSwitch.current,
