@@ -15,5 +15,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Shirizu"
-include(":android-app:app")
-include(":android-app:benchmark")
+include(":app")
+include(":benchmark")
