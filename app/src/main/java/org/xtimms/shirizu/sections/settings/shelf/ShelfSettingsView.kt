@@ -14,7 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Numbers
-import androidx.compose.material.icons.outlined.Update
+import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,13 +39,13 @@ import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.PreferenceItem
 import org.xtimms.shirizu.core.components.PreferenceSubtitle
 import org.xtimms.shirizu.core.components.PreferenceSwitch
+import org.xtimms.shirizu.core.components.PreferenceSwitchWithDivider
 import org.xtimms.shirizu.core.components.ScaffoldWithTopAppBar
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.prefs.AppSettings.getInt
-import org.xtimms.shirizu.core.prefs.AppSettings.getString
 import org.xtimms.shirizu.core.prefs.GRID_COLUMNS
-import org.xtimms.shirizu.core.prefs.PROXY_ADDRESS
 import org.xtimms.shirizu.core.prefs.TABS_MANGA_COUNT
+import org.xtimms.shirizu.core.prefs.TRACKER
 import org.xtimms.shirizu.sections.shelf.ShelfViewModel
 
 const val SHELF_SETTINGS_DESTINATION = "shelf_settings"
@@ -54,9 +54,11 @@ const val SHELF_SETTINGS_DESTINATION = "shelf_settings"
 fun ShelfSettingsView(
     shelfViewModel: ShelfViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
-    navigateToCategories: () -> Unit
+    navigateToCategories: () -> Unit,
+    navigateToTrackerSettings: () -> Unit = {}
 ) {
 
+    var isTrackerEnabled by remember { mutableStateOf(AppSettings.isTrackerEnabled()) }
     var showGridColumnsDialog by remember { mutableStateOf(false) }
 
     val categories by shelfViewModel.categories.collectAsStateWithLifecycle(emptyList())
@@ -106,7 +108,10 @@ fun ShelfSettingsView(
             item {
                 PreferenceItem(
                     title = stringResource(id = R.string.grid_columns_count),
-                    description = stringResource(id = R.string.grid_columns_count_desc, gridColumns),
+                    description = stringResource(
+                        id = R.string.grid_columns_count_desc,
+                        gridColumns
+                    ),
                     icon = Icons.Outlined.GridView
                 ) { showGridColumnsDialog = true }
             }
@@ -114,10 +119,17 @@ fun ShelfSettingsView(
                 PreferenceSubtitle(text = stringResource(id = R.string.updates))
             }
             item {
-                PreferenceItem(
+                PreferenceSwitchWithDivider(
                     title = stringResource(id = R.string.auto_update),
-                    description = "Off",
-                    icon = Icons.Outlined.Update
+                    description = if (isTrackerEnabled) stringResource(id = R.string.on)
+                    else stringResource(id = R.string.off),
+                    icon = Icons.Outlined.RssFeed,
+                    isChecked = isTrackerEnabled,
+                    onClick = navigateToTrackerSettings,
+                    onChecked = {
+                        isTrackerEnabled = !isTrackerEnabled
+                        AppSettings.updateValue(TRACKER, isTrackerEnabled)
+                    }
                 )
             }
         }

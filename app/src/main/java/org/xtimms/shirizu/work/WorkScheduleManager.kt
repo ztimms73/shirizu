@@ -17,14 +17,8 @@ class WorkScheduleManager @Inject constructor(
 
     fun init() {
         processLifecycleScope.launch(Dispatchers.Default) {
-            updateWorkerImpl(trackerScheduler, isEnabled = true, force = false) // TODO
+            updateWorkerImpl(trackerScheduler, AppSettings.isTrackerEnabled(), force = true)
             updateWorkerImpl(suggestionScheduler, AppSettings.isSuggestionsEnabled(), force = false)
-        }
-    }
-
-    private fun updateWorker(scheduler: PeriodicWorkScheduler, isEnabled: Boolean, force: Boolean) {
-        processLifecycleScope.launch(Dispatchers.Default) {
-            updateWorkerImpl(scheduler, isEnabled, force)
         }
     }
 

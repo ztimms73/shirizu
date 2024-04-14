@@ -21,5 +21,9 @@ inline val String.intState
         mutableIntStateOf(this.getInt())
     }
 
+inline fun Int.ifZero(defaultValue: () -> Int): Int = if (this == 0) defaultValue() else this
+
+inline fun Long.ifZero(defaultValue: () -> Long): Long = if (this == 0L) defaultValue() else this
+
 // clamp(3.5f, 6.7f) > [0.0f, 1.0f]
 fun Float.clamp(min: Float, max: Float): Float = (1f - ((this.coerceIn(min, max) - min) / (max - min)))

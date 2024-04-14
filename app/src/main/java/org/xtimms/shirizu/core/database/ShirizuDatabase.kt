@@ -35,9 +35,10 @@ import org.xtimms.shirizu.core.database.entity.TagEntity
 import org.xtimms.shirizu.core.database.entity.TrackEntity
 import org.xtimms.shirizu.core.database.entity.TrackLogEntity
 import org.xtimms.shirizu.core.database.migrations.Migration1To2
+import org.xtimms.shirizu.core.database.migrations.Migration2To3
 import org.xtimms.shirizu.utils.lang.processLifecycleScope
 
-const val DATABASE_VERSION = 2
+const val DATABASE_VERSION = 3
 
 @Database(
     entities = [
@@ -83,7 +84,8 @@ abstract class ShirizuDatabase : RoomDatabase() {
 }
 
 fun getDatabaseMigrations(context: Context): Array<Migration> = arrayOf(
-    Migration1To2()
+    Migration1To2(),
+    Migration2To3()
 )
 
 fun ShirizuDatabase(context: Context): ShirizuDatabase = Room

@@ -28,6 +28,9 @@ interface TrackLogsDao {
     @Query("DELETE FROM track_logs WHERE manga_id NOT IN (SELECT manga_id FROM tracks)")
     suspend fun gc()
 
+    @Query("DELETE FROM track_logs WHERE id IN (SELECT id FROM track_logs ORDER BY created_at DESC LIMIT 0 OFFSET :size)")
+    suspend fun trim(size: Int)
+
     @Query("SELECT COUNT(*) FROM track_logs")
     suspend fun count(): Int
 }

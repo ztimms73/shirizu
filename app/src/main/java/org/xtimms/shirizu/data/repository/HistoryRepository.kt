@@ -21,8 +21,6 @@ import org.xtimms.shirizu.utils.ReversibleHandle
 import org.xtimms.shirizu.utils.lang.mapItems
 import javax.inject.Inject
 
-const val PROGRESS_NONE = -1f
-
 @Reusable
 class HistoryRepository @Inject constructor(
     private val db: ShirizuDatabase,
@@ -32,6 +30,10 @@ class HistoryRepository @Inject constructor(
     suspend fun getList(offset: Int, limit: Int): List<Manga> {
         val entities = db.getHistoryDao().findAll(offset, limit)
         return entities.map { it.manga.toManga(it.tags.toMangaTags()) }
+    }
+
+    suspend fun getCount(): Int {
+        return db.getHistoryDao().getCount()
     }
 
     suspend fun getLastOrNull(): Manga? {

@@ -69,6 +69,8 @@ fun LocalDateTime.toDate(): Date = Date(this.toEpochSecond(
     ZoneId.systemDefault().rules.getOffset(this)
 ) * 1000)
 
+fun Long.toInstantOrNull() = if (this == 0L) null else Instant.ofEpochMilli(this)
+
 sealed class DateTimeAgo {
 
     abstract fun format(resources: Resources): String

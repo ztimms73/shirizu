@@ -1,7 +1,6 @@
 package org.xtimms.shirizu.data.repository
 
 import androidx.annotation.VisibleForTesting
-import androidx.collection.MutableLongSet
 import androidx.room.withTransaction
 import dagger.Reusable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.koitharu.kotatsu.parsers.util.mapToSet
 import org.xtimms.shirizu.core.database.ShirizuDatabase
 import org.xtimms.shirizu.core.database.entity.MangaEntity
 import org.xtimms.shirizu.core.database.entity.TrackEntity
@@ -21,19 +19,23 @@ import org.xtimms.shirizu.core.database.entity.toFavouriteCategory
 import org.xtimms.shirizu.core.database.entity.toManga
 import org.xtimms.shirizu.core.database.entity.toTrackingLogItem
 import org.xtimms.shirizu.core.model.FavouriteCategory
-import org.xtimms.shirizu.core.model.isLocal
 import org.xtimms.shirizu.core.parser.local.LocalMangaRepository
 import org.xtimms.shirizu.core.tracker.model.MangaTracking
 import org.xtimms.shirizu.core.tracker.model.MangaUpdates
 import org.xtimms.shirizu.core.tracker.model.TrackingLogItem
+import org.xtimms.shirizu.utils.lang.ifZero
 import org.xtimms.shirizu.utils.lang.mapItems
-import java.time.Instant
+import org.xtimms.shirizu.utils.lang.toInstantOrNull
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Provider
 
 private const val NO_ID = 0L
+
+@Deprecated("Use buckets")
 private const val MAX_QUERY_IDS = 100
+private const val MAX_BUCKET_SIZE = 20
+private const val MAX_LOG_SIZE = 120
 
 @Reusable
 class TrackingRepository @Inject constructor(
@@ -66,35 +68,18 @@ class TrackingRepository @Inject constructor(
             .onStart { gcIfNotCalled() }
     }
 
-    suspend fun getTracks(mangaList: Collection<Manga>): List<MangaTracking> {
-        val ids = mangaList.mapToSet { it.id }
-        val dao = db.getTracksDao()
-        val tracks = if (ids.size <= MAX_QUERY_IDS) {
-            dao.findAll(ids)
-        } else {
-            // TODO split tracks in the worker
-            ids.windowed(MAX_QUERY_IDS, MAX_QUERY_IDS, true)
-                .flatMap { dao.findAll(it) }
-        }.groupBy { it.mangaId }
-        val idSet = MutableLongSet(mangaList.size)
-        val result = ArrayList<MangaTracking>(mangaList.size)
-        for (item in mangaList) {
-            val manga = if (item.isLocal) {
-                localMangaRepositoryProvider.get().getRemoteManga(item) ?: continue
-            } else {
-                item
-            }
-            if (!idSet.add(manga.id)) {
-                continue
-            }
-            val track = tracks[manga.id]?.lastOrNull()
-            result += MangaTracking(
-                manga = manga,
-                lastChapterId = track?.lastChapterId ?: NO_ID,
-                lastCheck = track?.lastCheck?.takeUnless { it == 0L }?.let(Instant::ofEpochMilli),
+    suspend fun getCategoryId(mangaId: Long): Long {
+        return db.getFavouritesDao().findCategoriesIdsWithTrack(mangaId).firstOrNull() ?: NO_ID
+    }
+
+    suspend fun getTracks(offset: Int, limit: Int): List<MangaTracking> {
+        return db.getTracksDao().findAll(offset, limit).map {
+            MangaTracking(
+                manga = it.manga.toManga(emptySet()),
+                lastChapterId = it.track.lastChapterId,
+                lastCheck = it.track.lastCheckTime.toInstantOrNull(),
             )
         }
-        return result
     }
 
     @VisibleForTesting
@@ -103,7 +88,7 @@ class TrackingRepository @Inject constructor(
         return MangaTracking(
             manga = manga,
             lastChapterId = track?.lastChapterId ?: NO_ID,
-            lastCheck = track?.lastCheck?.takeUnless { it == 0L }?.let(Instant::ofEpochMilli),
+            lastCheck = track?.lastCheckTime?.toInstantOrNull(),
         )
     }
 
@@ -133,16 +118,19 @@ class TrackingRepository @Inject constructor(
 
     suspend fun clearCounters() = db.getTracksDao().clearCounters()
 
-    suspend fun gc() {
+    suspend fun gc() = db.withTransaction {
         db.getTracksDao().gc()
-        db.getTrackLogsDao().gc()
+        db.getTrackLogsDao().run {
+            gc()
+            trim(MAX_LOG_SIZE)
+        }
     }
 
-    suspend fun saveUpdates(updates: MangaUpdates.Success) {
+    suspend fun saveUpdates(updates: MangaUpdates) {
         db.withTransaction {
             val track = getOrCreateTrack(updates.manga.id).mergeWith(updates)
             db.getTracksDao().upsert(track)
-            if (updates.isValid && updates.newChapters.isNotEmpty()) {
+            if (updates is MangaUpdates.Success && updates.isValid && updates.newChapters.isNotEmpty()) {
                 updatePercent(updates)
                 val logEntity = TrackLogEntity(
                     mangaId = updates.manga.id,
@@ -174,7 +162,6 @@ class TrackingRepository @Inject constructor(
         val lastChapterId = chapters.lastOrNull()?.id ?: NO_ID
         val entity = TrackEntity(
             mangaId = manga.id,
-            totalChapters = chapters.size,
             lastChapterId = lastChapterId,
             newChapters = when {
                 track.newChapters == 0 -> 0
@@ -182,8 +169,9 @@ class TrackingRepository @Inject constructor(
                 chapterIndex >= lastNewChapterIndex -> chapters.lastIndex - chapterIndex
                 else -> track.newChapters
             },
-            lastCheck = System.currentTimeMillis(),
-            lastNotifiedChapterId = lastChapterId,
+            lastCheckTime = System.currentTimeMillis(),
+            lastChapterDate = maxOf(track.lastChapterDate, chapters.lastOrNull()?.uploadDate ?: 0L),
+            lastResult = track.lastResult,
         )
         db.getTracksDao().upsert(entity)
     }
@@ -204,19 +192,36 @@ class TrackingRepository @Inject constructor(
         }
     }
 
-    suspend fun getAllHistoryManga(): List<Manga> {
-        return db.getHistoryDao().findAllManga().toMangaList()
+    suspend fun updateTracks() = db.withTransaction {
+        val dao = db.getTracksDao()
+        dao.gc()
+        val ids = dao.findAllIds().toMutableSet()
+        val size = ids.size
+        // history
+        val historyIds = db.getHistoryDao().findAllIds()
+        for (mangaId in historyIds) {
+            if (!ids.remove(mangaId)) {
+                dao.upsert(TrackEntity.create(mangaId))
+            }
+        }
+
+        // favourites
+        val favoritesIds = db.getFavouritesDao().findIdsWithTrack()
+        for (mangaId in favoritesIds) {
+            if (!ids.remove(mangaId)) {
+                dao.upsert(TrackEntity.create(mangaId))
+            }
+        }
+
+        // remove unused
+        for (mangaId in ids) {
+            dao.delete(mangaId)
+        }
+        size - ids.size
     }
 
     private suspend fun getOrCreateTrack(mangaId: Long): TrackEntity {
-        return db.getTracksDao().find(mangaId) ?: TrackEntity(
-            mangaId = mangaId,
-            totalChapters = 0,
-            lastChapterId = 0L,
-            newChapters = 0,
-            lastCheck = 0L,
-            lastNotifiedChapterId = 0L,
-        )
+        return db.getTracksDao().find(mangaId) ?: TrackEntity.create(mangaId)
     }
 
     private suspend fun updatePercent(updates: MangaUpdates.Success) {
@@ -234,16 +239,27 @@ class TrackingRepository @Inject constructor(
         db.getHistoryDao().update(history.copy(percent = newPercent))
     }
 
-    private fun TrackEntity.mergeWith(updates: MangaUpdates.Success): TrackEntity {
+    private fun TrackEntity.mergeWith(updates: MangaUpdates): TrackEntity {
         val chapters = updates.manga.chapters.orEmpty()
-        return TrackEntity(
-            mangaId = mangaId,
-            totalChapters = chapters.size,
-            lastChapterId = chapters.lastOrNull()?.id ?: NO_ID,
-            newChapters = if (updates.isValid) newChapters + updates.newChapters.size else 0,
-            lastCheck = System.currentTimeMillis(),
-            lastNotifiedChapterId = NO_ID,
-        )
+        return when (updates) {
+            is MangaUpdates.Failure -> TrackEntity(
+                mangaId = mangaId,
+                lastChapterId = lastChapterId,
+                newChapters = newChapters,
+                lastCheckTime = System.currentTimeMillis(),
+                lastChapterDate = lastChapterDate,
+                lastResult = TrackEntity.RESULT_FAILED,
+            )
+
+            is MangaUpdates.Success -> TrackEntity(
+                mangaId = mangaId,
+                lastChapterId = chapters.lastOrNull()?.id ?: NO_ID,
+                newChapters = if (updates.isValid) newChapters + updates.newChapters.size else 0,
+                lastCheckTime = System.currentTimeMillis(),
+                lastChapterDate = updates.lastChapterDate().ifZero { lastChapterDate },
+                lastResult = if (updates.isNotEmpty()) TrackEntity.RESULT_HAS_UPDATE else TrackEntity.RESULT_NO_UPDATE,
+            )
+        }
     }
 
     private suspend fun gcIfNotCalled() {

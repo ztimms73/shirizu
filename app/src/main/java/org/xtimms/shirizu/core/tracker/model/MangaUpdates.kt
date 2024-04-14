@@ -3,6 +3,7 @@ package org.xtimms.shirizu.core.tracker.model
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.xtimms.shirizu.core.exceptions.TooManyRequestExceptions
+import org.xtimms.shirizu.utils.lang.ifZero
 
 sealed interface MangaUpdates {
 
@@ -16,6 +17,15 @@ sealed interface MangaUpdates {
     ) : MangaUpdates {
 
         fun isNotEmpty() = newChapters.isNotEmpty()
+
+        fun lastChapterDate(): Long {
+            val lastChapter = newChapters.lastOrNull()
+            return if (lastChapter == null) {
+                manga.chapters?.lastOrNull()?.uploadDate ?: 0L
+            } else {
+                lastChapter.uploadDate.ifZero { System.currentTimeMillis() }
+            }
+        }
     }
 
     data class Failure(

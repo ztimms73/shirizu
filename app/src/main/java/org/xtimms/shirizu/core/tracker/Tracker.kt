@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.collection.MutableLongSet
 import coil.request.CachePolicy
 import org.koitharu.kotatsu.parsers.model.Manga
+import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.xtimms.shirizu.core.model.getPreferredBranch
 import org.xtimms.shirizu.core.parser.MangaRepository
 import org.xtimms.shirizu.core.parser.RemoteMangaRepository
@@ -26,47 +27,19 @@ class Tracker @Inject constructor(
     private val mangaRepositoryFactory: MangaRepository.Factory,
 ) {
 
-    suspend fun getAllTracks(): List<TrackingItem> {
-        val knownManga = MutableLongSet()
-        val result = ArrayList<TrackingItem>()
-        // Favourites
-        val favourites = repository.getAllFavouritesManga()
-        channels.updateChannels(favourites.keys)
-        for ((category, mangaList) in favourites) {
-            if (!category.isTrackingEnabled || mangaList.isEmpty()) {
-                continue
-            }
-            val categoryTracks = repository.getTracks(mangaList)
-            val channelId = if (channels.isFavouriteNotificationsEnabled(category)) {
-                channels.getFavouritesChannelId(category.id)
-            } else {
-                null
-            }
-            for (track in categoryTracks) {
-                if (knownManga.add(track.manga.id)) {
-                    result.add(TrackingItem(track, channelId))
-                }
-            }
+    suspend fun getTracks(limit: Int): List<TrackingItem> {
+        repository.updateTracks()
+        return repository.getTracks(0, limit).map {
+            val categoryId = repository.getCategoryId(it.manga.id)
+            TrackingItem(
+                tracking = it,
+                channelId = if (categoryId == 0L) {
+                    channels.getHistoryChannelId()
+                } else {
+                    channels.getFavouritesChannelId(categoryId)
+                },
+            )
         }
-        // History
-        val history = repository.getAllHistoryManga()
-        val historyTracks = repository.getTracks(history)
-        val channelId = if (channels.isHistoryNotificationsEnabled()) {
-            channels.getHistoryChannelId()
-        } else {
-            null
-        }
-        for (track in historyTracks) {
-            if (knownManga.add(track.manga.id)) {
-                result.add(TrackingItem(track, channelId))
-            }
-        }
-        result.trimToSize()
-        return result
-    }
-
-    suspend fun getTracks(ids: Set<Long>): List<TrackingItem> {
-        return getAllTracks().filterTo(ArrayList(ids.size)) { x -> x.tracking.manga.id in ids }
     }
 
     suspend fun gc() {
@@ -76,11 +49,18 @@ class Tracker @Inject constructor(
     suspend fun fetchUpdates(
         track: MangaTracking,
         commit: Boolean
-    ): MangaUpdates.Success = withMangaLock(track.manga.id) {
-        val repo = mangaRepositoryFactory.create(track.manga.source)
-        require(repo is RemoteMangaRepository) { "Repository ${repo.javaClass.simpleName} is not supported" }
-        val manga = repo.getDetails(track.manga, CachePolicy.WRITE_ONLY)
-        val updates = compare(track, manga, getBranch(manga))
+    ): MangaUpdates = withMangaLock(track.manga.id) {
+        val updates = runCatchingCancellable {
+            val repo = mangaRepositoryFactory.create(track.manga.source)
+            require(repo is RemoteMangaRepository) { "Repository ${repo.javaClass.simpleName} is not supported" }
+            val manga = repo.getDetails(track.manga, CachePolicy.WRITE_ONLY)
+            compare(track, manga, getBranch(manga))
+        }.getOrElse { error ->
+            MangaUpdates.Failure(
+                manga = track.manga,
+                error = error
+            )
+        }
         if (commit) {
             repository.saveUpdates(updates)
         }
