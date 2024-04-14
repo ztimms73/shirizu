@@ -2,24 +2,14 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="AppBackupAgentTest">
+      <entry key="BaselineProfileGenerator">
         <State />
       </entry>
-      <entry key="app">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\xtimms\.android\avd\Pixel_5_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-06T08:29:40.034958200Z" />
-        </State>
+      <entry key="Generate Baseline Profile">
+        <State />
+      </entry>
+      <entry key="android-app.app">
+        <State />
       </entry>
     </value>
   </component>
