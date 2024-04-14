@@ -22,8 +22,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SentimentSatisfiedAlt
@@ -41,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -63,6 +64,7 @@ import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.DURATION_ENTER
 import org.xtimms.shirizu.core.DURATION_EXIT
 import org.xtimms.shirizu.core.initialOffset
+import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.toEasing
 import org.xtimms.shirizu.sections.explore.EXPLORE_DESTINATION
 import org.xtimms.shirizu.sections.feed.FEED_DESTINATION
@@ -167,53 +169,76 @@ fun TopAppBar(
             Row(
                 modifier = modifier.padding(end = 16.dp),
             ) {
-                IconButton(
-                    onClick = { navController.navigate(FEED_DESTINATION) },
-                    modifier = Modifier.padding(0.dp),
-                ) {
-                    Icon(
-                        Icons.Outlined.RssFeed,
-                        contentDescription = stringResource(id = R.string.feed),
-                        tint = MaterialTheme.colorScheme.outline
-                    )
-                }
-                IconButton(
-                    onClick = { expanded = true },
-                    modifier = Modifier.padding(0.dp),
-                ) {
-                    Icon(
-                        Icons.Outlined.MoreVert,
-                        contentDescription = stringResource(id = R.string.open_menu),
-                        tint = MaterialTheme.colorScheme.outline
-                    )
-                }
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.statistics)) },
-                        onClick = {
-                            navController.navigate(STATS_DESTINATION)
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.QueryStats,
-                                contentDescription = stringResource(id = R.string.statistics)
-                            )
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.settings)) },
-                        onClick = {
-                            navController.navigate(SETTINGS_DESTINATION)
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Outlined.Settings,
-                                contentDescription = stringResource(id = R.string.settings)
-                            )
-                        }
-                    )
+                if (AppSettings.isTrackerEnabled()) {
+                    IconButton(
+                        onClick = { navController.navigate(FEED_DESTINATION) },
+                        modifier = Modifier.padding(0.dp),
+                    ) {
+                        Icon(
+                            Icons.Outlined.RssFeed,
+                            contentDescription = stringResource(id = R.string.feed),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                    IconButton(
+                        onClick = { expanded = true },
+                        modifier = Modifier.padding(0.dp),
+                    ) {
+                        Icon(
+                            Icons.Outlined.MoreVert,
+                            contentDescription = stringResource(id = R.string.open_menu),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(id = R.string.statistics)) },
+                            onClick = {
+                                navController.navigate(STATS_DESTINATION)
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Outlined.QueryStats,
+                                    contentDescription = stringResource(id = R.string.statistics)
+                                )
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = stringResource(id = R.string.settings)) },
+                            onClick = {
+                                navController.navigate(SETTINGS_DESTINATION)
+                                expanded = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Outlined.Settings,
+                                    contentDescription = stringResource(id = R.string.settings)
+                                )
+                            }
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = { navController.navigate(STATS_DESTINATION) },
+                        modifier = Modifier.padding(0.dp),
+                    ) {
+                        Icon(
+                            Icons.Outlined.QueryStats,
+                            contentDescription = stringResource(id = R.string.statistics),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    }
+                    IconButton(
+                        onClick = { navController.navigate(SETTINGS_DESTINATION) },
+                        modifier = Modifier.padding(0.dp),
+                    ) {
+                        Icon(
+                            Icons.Outlined.Settings,
+                            contentDescription = stringResource(id = R.string.settings),
+                            tint = MaterialTheme.colorScheme.outline
+                        )
+                    }
                 }
             }
         }
@@ -271,18 +296,36 @@ fun SmallTopAppBarWithChips(
     }
 }
 
+private val path = Path().apply {
+    moveTo(0f,0f)
+    lineTo(0.7f, 0.1f)
+    cubicTo(0.7f, 0.1f, .95F, .5F, 1F, 1F)
+    moveTo(1f,1f)
+}
+
+val fraction: (Float) -> Float = { PathInterpolator(path).getInterpolation(it) }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmallTopAppBar(
-    title: String,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    titleText: String = "",
+    scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
+    title: @Composable () -> Unit = {
+        Text(
+            text = titleText,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = fraction(scrollBehavior.state.overlappedFraction)),
+            maxLines = 1
+        )
+    },
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
-    MediumTopAppBar(
-        title = { Text(text = title) },
-        navigationIcon = {
-            BackIconButton(onClick = navigateBack)
-        },
+    androidx.compose.material3.TopAppBar(
+        modifier = modifier,
+        title = title,
+        navigationIcon = navigationIcon,
+        actions = actions,
         scrollBehavior = scrollBehavior
     )
 }

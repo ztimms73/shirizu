@@ -45,7 +45,7 @@ import org.xtimms.shirizu.core.components.effects.RowEntity
 import org.xtimms.shirizu.core.components.effects.RowEntityType
 import org.xtimms.shirizu.core.components.effects.animatedItemsIndexed
 import org.xtimms.shirizu.core.components.effects.updateAnimatedItemsState
-import org.xtimms.shirizu.core.screens.EmptyScreen
+import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.core.tracker.model.TrackingLogItem
 import org.xtimms.shirizu.sections.feed.model.toFeedItem
 import org.xtimms.shirizu.utils.lang.calculateTimeAgo

@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.BackIconButton
-import org.xtimms.shirizu.core.screens.EmptyScreen
+import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.ui.theme.ShirizuTheme
 
 const val SEARCH_DESTINATION = "search"

@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import org.acra.ktx.sendWithAcra
 import org.xtimms.shirizu.R
-import org.xtimms.shirizu.core.screens.InfoScreen
+import org.xtimms.shirizu.core.ui.screens.InfoScreen
 import org.xtimms.shirizu.ui.theme.ShirizuTheme
 import org.xtimms.shirizu.utils.system.toast
 

@@ -66,6 +66,7 @@ import org.xtimms.shirizu.utils.MaskVisualTransformation
 import org.xtimms.shirizu.utils.NumberDefaults.INPUT_LENGTH
 import org.xtimms.shirizu.utils.NumberDefaults.MASK
 import org.xtimms.shirizu.utils.NumberDefaults.MAX_PORT
+import org.xtimms.shirizu.utils.lang.ifNullOrEmpty
 import org.xtimms.shirizu.utils.lang.intState
 import java.net.Proxy
 
@@ -175,14 +176,14 @@ fun NetworkView(
                 PreferenceItem(
                     enabled = proxy != Proxy.Type.DIRECT.ordinal,
                     title = stringResource(id = R.string.proxy_address),
-                    description = address,
+                    description = address.ifNullOrEmpty { stringResource(id = R.string.not_set) },
                 ) { showProxyAddressDialog = true }
             }
             item {
                 PreferenceItem(
                     enabled = proxy != Proxy.Type.DIRECT.ordinal,
                     title = stringResource(id = R.string.proxy_port),
-                    description = port.toString()
+                    description = if (port == 0) stringResource(id = R.string.not_set) else port.toString()
                 ) { showProxyPortDialog = true }
             }
             item {
@@ -192,14 +193,14 @@ fun NetworkView(
                 PreferenceItem(
                     enabled = proxy != Proxy.Type.DIRECT.ordinal,
                     title = stringResource(id = R.string.proxy_username),
-                    description = username,
+                    description = username.ifNullOrEmpty { stringResource(id = R.string.not_set) },
                 ) { showProxyUsernameDialog = true }
             }
             item {
                 PreferenceItem(
                     enabled = proxy != Proxy.Type.DIRECT.ordinal,
                     title = stringResource(id = R.string.proxy_password),
-                    description = String(CharArray(password.length) { '\u2022' }),
+                    description = String(CharArray(password.length) { '\u2022' }).ifNullOrEmpty { stringResource(id = R.string.not_set) },
                 ) { showProxyPasswordDialog = true }
             }
         }

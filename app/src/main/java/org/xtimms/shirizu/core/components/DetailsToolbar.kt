@@ -1,14 +1,9 @@
 package org.xtimms.shirizu.core.components
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Download
@@ -32,13 +27,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsToolbar(
+fun ModernDetailsToolbar(
     title: String,
     titleAlphaProvider: () -> Float,
     navigateBack: () -> Unit,
@@ -81,6 +75,78 @@ fun DetailsToolbar(
                         disabledContainerColor = MaterialTheme.colorScheme.outline,
                         disabledContentColor = MaterialTheme.colorScheme.outlineVariant
                     )
+                ) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+                }
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Share") },
+                        onClick = { /*TODO*/ },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Default.Share, contentDescription = null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Download") },
+                        onClick = { /*TODO*/ },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.Download, contentDescription = null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Open in web browser") },
+                        onClick = {
+                            navigateToWebBrowser()
+                            expanded = false
+                        },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.Language, contentDescription = null)
+                        }
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme
+                    .surfaceColorAtElevation(3.dp)
+                    .copy(alpha = backgroundAlphaProvider())
+            )
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ClassicDetailsToolbar(
+    title: String,
+    titleAlphaProvider: () -> Float,
+    navigateBack: () -> Unit,
+    navigateToWebBrowser: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundAlphaProvider: () -> Float = titleAlphaProvider
+) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
+    ) {
+        TopAppBar(
+            navigationIcon = {
+                BackIconButton(
+                    onClick = navigateBack
+                )
+            },
+            title = {
+                Text(
+                    text = title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = LocalContentColor.current.copy(alpha = titleAlphaProvider()),
+                )
+            },
+            actions = {
+                IconButton(
+                    onClick = { expanded = true }
                 ) {
                     Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
                 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -17,14 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastAny
 import coil.ImageLoader
 import org.xtimms.shirizu.R
-import org.xtimms.shirizu.core.components.MangaGridItem
-import org.xtimms.shirizu.core.screens.EmptyScreen
-import org.xtimms.shirizu.sections.shelf.LazyShelfGrid
-import org.xtimms.shirizu.sections.shelf.ShelfGrid
-import org.xtimms.shirizu.sections.shelf.ShelfManga
+import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.utils.system.plus
 
 @Composable

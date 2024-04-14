@@ -31,8 +31,8 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material.icons.outlined.LightMode
-import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -72,7 +72,7 @@ import org.xtimms.shirizu.core.components.ScaffoldWithTopAppBar
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.prefs.DarkThemePreference.Companion.OFF
 import org.xtimms.shirizu.core.prefs.DarkThemePreference.Companion.ON
-import org.xtimms.shirizu.core.prefs.READING_TIME
+import org.xtimms.shirizu.core.prefs.MODERN_VIEW
 import org.xtimms.shirizu.core.prefs.STYLE_MONOCHROME
 import org.xtimms.shirizu.core.prefs.STYLE_TONAL_SPOT
 import org.xtimms.shirizu.core.prefs.paletteStyles
@@ -85,7 +85,6 @@ import org.xtimms.shirizu.ui.monet.TonalPalettes.Companion.toTonalPalettes
 import org.xtimms.shirizu.ui.monet.a1
 import org.xtimms.shirizu.ui.monet.a2
 import org.xtimms.shirizu.ui.monet.a3
-import org.xtimms.shirizu.utils.material.combineColors
 import org.xtimms.shirizu.utils.system.toDisplayName
 import java.util.Locale
 
@@ -100,6 +99,10 @@ fun AppearanceView(
     navigateToLanguages: () -> Unit
 ) {
     val localDensity = LocalDensity.current
+
+    var isModernViewEnabled by remember {
+        mutableStateOf(AppSettings.isModernViewEnabled())
+    }
 
     ScaffoldWithTopAppBar(
         title = stringResource(R.string.appearance),
@@ -246,6 +249,15 @@ fun AppearanceView(
                 icon = Icons.Outlined.Language,
                 description = Locale.getDefault().toDisplayName(),
                 onClick = { navigateToLanguages() })
+            PreferenceSubtitle(text = stringResource(id = R.string.user_interface))
+            PreferenceSwitch(
+                icon = Icons.Outlined.Layers,
+                title = stringResource(id = R.string.details_modern_look),
+                isChecked = isModernViewEnabled,
+            ) {
+                isModernViewEnabled = !isModernViewEnabled
+                AppSettings.updateValue(MODERN_VIEW, isModernViewEnabled)
+            }
         }
     }
 }
@@ -286,8 +298,12 @@ fun RowScope.ColorButtonImpl(
     onClick: () -> Unit = {}
 ) {
 
-    val containerSize by animateDpAsState(targetValue = if (isSelected.invoke()) 28.dp else 0.dp)
-    val iconSize by animateDpAsState(targetValue = if (isSelected.invoke()) 16.dp else 0.dp)
+    val containerSize by animateDpAsState(targetValue = if (isSelected.invoke()) 28.dp else 0.dp,
+        label = "containerSize"
+    )
+    val iconSize by animateDpAsState(targetValue = if (isSelected.invoke()) 16.dp else 0.dp,
+        label = "iconSize"
+    )
 
     Surface(
         modifier = modifier

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.prefs.AppSettings
-import org.xtimms.shirizu.core.screens.EmptyScreen
+import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.utils.system.plus
 
 @Composable

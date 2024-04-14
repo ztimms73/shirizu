@@ -1,4 +1,4 @@
-package org.xtimms.shirizu.core.screens
+package org.xtimms.shirizu.core.ui.screens
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.RepeatMode

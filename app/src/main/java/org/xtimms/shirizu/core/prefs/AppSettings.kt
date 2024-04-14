@@ -59,6 +59,7 @@ const val RELATED = "related"
 const val TRACKER = "tracker"
 const val CELLULAR_DOWNLOAD = "cellular_download"
 const val STATISTICS = "statistics"
+const val MODERN_VIEW = "modern_view"
 
 const val PROXY_TYPE = "proxy_type"
 const val PROXY_ADDRESS = "proxy_address"
@@ -169,6 +170,8 @@ object AppSettings {
     fun isRelatedMangaEnabled() = RELATED.getBoolean()
 
     fun isStatisticsEnabled() = STATISTICS.getBoolean()
+
+    fun isModernViewEnabled() = MODERN_VIEW.getBoolean(true)
 
     fun getGridColumnsCount(columns: Int = GRID_COLUMNS.getInt()): Float {
         return when (columns) {

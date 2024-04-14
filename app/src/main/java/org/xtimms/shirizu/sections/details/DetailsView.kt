@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -62,12 +60,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
-import org.koitharu.kotatsu.parsers.model.RATING_UNKNOWN
 import org.xtimms.shirizu.LocalWindowWidthState
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.HapticFeedback.slightHapticFeedback
-import org.xtimms.shirizu.core.components.DetailsToolbar
+import org.xtimms.shirizu.core.components.ClassicDetailsToolbar
 import org.xtimms.shirizu.core.components.MangaHorizontalItem
+import org.xtimms.shirizu.core.components.ModernDetailsToolbar
 import org.xtimms.shirizu.core.parser.favicon.faviconUri
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.prefs.AppSettings.getBoolean
@@ -115,6 +113,7 @@ fun DetailsView(
             }
         }
     } else null
+    val isModernView = AppSettings.isModernViewEnabled()
 
     val checkNetworkOrDownload = {
         if (!AppSettings.isNetworkAvailableForDownload()) {
@@ -224,13 +223,23 @@ fun DetailsView(
                 if (!isFirstItemVisible || isFirstItemScrolled) 1f else 0f,
                 label = "Top Bar Background",
             )
-            DetailsToolbar(
-                title = viewModel.details.value?.toManga()?.title.orEmpty(),
-                titleAlphaProvider = { animatedTitleAlpha },
-                backgroundAlphaProvider = { animatedBgAlpha },
-                navigateBack = { navigateBack() },
-                navigateToWebBrowser = { openUrl(viewModel.details.value?.toManga()?.publicUrl.orEmpty()) },
-            )
+            if (isModernView) {
+                ModernDetailsToolbar(
+                    title = viewModel.details.value?.toManga()?.title.orEmpty(),
+                    titleAlphaProvider = { animatedTitleAlpha },
+                    backgroundAlphaProvider = { animatedBgAlpha },
+                    navigateBack = { navigateBack() },
+                    navigateToWebBrowser = { openUrl(viewModel.details.value?.toManga()?.publicUrl.orEmpty()) },
+                )
+            } else {
+                ClassicDetailsToolbar(
+                    title = viewModel.details.value?.toManga()?.title.orEmpty(),
+                    titleAlphaProvider = { animatedTitleAlpha },
+                    backgroundAlphaProvider = { animatedBgAlpha },
+                    navigateBack = { navigateBack() },
+                    navigateToWebBrowser = { openUrl(viewModel.details.value?.toManga()?.publicUrl.orEmpty()) },
+                )
+            }
         },
         snackbarHost = {
             SnackbarHost(
@@ -245,7 +254,7 @@ fun DetailsView(
             modifier = Modifier.fillMaxHeight(),
             state = chapterListState,
             contentPadding = PaddingValues(
-                top = contentPadding.calculateTopPadding() - 60.dp,
+                top = if (isModernView) contentPadding.calculateTopPadding() - 60.dp else 0.dp,
                 start = contentPadding.calculateStartPadding(layoutDirection),
                 end = contentPadding.calculateEndPadding(layoutDirection),
                 bottom = contentPadding.calculateBottomPadding(),
@@ -256,38 +265,73 @@ fun DetailsView(
                 key = DetailsViewItem.INFO_BOX,
                 contentType = DetailsViewItem.INFO_BOX
             ) {
-                DetailsInfoBox(
-                    coil = coil,
-                    imageUrl = manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
-                    favicon = manga?.source?.faviconUri() ?: Uri.EMPTY,
-                    title = manga?.title.orEmpty(),
-                    altTitle = manga?.altTitle.orEmpty(),
-                    author = manga?.author.orEmpty(),
-                    isNsfw = manga?.isNsfw ?: true,
-                    state = manga?.state ?: MangaState.FINISHED,
-                    source = manga?.source ?: MangaSource.DUMMY,
-                    isTabletUi = false,
-                    appBarPadding = topPadding,
-                    onCoverClick = {
-                        navigateToFullImage(
-                            arrayOf(
-                                manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
-                            ).toNavArgument()
-                        )
-                    },
-                    historyInfo = historyInfo,
-                    readingTime = readingTime,
-                    isInShelf = favouriteCategories,
-                    onAddToShelfClicked = {
-                        openCategoriesBottomSheet = !openCategoriesBottomSheet
-                    },
-                    onSourceClicked = {
-                        navigateToSource(
-                            manga?.source ?: MangaSource.DUMMY
-                        )
-                    },
-                    onDownloadClick = downloadCallback
-                )
+                if (isModernView) {
+                    ModernDetailsInfoBox(
+                        coil = coil,
+                        imageUrl = manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
+                        favicon = manga?.source?.faviconUri() ?: Uri.EMPTY,
+                        title = manga?.title.orEmpty(),
+                        altTitle = manga?.altTitle.orEmpty(),
+                        author = manga?.author.orEmpty(),
+                        isNsfw = manga?.isNsfw ?: true,
+                        state = manga?.state ?: MangaState.FINISHED,
+                        source = manga?.source ?: MangaSource.DUMMY,
+                        isTabletUi = false,
+                        appBarPadding = topPadding,
+                        onCoverClick = {
+                            navigateToFullImage(
+                                arrayOf(
+                                    manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
+                                ).toNavArgument()
+                            )
+                        },
+                        historyInfo = historyInfo,
+                        readingTime = readingTime,
+                        isInShelf = favouriteCategories,
+                        onAddToShelfClicked = {
+                            openCategoriesBottomSheet = !openCategoriesBottomSheet
+                        },
+                        onSourceClicked = {
+                            navigateToSource(
+                                manga?.source ?: MangaSource.DUMMY
+                            )
+                        },
+                        onDownloadClick = downloadCallback
+                    )
+                } else {
+                    ClassicDetailsInfoBox(
+                        coil = coil,
+                        imageUrl = manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
+                        favicon = manga?.source?.faviconUri() ?: Uri.EMPTY,
+                        title = manga?.title.orEmpty(),
+                        altTitle = manga?.altTitle.orEmpty(),
+                        author = manga?.author.orEmpty(),
+                        isNsfw = manga?.isNsfw ?: true,
+                        state = manga?.state ?: MangaState.FINISHED,
+                        source = manga?.source ?: MangaSource.DUMMY,
+                        isTabletUi = false,
+                        appBarPadding = topPadding,
+                        onCoverClick = {
+                            navigateToFullImage(
+                                arrayOf(
+                                    manga?.largeCoverUrl ?: manga?.coverUrl.orEmpty(),
+                                ).toNavArgument()
+                            )
+                        },
+                        historyInfo = historyInfo,
+                        readingTime = readingTime,
+                        isInShelf = favouriteCategories,
+                        onAddToShelfClicked = {
+                            openCategoriesBottomSheet = !openCategoriesBottomSheet
+                        },
+                        onSourceClicked = {
+                            navigateToSource(
+                                manga?.source ?: MangaSource.DUMMY
+                            )
+                        },
+                        onDownloadClick = downloadCallback
+                    )
+                }
             }
 
             item(

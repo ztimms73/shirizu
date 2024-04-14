@@ -3,50 +3,60 @@ package org.xtimms.shirizu.sections.settings.sources.catalog
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.core.AsyncImageImpl
 import org.xtimms.shirizu.core.parser.favicon.faviconUri
+import org.xtimms.shirizu.ui.theme.ShirizuTheme
 
 @Composable
 fun SourceCatalogItem(
     coil: ImageLoader,
     source: MangaSource,
-    modifier: Modifier = Modifier,
 ) {
 
-    Card(
-        modifier = modifier,
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
+        AsyncImageImpl(
+            modifier = Modifier.size(42.dp),
+            coil = coil,
+            contentDescription = null,
+            model = source.faviconUri()
+        )
+        Text(
+            text = source.title,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 16.dp,
-                    top = 16.dp,
-                    end = 16.dp,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AsyncImageImpl(
-                coil = coil,
-                contentDescription = null,
-                model = source.faviconUri()
-            )
-            Text(
-                text = source.title,
-                modifier = Modifier
-                    .padding(start = 16.dp),
-            )
+                .padding(start = 16.dp)
+                .weight(1f),
+        )
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
         }
+    }
+}
+
+@Preview
+@Composable
+fun SourceCatalogItemPreview() {
+    ShirizuTheme {
+        SourceCatalogItem(coil = ImageLoader(LocalContext.current), source = MangaSource.MANGADEX)
     }
 }

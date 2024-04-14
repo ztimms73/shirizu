@@ -15,33 +15,26 @@ import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.Person
@@ -49,20 +42,16 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Upcoming
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,14 +71,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -105,10 +91,8 @@ import org.xtimms.shirizu.core.components.ButtonType
 import org.xtimms.shirizu.core.components.HtmlTextField
 import org.xtimms.shirizu.core.components.MangaCover
 import org.xtimms.shirizu.core.components.ReadButton
-import org.xtimms.shirizu.core.parser.favicon.faviconUri
 import org.xtimms.shirizu.sections.details.data.ReadingTime
 import org.xtimms.shirizu.sections.details.model.HistoryInfo
-import org.xtimms.shirizu.ui.theme.ShirizuTheme
 import org.xtimms.shirizu.utils.composable.clickableNoIndication
 import org.xtimms.shirizu.utils.composable.secondaryItemAlpha
 import kotlin.math.roundToInt
@@ -116,106 +100,7 @@ import kotlin.math.roundToInt
 private val whitespaceLineRegex = Regex("[\\r\\n]{2,}", setOf(RegexOption.MULTILINE))
 
 @Composable
-fun DetailsInfoBox(
-    coil: ImageLoader,
-    imageUrl: String,
-    favicon: Uri,
-    title: String,
-    altTitle: String,
-    author: String,
-    isNsfw: Boolean,
-    state: MangaState?,
-    source: MangaSource,
-    historyInfo: HistoryInfo,
-    readingTime: ReadingTime?,
-    isTabletUi: Boolean,
-    appBarPadding: Dp,
-    modifier: Modifier = Modifier,
-    onCoverClick: () -> Unit,
-    isInShelf: Boolean,
-    onAddToShelfClicked: () -> Unit,
-    onSourceClicked: () -> Unit,
-    onDownloadClick: () -> Unit,
-) {
-    Column(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.BottomEnd,
-        ) {
-            AsyncImageImpl(
-                coil = coil,
-                model = imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-                    .aspectRatio(1f)
-                    .clickable(
-                        role = Role.Button,
-                        onClick = onCoverClick
-                    )
-                    .clip(MaterialTheme.shapes.large)
-            )
-            if (isNsfw) {
-                ElevatedAssistChip(
-                    modifier = Modifier.padding(end = 32.dp, bottom = 8.dp),
-                    onClick = { /*TODO*/ },
-                    label = {
-                        Text(
-                            text = "18+",
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    },
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.errorContainer),
-                    colors = AssistChipDefaults.elevatedAssistChipColors()
-                        .copy(containerColor = MaterialTheme.colorScheme.errorContainer)
-                )
-            }
-        }
-
-        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-            if (!isTabletUi) {
-                MangaAndSourceTitlesSmall(
-                    coil = coil,
-                    favicon = favicon,
-                    title = title,
-                    altTitle = altTitle,
-                    author = author,
-                    state = state,
-                    source = source,
-                    isInShelf = isInShelf,
-                    onAddToShelfClicked = onAddToShelfClicked,
-                    onSourceClicked = onSourceClicked,
-                    historyInfo = historyInfo,
-                    readingTime = readingTime,
-                    onDownloadClick = onDownloadClick
-                )
-            } else {
-                MangaAndSourceTitlesLarge(
-                    coil = coil,
-                    appBarPadding = appBarPadding,
-                    imageUrl = imageUrl,
-                    favicon = favicon,
-                    title = title,
-                    altTitle = altTitle,
-                    author = author,
-                    state = state,
-                    source = source,
-                    isInShelf = isInShelf,
-                    onAddToShelfClicked = onAddToShelfClicked,
-                    onSourceClicked = onSourceClicked,
-                    historyInfo = historyInfo,
-                    readingTime = readingTime,
-                    onDownloadClick = onDownloadClick
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MangaAndSourceTitlesLarge(
+fun MangaAndSourceTitlesLarge(
     coil: ImageLoader,
     appBarPadding: Dp,
     imageUrl: String,
@@ -264,7 +149,7 @@ private fun MangaAndSourceTitlesLarge(
 }
 
 @Composable
-private fun MangaAndSourceTitlesSmall(
+fun MangaAndSourceTitlesSmall(
     coil: ImageLoader,
     favicon: Uri,
     title: String,
@@ -288,15 +173,6 @@ private fun MangaAndSourceTitlesSmall(
                 .padding(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            /*AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .padding(PaddingValues(bottom = 8.dp))
-                    .clip(RoundedCornerShape(100))
-                    .size(48.dp),
-            )*/
             DetailsContentInfo(
                 coil = coil,
                 favicon = favicon,
@@ -321,7 +197,7 @@ private fun MangaAndSourceTitlesSmall(
     ExperimentalMaterial3Api::class
 )
 @Composable
-private fun DetailsContentInfo(
+fun DetailsContentInfo(
     coil: ImageLoader,
     favicon: Uri,
     title: String,
@@ -528,23 +404,6 @@ private fun DetailsContentInfo(
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
         }
-
-        /*Row(modifier = Modifier
-            .weight(.5f)
-            .padding(start = 4.dp, end = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AnimatedButton(
-                    modifier = Modifier.size(54.dp),
-                    type = KeyboardButtonType.PRIMARY,
-                    icon = Icons.Outlined.FavoriteBorder
-                )
-                AnimatedButton(
-                    modifier = Modifier
-                        .height(54.dp)
-                        .fillMaxWidth(),
-                    type = KeyboardButtonType.TERTIARY,
-                    icon = Icons.Outlined.PlayArrow
-                )
-            }*/
     }
 }
 
@@ -621,7 +480,7 @@ fun ExpandableMangaDescription(
                 ) {
                     tags.forEach {
                         TagsChip(
-                            modifier = DefaultTagChipModifier,
+                            modifier = modifier.padding(vertical = 4.dp),
                             tag = it,
                             onClick = {
                                 tagSelected = it.title
@@ -644,8 +503,6 @@ private fun MangaSummary(
     expanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
-
-    val uriHandler = LocalUriHandler.current
 
     val animProgress by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
@@ -727,8 +584,6 @@ private fun MangaSummary(
         }
     }
 }
-
-private val DefaultTagChipModifier = Modifier.padding(vertical = 4.dp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
