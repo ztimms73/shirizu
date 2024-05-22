@@ -67,6 +67,13 @@ const val PROXY_PORT = "proxy_port"
 const val PROXY_USER = "proxy_user"
 const val PROXY_PASSWORD = "proxy_password"
 
+const val MANGA = "manga_sources"
+const val HENTAI = "hentai_sources"
+const val COMICS = "comics_sources"
+const val OTHER = "other_sources"
+
+const val NSFW_HISTORY = "nsfw_history"
+
 const val NOT_SPECIFIED = 0
 
 val paletteStyles = listOf(
@@ -172,6 +179,13 @@ object AppSettings {
     fun isStatisticsEnabled() = STATISTICS.getBoolean()
 
     fun isModernViewEnabled() = MODERN_VIEW.getBoolean(true)
+
+    fun isMangaContentTypeEnabled() = MANGA.getBoolean(true)
+    fun isHentaiContentTypeEnabled() = HENTAI.getBoolean(true)
+    fun isComicsContentTypeEnabled() = COMICS.getBoolean(true)
+    fun isOtherContentTypeEnabled() = OTHER.getBoolean(true)
+
+    fun showNsfwInHistory() = NSFW_HISTORY.getBoolean(true)
 
     fun getGridColumnsCount(columns: Int = GRID_COLUMNS.getInt()): Float {
         return when (columns) {

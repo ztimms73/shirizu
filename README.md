@@ -15,16 +15,17 @@ Shirizu (シリーズ, from Japanese - series) - An attempt to write an Android 
 No, nothing works.
 
 ## Screens
-|                    Shelf                     |                     Details                      |                     History                      |
-|:--------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-|   ![Shelf light theme](./images/shelf.png)   |   ![Details light theme](./images/details.png)   |   ![History light theme](./images/history.png)   |
-| ![Shelf dark theme](./images/shelf_dark.png) | ![Details dark theme](./images/details_dark.png) | ![History dark theme](./images/history_dark.png) |
+|                  Library                   |                   Explore                    |                   Search                    |
+|:------------------------------------------:|:--------------------------------------------:|:-------------------------------------------:|
+| ![Shelf light theme](./images/library.png) | ![Details light theme](./images/explore.png) | ![History light theme](./images/search.png) |
 
 ## Acknowledgements
 
 - [Kotatsu](https://github.com/KotatsuApp/Kotatsu) - UI, parsers, under the hood
+- [Mihon](https://github.com/mihonapp/mihon) - UI, under the hood
 - [Seal](https://github.com/JunkFood02/Seal) - UI
-- [MoeList](https://github.com/axiel7/MoeList) - Under the hood
+- [Tivi](https://github.com/chrisbanes/tivi) - UI
+- [Buckwheat](https://github.com/danilkinkin/buckwheat) - UI
 
 ## License
 

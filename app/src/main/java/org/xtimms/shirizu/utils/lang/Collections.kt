@@ -1,6 +1,7 @@
 package org.xtimms.shirizu.utils.lang
 
 import androidx.collection.ArrayMap
+import java.util.EnumSet
 
 fun <T> Collection<T>.asArrayList(): ArrayList<T> = if (this is ArrayList<*>) {
     this as ArrayList<T>
@@ -39,4 +40,29 @@ fun <T : R, R : Any> List<T>.insertSeparators(
         separator?.let(newList::add)
     }
     return newList
+}
+
+fun <K, V> Map<K, V>.findKeyByValue(value: V): K? {
+    for ((k, v) in entries) {
+        if (v == value) {
+            return k
+        }
+    }
+    return null
+}
+
+fun Collection<*>?.sizeOrZero() = if (this == null) 0 else size
+
+inline fun <reified E : Enum<E>> Collection<E>.toEnumSet(): EnumSet<E> = if (isEmpty()) {
+    EnumSet.noneOf(E::class.java)
+} else {
+    EnumSet.copyOf(this)
+}
+
+fun <E> HashSet<E>.addOrRemove(value: E, shouldAdd: Boolean) {
+    if (shouldAdd) {
+        add(value)
+    } else {
+        remove(value)
+    }
 }

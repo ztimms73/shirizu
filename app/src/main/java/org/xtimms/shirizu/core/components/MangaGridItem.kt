@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
@@ -33,47 +35,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.Manga
-import org.xtimms.shirizu.core.AsyncImageImpl
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 
 private const val GridSelectedCoverAlpha = 0.76f
 
 @Composable
 fun MangaGridItem(
-    coil: ImageLoader,
     manga: Manga,
-    onClick: (Manga) -> Unit,
+    title: String,
+    onClick: () -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
+    titleMaxLines: Int = 2,
+    coverAlpha: Float = 1f,
 ) {
     GridItemSelectable(
-        manga = manga,
         isSelected = isSelected,
         onClick = onClick,
         onLongClick = onLongClick,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Box {
-                AsyncImageImpl(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                        .clip(MaterialTheme.shapes.medium)
-                        .aspectRatio(10F / 16F),
-                    coil = coil,
-                    model = manga.largeCoverUrl ?: manga.coverUrl,
-                    contentDescription = null
-                )
-            }
-            Text(
-                text = manga.title,
+        Column {
+            MangaGridCover(
+                cover = {
+                    MangaCover.Book(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .alpha(if (isSelected) GridSelectedCoverAlpha else coverAlpha),
+                        data = manga.largeCoverUrl ?: manga.coverUrl,
+                    )
+                },
+            )
+            GridItemTitle(
                 modifier = Modifier.padding(4.dp),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
+                title = title,
                 style = MaterialTheme.typography.titleSmall,
+                minLines = 2,
+                maxLines = titleMaxLines,
             )
         }
     }
@@ -81,14 +80,12 @@ fun MangaGridItem(
 
 @Composable
 fun MangaHorizontalItem(
-    coil: ImageLoader,
     manga: Manga,
     onClick: (Manga) -> Unit,
     onLongClick: () -> Unit,
     isSelected: Boolean = false,
 ) {
     GridItemSelectable(
-        manga = manga,
         isSelected = isSelected,
         onClick = { onClick(manga) },
         onLongClick = onLongClick,
@@ -98,14 +95,13 @@ fun MangaHorizontalItem(
             horizontalAlignment = Alignment.Start
         ) {
             Box {
-                AsyncImageImpl(
+                ShirizuAsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(4.dp)
                         .clip(MaterialTheme.shapes.medium)
                         .aspectRatio(10F / 16F)
                         .height(156.dp),
-                    coil = coil,
                     model = manga.largeCoverUrl ?: manga.coverUrl,
                     contentDescription = null
                 )
@@ -128,7 +124,6 @@ fun MangaHorizontalItem(
 private fun MangaGridCover(
     modifier: Modifier = Modifier,
     cover: @Composable BoxScope.() -> Unit = {},
-    content: @Composable (BoxScope.() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -136,7 +131,6 @@ private fun MangaGridCover(
             .aspectRatio(MangaCover.Book.ratio),
     ) {
         cover()
-        content?.invoke(this)
     }
 }
 
@@ -193,8 +187,6 @@ private fun GridItemTitle(
     Text(
         modifier = modifier,
         text = title,
-        fontSize = 12.sp,
-        lineHeight = 18.sp,
         minLines = minLines,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
@@ -208,9 +200,8 @@ private fun GridItemTitle(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun GridItemSelectable(
-    manga: Manga,
     isSelected: Boolean,
-    onClick: (Manga) -> Unit,
+    onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -219,7 +210,7 @@ private fun GridItemSelectable(
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
             .combinedClickable(
-                onClick = { onClick(manga) },
+                onClick = onClick,
                 onLongClick = onLongClick,
             )
             .selectedOutline(isSelected = isSelected, color = MaterialTheme.colorScheme.secondary)

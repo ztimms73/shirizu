@@ -9,11 +9,14 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
+import android.webkit.WebView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.WorkerThread
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import androidx.work.CoroutineWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
@@ -70,4 +73,17 @@ fun Context.ensureRamAtLeast(requiredSize: Long) {
 
 fun Context.isPowerSaveMode(): Boolean {
     return powerManager?.isPowerSaveMode == true
+}
+
+fun WebView.configureForParser(userAgentOverride: String?) = with(settings) {
+    javaScriptEnabled = true
+    domStorageEnabled = true
+    mediaPlaybackRequiresUserGesture = false
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.MUTE_AUDIO)) {
+        WebViewCompat.setAudioMuted(this@configureForParser, true)
+    }
+    databaseEnabled = true
+    if (userAgentOverride != null) {
+        userAgentString = userAgentOverride
+    }
 }

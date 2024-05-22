@@ -5,7 +5,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import org.xtimms.shirizu.core.base.viewmodel.KotatsuBaseViewModel
 import org.xtimms.shirizu.core.parser.MangaDataRepository
 import org.xtimms.shirizu.core.parser.MangaIntent

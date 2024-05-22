@@ -1,6 +1,8 @@
 package org.xtimms.shirizu.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Transaction
@@ -32,6 +34,10 @@ abstract class MangaSourcesDao {
 
     @Query("UPDATE sources SET enabled = 0")
     abstract suspend fun disableAllSources()
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Transaction
+    abstract suspend fun insertIfAbsent(entries: Collection<MangaSourceEntity>)
 
     @Upsert
     abstract suspend fun upsert(entry: MangaSourceEntity)

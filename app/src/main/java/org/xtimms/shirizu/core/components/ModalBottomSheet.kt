@@ -41,7 +41,7 @@ fun ShirizuModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+        contentWindowInsets = { WindowInsets(0.dp, 0.dp, 0.dp, 0.dp) },
     ) {
         Column(modifier = Modifier.padding(paddingValues = horizontalPadding)) {
             content()

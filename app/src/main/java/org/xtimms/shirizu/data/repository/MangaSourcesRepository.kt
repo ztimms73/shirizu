@@ -1,6 +1,5 @@
 package org.xtimms.shirizu.data.repository
 
-import androidx.compose.runtime.Composable
 import dagger.Reusable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.map
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.util.mapToSet
-import org.xtimms.shirizu.BuildConfig
 import org.xtimms.shirizu.core.database.ShirizuDatabase
 import org.xtimms.shirizu.core.database.dao.MangaSourcesDao
 import org.xtimms.shirizu.core.database.entity.MangaSourceEntity
@@ -41,9 +39,7 @@ class MangaSourcesRepository @Inject constructor(
 
     private val remoteSources = EnumSet.allOf(MangaSource::class.java).apply {
         remove(MangaSource.LOCAL)
-        if (!BuildConfig.DEBUG) {
-            remove(MangaSource.DUMMY)
-        }
+        remove(MangaSource.DUMMY)
     }
 
     val allMangaSources: Set<MangaSource>
@@ -57,6 +53,15 @@ class MangaSourcesRepository @Inject constructor(
     suspend fun getDisabledSources(): List<MangaSource> {
         return dao.findAllDisabled().toSources(settings.isNsfwContentDisabled)
     }
+
+    fun observeDisabledSources(): Flow<List<MangaSource>> = combine(
+        observeIsNsfwDisabled(),
+        observeSortOrder(),
+    ) { skipNsfw, _ ->
+        dao.observeDisabled().map {
+            it.toSources(skipNsfw)
+        }
+    }.flatMapLatest { it }
 
     fun observeEnabledSourcesCount(): Flow<Int> {
         return combine(
@@ -113,6 +118,39 @@ class MangaSourcesRepository @Inject constructor(
         } else {
             flowOf(emptySet())
         }
+    }
+
+    suspend fun assimilateNewSources(): Set<MangaSource> {
+        val new = getNewSources()
+        if (new.isEmpty()) {
+            return emptySet()
+        }
+        var maxSortKey = dao.getMaxSortKey()
+        val entities = new.map { x ->
+            MangaSourceEntity(
+                source = x.name,
+                isEnabled = false,
+                sortKey = ++maxSortKey,
+            )
+        }
+        dao.insertIfAbsent(entities)
+        if (settings.isNsfwContentDisabled) {
+            new.removeAll { x -> x.isNsfw() }
+        }
+        return new
+    }
+
+    suspend fun isSetupRequired(): Boolean {
+        return dao.findAll().isEmpty()
+    }
+
+    private suspend fun getNewSources(): MutableSet<MangaSource> {
+        val entities = dao.findAll()
+        val result = EnumSet.copyOf(remoteSources)
+        for (e in entities) {
+            result.remove(MangaSource(e.source))
+        }
+        return result
     }
 
     private fun List<MangaSourceEntity>.toSources(

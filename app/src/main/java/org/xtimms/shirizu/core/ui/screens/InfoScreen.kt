@@ -57,7 +57,7 @@ import org.xtimms.shirizu.utils.material.combineColors
 fun InfoScreen(
     icon: ImageVector,
     headingText1: String,
-    headingText2: String,
+    headingText2: String? = null,
     subtitleText: String,
     acceptText: String,
     onAcceptClick: () -> Unit,
@@ -182,10 +182,12 @@ fun InfoScreen(
                 else -> headingText2
             }
             AnimatedContent(targetState = heading, label = "heading animation") {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.headlineLarge,
-                )
+                if (it != null) {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.headlineLarge,
+                    )
+                }
             }
             Text(
                 text = subtitleText,

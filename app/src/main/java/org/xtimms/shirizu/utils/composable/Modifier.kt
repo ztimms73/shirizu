@@ -4,6 +4,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,3 +44,11 @@ fun Modifier.clickableNoIndication(
         onClick = onClick,
     )
 }
+
+fun Modifier.bodyWidth() = fillMaxWidth()
+    .composed {
+        windowInsetsPadding(
+            WindowInsets.systemBars
+                .only(WindowInsetsSides.Horizontal),
+        )
+    }

@@ -59,7 +59,6 @@ fun SourcesCatalogPager(
             ) { item ->
                 item.items.forEach { source ->
                     SourceCatalogItem(
-                        coil = coil,
                         source = source.source,
                     )
                 }

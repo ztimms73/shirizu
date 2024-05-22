@@ -30,17 +30,18 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import coil.compose.AsyncImage
+import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.xtimms.shirizu.R
-import org.xtimms.shirizu.core.AsyncImageImpl
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.core.components.MangaCover
 import org.xtimms.shirizu.sections.details.data.ReadingTime
 import org.xtimms.shirizu.sections.details.model.HistoryInfo
 
 @Composable
 fun ClassicDetailsInfoBox(
-    coil: ImageLoader,
     imageUrl: String,
     favicon: Uri,
     title: String,
@@ -50,7 +51,7 @@ fun ClassicDetailsInfoBox(
     state: MangaState?,
     source: MangaSource,
     historyInfo: HistoryInfo,
-    readingTime: ReadingTime?,
+    readingTime: ReadingTime,
     isTabletUi: Boolean,
     appBarPadding: Dp,
     modifier: Modifier = Modifier,
@@ -67,8 +68,7 @@ fun ClassicDetailsInfoBox(
             Color.Transparent,
             MaterialTheme.colorScheme.background,
         )
-        AsyncImageImpl(
-            coil = coil,
+        ShirizuAsyncImage(
             model = imageUrl,
             contentDescription = null,
             contentScale = ContentScale.Crop,
@@ -80,7 +80,7 @@ fun ClassicDetailsInfoBox(
                         brush = Brush.verticalGradient(colors = backdropGradientColors),
                     )
                 }
-                .blur(3.dp)
+                .blur(5.dp)
                 .alpha(0.33f),
         )
 
@@ -88,7 +88,6 @@ fun ClassicDetailsInfoBox(
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             if (!isTabletUi) {
                 MangaInfoSmall(
-                    coil = coil,
                     appBarPadding = appBarPadding,
                     imageUrl = imageUrl,
                     favicon = favicon,
@@ -107,7 +106,6 @@ fun ClassicDetailsInfoBox(
                 )
             } else {
                 MangaInfoLarge(
-                    coil = coil,
                     appBarPadding = appBarPadding,
                     imageUrl = imageUrl,
                     favicon = favicon,
@@ -131,7 +129,6 @@ fun ClassicDetailsInfoBox(
 
 @Composable
 fun MangaInfoLarge(
-    coil: ImageLoader,
     appBarPadding: Dp,
     imageUrl: String,
     favicon: Uri,
@@ -140,7 +137,7 @@ fun MangaInfoLarge(
     author: String,
     source: MangaSource,
     state: MangaState?,
-    historyInfo: HistoryInfo,
+    historyInfo: HistoryInfo?,
     readingTime: ReadingTime?,
     isInShelf: Boolean,
     onAddToShelfClicked: () -> Unit,
@@ -155,7 +152,6 @@ fun MangaInfoLarge(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MangaCover.Book(
-            coil = coil,
             modifier = Modifier
                 .fillMaxWidth(0.65f)
                 .clickable(
@@ -167,7 +163,6 @@ fun MangaInfoLarge(
         )
         Spacer(modifier = Modifier.height(16.dp))
         DetailsContentInfo(
-            coil = coil,
             favicon = favicon,
             title = title,
             altTitle = altTitle,
@@ -177,7 +172,7 @@ fun MangaInfoLarge(
             isInShelf = isInShelf,
             onAddToShelfClicked = onAddToShelfClicked,
             onSourceClicked = onSourceClicked,
-            historyInfo = historyInfo,
+            historyInfo = historyInfo!!,
             readingTime = readingTime,
             onDownloadClick = onDownloadClick
         )
@@ -186,7 +181,6 @@ fun MangaInfoLarge(
 
 @Composable
 fun MangaInfoSmall(
-    coil: ImageLoader,
     appBarPadding: Dp,
     imageUrl: String,
     favicon: Uri,
@@ -196,7 +190,7 @@ fun MangaInfoSmall(
     state: MangaState?,
     source: MangaSource,
     historyInfo: HistoryInfo,
-    readingTime: ReadingTime?,
+    readingTime: ReadingTime,
     isInShelf: Boolean,
     onAddToShelfClicked: () -> Unit,
     onCoverClick: () -> Unit,
@@ -210,8 +204,7 @@ fun MangaInfoSmall(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AsyncImageImpl(
-            coil = coil,
+        ShirizuAsyncImage(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .sizeIn(maxWidth = 54.dp)
@@ -224,9 +217,9 @@ fun MangaInfoSmall(
                 ),
             model = imageUrl,
             contentDescription = stringResource(R.string.manga_cover),
+            contentScale = ContentScale.Crop
         )
         DetailsContentInfo(
-            coil = coil,
             favicon = favicon,
             title = title,
             altTitle = altTitle,

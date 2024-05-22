@@ -11,6 +11,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.hilt.getScreenModel
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.ConfirmButton
 import org.xtimms.shirizu.core.components.DialogCheckBoxItem
@@ -38,8 +40,8 @@ fun CleanDialog(
     onConfirm: (isPagesCacheSelected: Boolean, isThumbnailCacheSelected: Boolean, isNetworkCacheSelected: Boolean) -> Unit = { _, _, _ -> }
 ) {
 
-    val viewModel: StorageViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // val screenModel = getScreenModel<StorageScreenModel>()
+    // val state by screenModel.state.collectAsState()
 
     var pagesCache by remember {
         mutableStateOf(isPagesCacheSelected)
@@ -95,32 +97,21 @@ fun CleanDialog(
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
                 Spacer(modifier = Modifier.height(4.dp))
-                val summary = StringBuilder().run {
-                    append(
-                        FileSize.BYTES.format(
-                            LocalContext.current,
-                            (uiState.pagesCache + uiState.thumbnailsCache + uiState.httpCacheSize).toFloat()
-                        )
-                    )
-                    append("")
-                }
-                Text(
-                    text = stringResource(R.string.free_up_space_summary) + " " + summary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                )
+                //val summary = StringBuilder().run {
+                //    append(
+                //        FileSize.BYTES.format(
+                //            LocalContext.current,
+                            // (uiState.pagesCache + uiState.thumbnailsCache + uiState.httpCacheSize).toFloat()
+                //        )
+                //    )
+               //     append("")
+               // }
+                //Text(
+                //    text = stringResource(R.string.free_up_space_summary) + " " + summary,
+                //    modifier = Modifier
+                //        .fillMaxWidth()
+                //        .padding(horizontal = 24.dp),
+                //)
             }
         })
-}
-
-@Preview
-@Composable
-private fun CleanDialogPreview() {
-    CleanDialog(
-        onDismissRequest = {},
-        isPagesCacheSelected = false,
-        isThumbnailsCacheSelected = false,
-        isNetworkCacheSelected = false
-    )
 }

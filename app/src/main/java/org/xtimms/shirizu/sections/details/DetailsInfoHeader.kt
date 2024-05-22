@@ -81,11 +81,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
+import coil.compose.AsyncImage
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.xtimms.shirizu.R
-import org.xtimms.shirizu.core.AsyncImageImpl
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.core.components.AnimatedButton
 import org.xtimms.shirizu.core.components.ButtonType
 import org.xtimms.shirizu.core.components.HtmlTextField
@@ -101,7 +102,6 @@ private val whitespaceLineRegex = Regex("[\\r\\n]{2,}", setOf(RegexOption.MULTIL
 
 @Composable
 fun MangaAndSourceTitlesLarge(
-    coil: ImageLoader,
     appBarPadding: Dp,
     imageUrl: String,
     favicon: Uri,
@@ -124,14 +124,12 @@ fun MangaAndSourceTitlesLarge(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MangaCover.Book(
-            coil = coil,
             modifier = Modifier.fillMaxWidth(0.65f),
             data = imageUrl,
             contentDescription = stringResource(R.string.manga_cover),
         )
         Spacer(modifier = Modifier.height(16.dp))
         DetailsContentInfo(
-            coil = coil,
             favicon = favicon,
             title = title,
             altTitle = altTitle,
@@ -150,7 +148,6 @@ fun MangaAndSourceTitlesLarge(
 
 @Composable
 fun MangaAndSourceTitlesSmall(
-    coil: ImageLoader,
     favicon: Uri,
     title: String,
     altTitle: String,
@@ -174,7 +171,6 @@ fun MangaAndSourceTitlesSmall(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             DetailsContentInfo(
-                coil = coil,
                 favicon = favicon,
                 title = title,
                 altTitle = altTitle,
@@ -198,7 +194,6 @@ fun MangaAndSourceTitlesSmall(
 )
 @Composable
 fun DetailsContentInfo(
-    coil: ImageLoader,
     favicon: Uri,
     title: String,
     altTitle: String,
@@ -344,8 +339,7 @@ fun DetailsContentInfo(
                     AssistChip(
                         onClick = { onSourceClicked() },
                         leadingIcon = {
-                            AsyncImageImpl(
-                                coil = coil,
+                            ShirizuAsyncImage(
                                 modifier = Modifier
                                     .size(18.dp)
                                     .clip(RoundedCornerShape(100)),

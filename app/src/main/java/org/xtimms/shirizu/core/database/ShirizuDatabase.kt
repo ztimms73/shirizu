@@ -36,9 +36,12 @@ import org.xtimms.shirizu.core.database.entity.TrackEntity
 import org.xtimms.shirizu.core.database.entity.TrackLogEntity
 import org.xtimms.shirizu.core.database.migrations.Migration1To2
 import org.xtimms.shirizu.core.database.migrations.Migration2To3
+import org.xtimms.shirizu.core.database.migrations.Migration3To4
+import org.xtimms.shirizu.core.scrobbling.data.ScrobblingDao
+import org.xtimms.shirizu.core.scrobbling.data.ScrobblingEntity
 import org.xtimms.shirizu.utils.lang.processLifecycleScope
 
-const val DATABASE_VERSION = 3
+const val DATABASE_VERSION = 4
 
 @Database(
     entities = [
@@ -54,6 +57,7 @@ const val DATABASE_VERSION = 3
         TrackEntity::class,
         TrackLogEntity::class,
         StatsEntity::class,
+        ScrobblingEntity::class,
     ],
     version = DATABASE_VERSION
 )
@@ -81,11 +85,14 @@ abstract class ShirizuDatabase : RoomDatabase() {
 
     abstract fun getStatsDao(): StatsDao
 
+    abstract fun getScrobblingDao(): ScrobblingDao
+
 }
 
 fun getDatabaseMigrations(context: Context): Array<Migration> = arrayOf(
     Migration1To2(),
-    Migration2To3()
+    Migration2To3(),
+    Migration3To4()
 )
 
 fun ShirizuDatabase(context: Context): ShirizuDatabase = Room

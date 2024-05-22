@@ -25,7 +25,7 @@ private val Int.ForIncoming: Int
  * [materialSharedAxisX] allows to switch a layout with shared X-axis transition.
  *
  */
-public fun materialSharedAxisX(
+fun materialSharedAxisX(
     initialOffsetX: (fullWidth: Int) -> Int,
     targetOffsetX: (fullWidth: Int) -> Int,
     durationMillis: Int = MotionConstants.DefaultMotionDuration,
@@ -40,7 +40,7 @@ public fun materialSharedAxisX(
 /**
  * [materialSharedAxisXIn] allows to switch a layout with shared X-axis enter transition.
  */
-public fun materialSharedAxisXIn(
+fun materialSharedAxisXIn(
     initialOffsetX: (fullWidth: Int) -> Int,
     durationMillis: Int = MotionConstants.DefaultMotionDuration,
 ): EnterTransition = slideInHorizontally(
@@ -61,7 +61,7 @@ public fun materialSharedAxisXIn(
  * [materialSharedAxisXOut] allows to switch a layout with shared X-axis exit transition.
  *
  */
-public fun materialSharedAxisXOut(
+fun materialSharedAxisXOut(
     targetOffsetX: (fullWidth: Int) -> Int,
     durationMillis: Int = MotionConstants.DefaultMotionDuration,
 ): ExitTransition = slideOutHorizontally(

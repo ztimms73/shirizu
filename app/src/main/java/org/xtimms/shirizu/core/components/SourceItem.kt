@@ -24,12 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import coil.ImageLoader
-import org.xtimms.shirizu.core.AsyncImageImpl
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.ui.theme.ShirizuTheme
 
 @Composable
 fun SourceItem(
-    coil: ImageLoader,
     faviconUrl: Uri,
     title: String,
     modifier: Modifier = Modifier,
@@ -50,8 +49,7 @@ fun SourceItem(
                 .clip(MaterialTheme.shapes.large)
                 .aspectRatio(1f)
         ) {
-            AsyncImageImpl(
-                coil = coil,
+            ShirizuAsyncImage(
                 model = faviconUrl,
                 contentDescription = "favicon",
                 contentScale = ContentScale.Crop,
@@ -79,7 +77,6 @@ fun SourceItem(
 fun SourceItemPreview() {
     ShirizuTheme {
         SourceItem(
-            coil = ImageLoader(LocalContext.current),
             faviconUrl = "".toUri(),
             title = "Test",
             onClick = { }

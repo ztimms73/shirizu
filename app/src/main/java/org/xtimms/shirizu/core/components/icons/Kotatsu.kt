@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector.Builder
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-public val Icons.Filled.Kotatsu: ImageVector
+val Icons.Filled.Kotatsu: ImageVector
     get() {
         if (_kotatsu != null) {
             return _kotatsu!!

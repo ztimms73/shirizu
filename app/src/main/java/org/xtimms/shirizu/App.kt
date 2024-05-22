@@ -11,6 +11,7 @@ import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import coil.ImageLoader
 import com.google.android.material.color.DynamicColors
 import com.tencent.mmkv.MMKV
 import dagger.hilt.android.HiltAndroidApp
@@ -49,6 +50,9 @@ class App : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workManagerProvider: Provider<WorkManager>
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()

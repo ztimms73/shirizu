@@ -40,4 +40,8 @@
         <item quantity="one">%1$d new chapter</item>
         <item quantity="other">%1$d new chapters</item>
     </plurals>
+    <plurals name="mangas">
+        <item quantity="one">%1$d manga</item>
+        <item quantity="other">%1$d mangas</item>
+    </plurals>
 </resources>

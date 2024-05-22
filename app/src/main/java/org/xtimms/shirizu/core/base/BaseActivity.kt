@@ -24,7 +24,7 @@ abstract class BaseActivity<B : ViewBinding> :
         WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         putDataToExtras(intent)
         super.onNewIntent(intent)
     }

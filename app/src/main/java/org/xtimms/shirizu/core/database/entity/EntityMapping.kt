@@ -13,6 +13,8 @@ import org.xtimms.shirizu.core.model.MangaHistory
 import org.xtimms.shirizu.core.model.MangaSource
 import org.xtimms.shirizu.core.tracker.model.TrackingLogItem
 import org.xtimms.shirizu.sections.shelf.FavouriteManga
+import org.xtimms.shirizu.sections.shelf.ShelfCategory
+import org.xtimms.shirizu.sections.shelf.ShelfManga
 import org.xtimms.shirizu.utils.lang.longHashCode
 import java.time.Instant
 
@@ -44,6 +46,25 @@ fun MangaEntity.toManga(tags: Set<MangaTag>) = Manga(
     tags = tags,
 )
 
+fun MangaEntity.toShelfManga(tags: Set<MangaTag>) = ShelfManga(
+    Manga(
+        id = this.id,
+        title = this.title,
+        altTitle = this.altTitle,
+        state = this.state?.let { MangaState(it) },
+        rating = this.rating,
+        isNsfw = this.isNsfw,
+        url = this.url,
+        publicUrl = this.publicUrl,
+        coverUrl = this.coverUrl,
+        largeCoverUrl = this.largeCoverUrl,
+        author = this.author,
+        source = MangaSource(this.source),
+        tags = tags,
+    ),
+    category = 1
+)
+
 fun MangaWithTags.toManga() = manga.toManga(tags.toMangaTags())
 
 fun FavouriteCategoryEntity.toFavouriteCategory(id: Long = categoryId.toLong()) = FavouriteCategory(
@@ -56,9 +77,19 @@ fun FavouriteCategoryEntity.toFavouriteCategory(id: Long = categoryId.toLong()) 
     isVisibleInLibrary = isVisibleInLibrary,
 )
 
+fun FavouriteCategoryEntity.toShelfCategory(id: Long = categoryId.toLong()) = ShelfCategory(
+    id = id,
+    title = title,
+    mangaCount = 0
+)
+
 fun FavouriteManga.toManga() = manga.toManga(tags.toMangaTags())
 
+fun FavouriteManga.toShelfManga() = manga.toShelfManga(tags.toMangaTags())
+
 fun Collection<FavouriteManga>.toMangaList() = map { it.toManga() }
+
+fun Collection<FavouriteManga>.toShelfMangaList() = map { it.toShelfManga() }
 
 fun BookmarkEntity.toBookmark(manga: Manga) = Bookmark(
     manga = manga,

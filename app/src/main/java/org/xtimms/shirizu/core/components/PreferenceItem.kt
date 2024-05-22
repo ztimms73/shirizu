@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Check
@@ -67,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.xtimms.shirizu.ui.theme.FixedAccentColors
 import org.xtimms.shirizu.R
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.ui.monet.LocalTonalPalettes
 import org.xtimms.shirizu.ui.monet.TonalPalettes.Companion.toTonalPalettes
 import org.xtimms.shirizu.ui.theme.PreviewThemeLight

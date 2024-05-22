@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import org.xtimms.shirizu.core.model.ShelfCategory
+import org.xtimms.shirizu.sections.shelf.ShelfCategory
 
 @Composable
 fun DonutChart(

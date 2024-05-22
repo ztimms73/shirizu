@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import kotlinx.coroutines.launch
-import org.xtimms.shirizu.core.AsyncImageImpl
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.core.components.BackIconButton
 import org.xtimms.shirizu.core.components.ViewInBrowserButton
 import org.xtimms.shirizu.ui.theme.ShirizuTheme
@@ -41,7 +41,6 @@ const val FULL_POSTER_DESTINATION = "full_poster/$PICTURES_ARGUMENT"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullImageView(
-    coil: ImageLoader,
     pictures: Array<String>,
     navigateBack: () -> Unit,
 ) {
@@ -87,8 +86,7 @@ fun FullImageView(
                     modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    AsyncImageImpl(
-                        coil = coil,
+                    ShirizuAsyncImage(
                         model = pictures[page],
                         contentDescription = "image$page",
                         modifier = Modifier.fillMaxSize(),
@@ -131,7 +129,6 @@ fun FullImageView(
 fun FullPosterPreview() {
     ShirizuTheme {
         FullImageView(
-            coil = ImageLoader(LocalContext.current),
             pictures = arrayOf("", ""),
             navigateBack = {}
         )

@@ -32,7 +32,7 @@ fun ExploreButton(
     Card(
         onClick = onClick,
         modifier = modifier.padding(start = 8.dp, end = 8.dp),
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(25),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
         )

@@ -55,12 +55,4 @@ class StatsViewModel @Inject constructor(
         }
         selectedCategories.value = snapshot
     }
-
-    fun clear() {
-        launchLoadingJob(Dispatchers.Default) {
-            repository.clearStats()
-            readingStats.value = emptyList()
-            onActionDone.call(ReversibleAction(R.string.stats_cleared, null))
-        }
-    }
 }

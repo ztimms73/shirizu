@@ -34,7 +34,7 @@ import org.xtimms.shirizu.utils.withExtraCloseable
 import java.net.HttpURLConnection
 import kotlin.coroutines.coroutineContext
 
-private const val FALLBACK_SIZE = 9999 // largest icon
+private const val FALLBACK_SIZE = 99999 // largest icon
 
 @OptIn(ExperimentalCoilApi::class)
 class FaviconFetcher(

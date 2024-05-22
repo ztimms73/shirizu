@@ -93,18 +93,11 @@ fun ScaffoldWithClassicTopAppBar(
     contentWindowInsets: WindowInsets = WindowInsets.systemBars,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        rememberTopAppBarState(),
-        canScroll = { true }
-    )
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
+    org.xtimms.shirizu.core.components.Scaffold(
         topBar = {
             ClassicTopAppBar(
                 title = title,
-                scrollBehavior = topAppBarScrollBehavior,
+                scrollBehavior = it,
                 actions = actions,
                 navigateBack = navigateBack
             )

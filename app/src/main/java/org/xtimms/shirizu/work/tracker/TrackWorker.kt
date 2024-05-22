@@ -43,6 +43,7 @@ import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.koitharu.kotatsu.parsers.util.toIntUp
+import org.xtimms.shirizu.BuildConfig
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.database.ShirizuDatabase
 import org.xtimms.shirizu.core.exceptions.CloudflareProtectedException
@@ -269,7 +270,7 @@ class TrackWorker @AssistedInject constructor(
         override suspend fun schedule() {
             val constraints = createConstraints()
             val runCount = dbProvider.get().getTracksDao().getTracksCount()
-            val runsPerFullCheck = (runCount / BATCH_SIZE.toFloat()).toIntUp()
+            val runsPerFullCheck = (runCount / BATCH_SIZE.toFloat()).toIntUp().coerceAtLeast(1)
             val interval = (6 / runsPerFullCheck).coerceAtLeast(2)
             val request = PeriodicWorkRequestBuilder<TrackWorker>(interval.toLong(), TimeUnit.HOURS)
                 .setConstraints(constraints)
@@ -326,6 +327,6 @@ class TrackWorker @AssistedInject constructor(
         const val MAX_PARALLELISM = 6
         const val DATA_KEY_SUCCESS = "success"
         const val DATA_KEY_FAILED = "failed"
-        const val BATCH_SIZE = 20
+        val BATCH_SIZE = if (BuildConfig.DEBUG) 20 else 46
     }
 }

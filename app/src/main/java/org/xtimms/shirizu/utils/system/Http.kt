@@ -59,3 +59,16 @@ fun Response.ensureSuccess() = apply {
         throw HttpStatusException(message, code, request.url.toString())
     }
 }
+
+fun String.sanitizeHeaderValue(): String {
+    return if (all(Char::isValidForHeaderValue)) {
+        this // fast path
+    } else {
+        filter(Char::isValidForHeaderValue)
+    }
+}
+
+private fun Char.isValidForHeaderValue(): Boolean {
+    // from okhttp3.Headers$Companion.checkValue
+    return this == '\t' || this in '\u0020'..'\u007e'
+}

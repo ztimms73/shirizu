@@ -120,7 +120,6 @@ fun ClassicDetailsToolbar(
     title: String,
     titleAlphaProvider: () -> Float,
     navigateBack: () -> Unit,
-    navigateToWebBrowser: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundAlphaProvider: () -> Float = titleAlphaProvider
 ) {
@@ -163,16 +162,6 @@ fun ClassicDetailsToolbar(
                         onClick = { /*TODO*/ },
                         leadingIcon = {
                             Icon(imageVector = Icons.Outlined.Download, contentDescription = null)
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Open in web browser") },
-                        onClick = {
-                            navigateToWebBrowser()
-                            expanded = false
-                        },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Outlined.Language, contentDescription = null)
                         }
                     )
                 }

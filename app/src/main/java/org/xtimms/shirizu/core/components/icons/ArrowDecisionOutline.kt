@@ -5,7 +5,7 @@ import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
 import androidx.compose.ui.graphics.vector.ImageVector
 
-public val Icons.Outlined.ArrowDecisionOutline: ImageVector
+val Icons.Outlined.ArrowDecisionOutline: ImageVector
     get() {
         if (_arrow_decision_outline != null) {
             return _arrow_decision_outline!!

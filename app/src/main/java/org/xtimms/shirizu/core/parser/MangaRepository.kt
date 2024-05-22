@@ -1,6 +1,7 @@
 package org.xtimms.shirizu.core.parser
 
 import androidx.annotation.AnyThread
+import androidx.paging.PagingSource
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
 import org.koitharu.kotatsu.parsers.model.ContentRating
 import org.koitharu.kotatsu.parsers.model.Manga

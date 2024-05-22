@@ -16,10 +16,10 @@ import org.xtimms.shirizu.core.components.TabText
 import org.xtimms.shirizu.core.model.FavouriteCategory
 import org.xtimms.shirizu.core.prefs.AppSettings
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ShelfTabs(
-    categories: List<FavouriteTabModel>,
+    categories: List<FavouriteCategory>,
     pagerState: PagerState,
     onTabItemClick: (Int) -> Unit,
 ) {
@@ -40,7 +40,7 @@ internal fun ShelfTabs(
                     text = {
                         TabText(
                             text = category.title,
-                            badgeCount = if (AppSettings.isMangaCountInTabsEnabled()) category.mangaCount else null
+                            badgeCount = null
                         )
                     },
                     unselectedContentColor = MaterialTheme.colorScheme.onSurface,

@@ -1,7 +1,6 @@
 package org.xtimms.shirizu.core.tracker
 
 import androidx.annotation.VisibleForTesting
-import androidx.collection.MutableLongSet
 import coil.request.CachePolicy
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
@@ -12,7 +11,7 @@ import org.xtimms.shirizu.core.tracker.model.MangaTracking
 import org.xtimms.shirizu.core.tracker.model.MangaUpdates
 import org.xtimms.shirizu.data.repository.HistoryRepository
 import org.xtimms.shirizu.data.repository.TrackingRepository
-import org.xtimms.shirizu.utils.CompositeMutex2
+import org.xtimms.shirizu.utils.MultiMutex
 import org.xtimms.shirizu.work.tracker.TrackerNotificationChannels
 import org.xtimms.shirizu.work.tracker.TrackingItem
 import javax.inject.Inject
@@ -119,7 +118,7 @@ class Tracker @Inject constructor(
 
     private companion object {
 
-        private val mangaMutex = CompositeMutex2<Long>()
+        private val mangaMutex = MultiMutex<Long>()
 
         @OptIn(ExperimentalContracts::class)
         suspend inline fun <T> withMangaLock(id: Long, action: () -> T): T {

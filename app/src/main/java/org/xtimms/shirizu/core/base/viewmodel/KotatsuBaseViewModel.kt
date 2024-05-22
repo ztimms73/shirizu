@@ -63,7 +63,7 @@ abstract class KotatsuBaseViewModel : ViewModel() {
         loadingCounter.decrement()
     }
 
-    protected inline suspend fun <T> withLoading(block: () -> T): T = try {
+    protected suspend inline fun <T> withLoading(block: () -> T): T = try {
         loadingCounter.increment()
         block()
     } finally {

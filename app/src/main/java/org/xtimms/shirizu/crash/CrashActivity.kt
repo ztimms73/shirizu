@@ -22,7 +22,7 @@ class CrashActivity : ComponentActivity() {
 
         val exception = GlobalExceptionHandler.getThrowableFromIntent(intent)
         setContent {
-            SettingsProvider(LocalWindowWidthState.current) {
+            SettingsProvider {
                 ShirizuTheme(
                     darkTheme = LocalDarkTheme.current.isDarkTheme(),
                     isDynamicColorEnabled = LocalDynamicColorSwitch.current,

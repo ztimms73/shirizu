@@ -25,13 +25,12 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
-import org.xtimms.shirizu.core.AsyncImageImpl
+import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.sections.details.data.ReadingTime
 import org.xtimms.shirizu.sections.details.model.HistoryInfo
 
 @Composable
 fun ModernDetailsInfoBox(
-    coil: ImageLoader,
     imageUrl: String,
     favicon: Uri,
     title: String,
@@ -57,8 +56,7 @@ fun ModernDetailsInfoBox(
                 .fillMaxWidth(),
             contentAlignment = Alignment.BottomEnd,
         ) {
-            AsyncImageImpl(
-                coil = coil,
+            ShirizuAsyncImage(
                 model = imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
@@ -91,7 +89,6 @@ fun ModernDetailsInfoBox(
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
             if (!isTabletUi) {
                 MangaAndSourceTitlesSmall(
-                    coil = coil,
                     favicon = favicon,
                     title = title,
                     altTitle = altTitle,
@@ -107,7 +104,6 @@ fun ModernDetailsInfoBox(
                 )
             } else {
                 MangaAndSourceTitlesLarge(
-                    coil = coil,
                     appBarPadding = appBarPadding,
                     imageUrl = imageUrl,
                     favicon = favicon,

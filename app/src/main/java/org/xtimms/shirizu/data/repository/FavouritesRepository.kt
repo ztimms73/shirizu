@@ -17,15 +17,22 @@ import org.xtimms.shirizu.core.database.entity.toEntity
 import org.xtimms.shirizu.core.database.entity.toFavouriteCategory
 import org.xtimms.shirizu.core.database.entity.toManga
 import org.xtimms.shirizu.core.database.entity.toMangaList
+import org.xtimms.shirizu.core.database.entity.toShelfCategory
+import org.xtimms.shirizu.core.database.entity.toShelfManga
+import org.xtimms.shirizu.core.database.entity.toShelfMangaList
 import org.xtimms.shirizu.core.model.FavouriteCategory
 import org.xtimms.shirizu.core.model.ListSortOrder
+import org.xtimms.shirizu.sections.shelf.ShelfCategory
+import org.xtimms.shirizu.sections.shelf.ShelfManga
 import org.xtimms.shirizu.utils.ReversibleHandle
 import org.xtimms.shirizu.utils.lang.mapItems
+import org.xtimms.shirizu.work.tracker.TrackerNotificationChannels
 import javax.inject.Inject
 
 @Reusable
 class FavouritesRepository @Inject constructor(
     private val db: ShirizuDatabase,
+    private val channels: TrackerNotificationChannels,
 ) {
 
     suspend fun getAllManga(): List<Manga> {
@@ -33,13 +40,18 @@ class FavouritesRepository @Inject constructor(
         return entities.toMangaList()
     }
 
+    fun observeAllShelfManga(order: ListSortOrder): Flow<List<ShelfManga>> {
+        return db.getFavouritesDao().observeAll(order)
+            .mapItems { it.toShelfManga() }
+    }
+
     suspend fun getLastManga(limit: Int): List<Manga> {
         val entities = db.getFavouritesDao().findLast(limit)
         return entities.toMangaList()
     }
 
-    fun observeAll(categoryId: Long, order: ListSortOrder): Flow<List<Manga>> {
-        return db.getFavouritesDao().observeAll(categoryId, order)
+    fun observeAll(order: ListSortOrder): Flow<List<Manga>> {
+        return db.getFavouritesDao().observeAll(order)
             .mapItems { it.toManga() }
     }
 
@@ -48,7 +60,11 @@ class FavouritesRepository @Inject constructor(
         return entities.toMangaList()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeAll(categoryId: Long, order: ListSortOrder): Flow<List<Manga>> {
+        return db.getFavouritesDao().observeAll(categoryId, order)
+            .mapItems { it.toManga() }
+    }
+
     fun observeAll(categoryId: Long): Flow<List<Manga>> {
         return observeOrder(categoryId)
             .flatMapLatest { order -> observeAll(categoryId, order) }
@@ -56,11 +72,6 @@ class FavouritesRepository @Inject constructor(
 
     fun observeMangaCount(): Flow<Int> {
         return db.getFavouritesDao().observeMangaCount()
-            .distinctUntilChanged()
-    }
-
-    fun observeMangaCountInCategory(categoryId: Long): Flow<Int> {
-        return db.getFavouritesDao().observeMangaCountInCategory(categoryId)
             .distinctUntilChanged()
     }
 
@@ -76,8 +87,19 @@ class FavouritesRepository @Inject constructor(
         }.distinctUntilChanged()
     }
 
+    fun observeCategory(id: Long): Flow<FavouriteCategory?> {
+        return db.getFavouriteCategoriesDao().observe(id)
+            .map { it?.toFavouriteCategory() }
+    }
+
     fun observeCategoriesIds(mangaId: Long): Flow<Set<Long>> {
         return db.getFavouritesDao().observeIds(mangaId).map { it.toSet() }
+    }
+
+    fun observeCategories(mangaId: Long): Flow<Set<FavouriteCategory>> {
+        return db.getFavouritesDao().observeCategories(mangaId).map {
+            it.mapTo(LinkedHashSet(it.size)) { x -> x.toFavouriteCategory() }
+        }
     }
 
     suspend fun getCategory(id: Long): FavouriteCategory {
@@ -105,7 +127,9 @@ class FavouritesRepository @Inject constructor(
             isVisibleInLibrary = isVisibleOnShelf,
         )
         val id = db.getFavouriteCategoriesDao().insert(entity)
-        return entity.toFavouriteCategory(id)
+        val category = entity.toFavouriteCategory(id)
+        channels.createChannel(category)
+        return category
     }
 
     suspend fun updateCategory(
@@ -132,6 +156,10 @@ class FavouritesRepository @Inject constructor(
                 db.getFavouritesDao().deleteAll(id)
                 db.getFavouriteCategoriesDao().delete(id)
             }
+        }
+        // run after transaction success
+        for (id in ids) {
+            channels.deleteChannel(id)
         }
     }
 

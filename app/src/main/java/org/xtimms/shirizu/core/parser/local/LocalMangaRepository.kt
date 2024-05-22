@@ -3,6 +3,7 @@ package org.xtimms.shirizu.core.parser.local
 import android.net.Uri
 import androidx.core.net.toFile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -27,9 +28,10 @@ import org.xtimms.shirizu.core.parser.MangaRepository
 import org.xtimms.shirizu.core.parser.local.input.LocalMangaInput
 import org.xtimms.shirizu.core.parser.local.output.LocalMangaOutput
 import org.xtimms.shirizu.core.parser.local.output.LocalMangaUtil
+import org.xtimms.shirizu.data.LocalMangaMappingCache
 import org.xtimms.shirizu.data.LocalStorageManager
 import org.xtimms.shirizu.utils.AlphanumComparator
-import org.xtimms.shirizu.utils.CompositeMutex2
+import org.xtimms.shirizu.utils.MultiMutex
 import org.xtimms.shirizu.utils.system.children
 import org.xtimms.shirizu.utils.system.deleteAwait
 import org.xtimms.shirizu.utils.system.filterWith
@@ -48,7 +50,8 @@ class LocalMangaRepository @Inject constructor(
 ) : MangaRepository {
 
     override val source = MangaSource.LOCAL
-    private val locks = CompositeMutex2<Long>()
+    private val locks = MultiMutex<Long>()
+    private val localMappingCache = LocalMangaMappingCache()
 
     override val isMultipleTagsSupported: Boolean = true
     override val isTagsExclusionSupported: Boolean = true
@@ -133,6 +136,10 @@ class LocalMangaRepository @Inject constructor(
     }
 
     suspend fun findSavedManga(remoteManga: Manga): LocalManga? = runCatchingCancellable {
+        // very fast path
+        localMappingCache.get(remoteManga.id)?.let {
+            return@runCatchingCancellable it
+        }
         // fast path
         LocalMangaInput.find(storageManager.getReadableDirs(), remoteManga)?.let {
             return it.getManga()
@@ -154,6 +161,8 @@ class LocalMangaRepository @Inject constructor(
                 }
             }
         }.firstOrNull()?.getManga()
+    }.onSuccess { x: LocalManga? ->
+        localMappingCache[remoteManga.id] = x
     }.onFailure {
         it.printStackTrace()
     }.getOrNull()
@@ -200,6 +209,7 @@ class LocalMangaRepository @Inject constructor(
         locks.unlock(id)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getRawList(): ArrayList<LocalManga> {
         val files = getAllFiles().toList() // TODO remove toList()
         return coroutineScope {

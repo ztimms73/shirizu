@@ -37,7 +37,6 @@ const val ReadItemAlpha = .38f
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeedViewItem(
-    coil: ImageLoader,
     selected: Boolean,
     feed: FeedItem,
     onClick: () -> Unit,
@@ -63,7 +62,6 @@ fun FeedViewItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MangaCover.Square(
-            coil = coil,
             modifier = Modifier
                 .padding(vertical = 12.dp)
                 .fillMaxHeight(),

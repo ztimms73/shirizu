@@ -23,13 +23,11 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -39,8 +37,6 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 import androidx.compose.ui.unit.min
-import org.xtimms.shirizu.R
-import org.xtimms.shirizu.ui.theme.SEED
 import org.xtimms.shirizu.ui.theme.ShirizuTheme
 
 data class SwipeActionsConfig(
@@ -68,6 +64,7 @@ val DefaultSwipeActionsConfig = SwipeActionsConfig(
     ExperimentalComposeUiApi::class,
 )
 @Composable
+@Deprecated("Should be removed")
 fun SwipeActions(
     modifier: Modifier = Modifier,
     startActionsConfig: SwipeActionsConfig = DefaultSwipeActionsConfig,

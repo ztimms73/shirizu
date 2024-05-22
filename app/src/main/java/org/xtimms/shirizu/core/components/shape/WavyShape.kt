@@ -29,11 +29,11 @@ class WavyShape(
             moveTo(x = 0f, y = 0f)
             lineTo(size.width - amplitude, -halfPeriod * 2.5f + halfPeriod * 2 * shift)
             repeat(ceil(size.height / halfPeriod + 3).toInt()) { i ->
-                relativeQuadraticBezierTo(
+                relativeQuadraticTo(
                     dx1 = 2 * amplitude * (if (i % 2 == 0) 1 else -1),
                     dy1 = halfPeriod / 2,
                     dx2 = 0f,
-                    dy2 = halfPeriod,
+                    dy2 = halfPeriod
                 )
             }
             lineTo(0f, size.height)

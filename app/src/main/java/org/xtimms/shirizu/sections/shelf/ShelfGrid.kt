@@ -7,17 +7,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.fastAny
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.Manga
 import org.xtimms.shirizu.core.components.MangaGridItem
+import org.xtimms.shirizu.core.model.MangaCover
 
 @Composable
 internal fun ShelfGrid(
-    coil: ImageLoader,
-    items: List<ShelfManga>,
+    items: List<ShelfItem>,
     columns: Int,
     contentPadding: PaddingValues,
     selection: List<ShelfManga>,
-    onClick: (ShelfManga) -> Unit,
-    onLongClick: (ShelfManga) -> Unit,
+    onClick: (Manga) -> Unit,
+    onLongClick: (Manga) -> Unit,
 ) {
     LazyShelfGrid(
         modifier = Modifier.fillMaxSize(),
@@ -26,15 +27,15 @@ internal fun ShelfGrid(
     ) {
         items(
             items = items,
-            contentType = { "shelf_grid_item" },
-        ) { shelfItem ->
-            val manga = shelfItem.manga
+            contentType = { "library_comfortable_grid_item" },
+        ) { libraryItem ->
+            val shelfManga = libraryItem.shelfManga
             MangaGridItem(
-                coil = coil,
-                manga = manga,
-                isSelected = selection.fastAny { it.id == shelfItem.id },
-                onLongClick = { onLongClick(shelfItem) },
-                onClick = { onClick(shelfItem) },
+                isSelected = selection.fastAny { it.id == libraryItem.shelfManga.id },
+                title = shelfManga.manga.title,
+                manga = shelfManga.manga,
+                onLongClick = { onLongClick(libraryItem.shelfManga.manga) },
+                onClick = { onClick(libraryItem.shelfManga.manga) },
             )
         }
     }

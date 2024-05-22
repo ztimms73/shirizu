@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.Manga
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.ui.screens.EmptyScreen
@@ -22,11 +23,12 @@ import org.xtimms.shirizu.utils.system.plus
 
 @Composable
 fun ShelfPager(
-    coil: ImageLoader,
     state: PagerState,
     contentPadding: PaddingValues,
-    getShelfForPage: (Int) -> List<ShelfManga>,
-    navigateToDetails: (ShelfManga) -> Unit,
+    selectedManga: List<ShelfManga>,
+    getShelfForPage: (Int) -> List<ShelfItem>,
+    onClickManga: (Manga) -> Unit,
+    onLongClickManga: (Manga) -> Unit,
 ) {
     HorizontalPager(
         modifier = Modifier.fillMaxSize(),
@@ -46,13 +48,12 @@ fun ShelfPager(
         }
 
         ShelfGrid(
-            coil = coil,
             items = library,
             columns = AppSettings.getGridColumnsCount().toInt(),
             contentPadding = contentPadding,
-            selection = listOf(),
-            onClick = navigateToDetails,
-            onLongClick = {  },
+            selection = selectedManga,
+            onClick = onClickManga,
+            onLongClick = onLongClickManga,
         )
     }
 }

@@ -11,6 +11,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import org.intellij.lang.annotations.Language
+import org.xtimms.shirizu.core.database.entity.FavouriteCategoryEntity
 import org.xtimms.shirizu.core.database.entity.FavouriteEntity
 import org.xtimms.shirizu.core.database.entity.MangaEntity
 import org.xtimms.shirizu.core.model.ListSortOrder
@@ -89,15 +90,15 @@ abstract class FavouritesDao {
     @Query("SELECT COUNT(DISTINCT manga_id) FROM favourites WHERE deleted_at = 0")
     abstract fun observeMangaCount(): Flow<Int>
 
-    @Query("SELECT COUNT(DISTINCT manga_id) FROM favourites WHERE deleted_at = 0 AND category_id = :categoryId")
-    abstract fun observeMangaCountInCategory(categoryId: Long): Flow<Int>
-
     @Query("SELECT * FROM manga WHERE manga_id IN (SELECT manga_id FROM favourites WHERE deleted_at = 0)")
     abstract suspend fun findAllManga(): List<MangaEntity>
 
     @Transaction
     @Query("SELECT * FROM favourites WHERE manga_id = :id AND deleted_at = 0 GROUP BY manga_id")
     abstract suspend fun find(id: Long): FavouriteManga?
+
+    @Query("SELECT * FROM favourites WHERE manga_id = :mangaId AND deleted_at = 0")
+    abstract suspend fun findAllRaw(mangaId: Long): List<FavouriteEntity>
 
     @Transaction
     @Deprecated("Ignores order")
@@ -107,7 +108,10 @@ abstract class FavouritesDao {
     @Query("SELECT DISTINCT category_id FROM favourites WHERE manga_id = :id AND deleted_at = 0")
     abstract fun observeIds(id: Long): Flow<List<Long>>
 
-    @Query("SELECT DISTINCT category_id FROM favourites WHERE manga_id IN (:mangaIds) AND deleted_at = 0")
+    @Query("SELECT favourite_categories.* FROM favourites LEFT JOIN favourite_categories ON favourite_categories.category_id = favourites.category_id WHERE favourites.manga_id = :mangaId AND favourites.deleted_at = 0")
+    abstract fun observeCategories(mangaId: Long): Flow<List<FavouriteCategoryEntity>>
+
+    @Query("SELECT DISTINCT category_id FROM favourites WHERE manga_id IN (:mangaIds) AND deleted_at = 0 ORDER BY favourites.created_at ASC")
     abstract suspend fun findCategoriesIds(mangaIds: Collection<Long>): List<Long>
 
     @Query("SELECT DISTINCT favourite_categories.category_id FROM favourites LEFT JOIN favourite_categories ON favourites.category_id = favourite_categories.category_id WHERE manga_id = :mangaId AND favourites.deleted_at = 0 AND favourite_categories.deleted_at = 0 AND favourite_categories.track = 1")
@@ -172,7 +176,5 @@ abstract class FavouritesDao {
         ListSortOrder.NEWEST -> "favourites.created_at DESC"
         ListSortOrder.ALPHABETIC -> "manga.title ASC"
         ListSortOrder.PROGRESS -> "IFNULL((SELECT percent FROM history WHERE history.manga_id = manga.manga_id), 0) DESC"
-
-        else -> throw IllegalArgumentException("Sort order $sortOrder is not supported")
     }
 }
