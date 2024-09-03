@@ -1,12 +1,10 @@
 package org.xtimms.shirizu.sections.explore.sources
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.outlined.ExploreOff
 import androidx.compose.material.icons.outlined.ExtensionOff
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PushPin
@@ -27,11 +25,11 @@ import org.xtimms.shirizu.core.components.ScrollbarLazyColumn
 import org.xtimms.shirizu.core.model.isNsfw
 import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.core.ui.screens.LoadingScreen
-import org.xtimms.shirizu.utils.LocaleHelper
 import org.xtimms.shirizu.utils.material.SecondaryItemAlpha
+import org.xtimms.shirizu.utils.system.getDisplayName
 import org.xtimms.shirizu.utils.system.plus
+import org.xtimms.shirizu.utils.system.toLocale
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SourcesScreen(
     state: SourcesScreenModel.State,
@@ -97,7 +95,7 @@ fun SourceHeader(
 ) {
     val context = LocalContext.current
     Text(
-        text = LocaleHelper.getSourceDisplayName(language, context),
+        text = language.toLocale().getDisplayName(context),
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 8.dp),
         style = MaterialTheme.typography.bodyLarge,

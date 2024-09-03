@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
-import org.xtimms.shirizu.core.model.getTitle
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.data.repository.MangaSourcesRepository
 import org.xtimms.shirizu.sections.explore.sources.SourceUiModel
@@ -39,8 +38,8 @@ class CatalogScreenModel @Inject constructor(
         val queryFilter: (String) -> ((MangaParserSource) -> Boolean) = { query ->
             filter@{ source ->
                 if (query.isEmpty()) return@filter true
-                query.split(",").any { _input ->
-                    val input = _input.trim()
+                query.split(",").any {
+                    val input = it.trim()
                     if (input.isEmpty()) return@any false
                     source.title.contains(input, ignoreCase = true)
                 }
