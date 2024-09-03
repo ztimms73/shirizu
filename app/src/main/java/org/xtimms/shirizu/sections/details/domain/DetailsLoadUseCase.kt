@@ -32,7 +32,7 @@ class DetailsLoadUseCase @Inject constructor(
 ) {
 
     operator fun invoke(mangaId: Long): Flow<MangaDetails> = channelFlow {
-        val manga = requireNotNull(mangaDataRepository.findMangaById(mangaId)) {
+        val manga = requireNotNull(mangaDataRepository.findMangaById(mangaId)) { // wrong method
             "Cannot resolve id $mangaId"
         }
         val local = if (!manga.isLocal) {
@@ -52,7 +52,7 @@ class DetailsLoadUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getDetails(seed: Manga) = runCatchingCancellable {
+    suspend fun getDetails(seed: Manga) = runCatchingCancellable {
         val repository = mangaRepositoryFactory.create(seed.source)
         repository.getDetails(seed)
     }.getOrThrow()

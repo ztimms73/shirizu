@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaTag
@@ -121,22 +120,6 @@ class MangaSearchRepository @Inject constructor(
 
     suspend fun getRareTags(source: MangaSource, limit: Int): List<MangaTag> {
         return db.getTagsDao().findRareTags(source.name, limit).toMangaTagsList()
-    }
-
-    fun getSourcesSuggestion(query: String, limit: Int): List<MangaSource> {
-        if (query.length < 3) {
-            return emptyList()
-        }
-        val skipNsfw = !AppSettings.isNSFWEnabled()
-        val sources = sourcesRepository.allMangaSources
-            .filter { x ->
-                (x.contentType != ContentType.HENTAI || !skipNsfw) && x.title.contains(query, ignoreCase = true)
-            }
-        return if (limit == 0) {
-            sources
-        } else {
-            sources.take(limit)
-        }
     }
 
     fun saveSearchQuery(query: String) {

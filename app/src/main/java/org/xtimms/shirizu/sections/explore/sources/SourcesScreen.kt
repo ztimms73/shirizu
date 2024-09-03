@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.ScrollbarLazyColumn
@@ -105,7 +106,7 @@ fun SourceHeader(
 
 @Composable
 fun SourceItem(
-    source: MangaSource,
+    source: MangaParserSource,
     onClickItem: (MangaSource) -> Unit,
     onLongClickItem: (MangaSource) -> Unit,
     onClickMenu: (MangaSource) -> Unit,
@@ -172,6 +173,6 @@ private fun SourcePinButton(
 }
 
 sealed interface SourceUiModel {
-    data class Item(val source: MangaSource) : SourceUiModel
+    data class Item(val source: MangaParserSource) : SourceUiModel
     data class Header(val language: String?) : SourceUiModel
 }

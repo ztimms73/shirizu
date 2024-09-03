@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.parsers.model.ContentType
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.shirizu.core.model.getTitle
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.data.repository.MangaSourcesRepository
 import org.xtimms.shirizu.sections.explore.sources.SourceUiModel
@@ -34,7 +36,7 @@ class CatalogScreenModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
-        val queryFilter: (String) -> ((MangaSource) -> Boolean) = { query ->
+        val queryFilter: (String) -> ((MangaParserSource) -> Boolean) = { query ->
             filter@{ source ->
                 if (query.isEmpty()) return@filter true
                 query.split(",").any { _input ->

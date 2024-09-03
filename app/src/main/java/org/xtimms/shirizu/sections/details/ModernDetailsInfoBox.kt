@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.xtimms.shirizu.core.ShirizuAsyncImage
@@ -38,7 +39,7 @@ fun ModernDetailsInfoBox(
     author: String,
     isNsfw: Boolean,
     state: MangaState?,
-    source: MangaSource,
+    source: MangaParserSource,
     historyInfo: HistoryInfo,
     readingTime: ReadingTime?,
     isTabletUi: Boolean,

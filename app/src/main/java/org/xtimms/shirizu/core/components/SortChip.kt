@@ -1,11 +1,12 @@
 package org.xtimms.shirizu.core.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.ArrowDropUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -30,28 +31,33 @@ fun SortChip(
     Box(modifier) {
         var expanded by remember { mutableStateOf(false) }
 
+        val arrowDrop = if (expanded) Icons.Outlined.ArrowDropUp else Icons.Outlined.ArrowDropDown
+
         FilterChip(
             selected = true,
             onClick = { expanded = true },
             label = {
-                Text(
-                    text = currentSortOption.label(LocalContext.current.resources),
-                    modifier = Modifier.animateContentSize(),
-                )
+                AnimatedContent(targetState = currentSortOption.label(LocalContext.current.resources), label = "Text") {
+                    Text(text = it)
+                }
             },
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Sort,
-                    contentDescription = null, // decorative
-                    modifier = Modifier.size(16.dp),
-                )
+                AnimatedContent(targetState = currentSortOption.icon(), label = "Icon") {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null, // decorative
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
             },
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null, // decorative
-                    modifier = Modifier.size(16.dp),
-                )
+                AnimatedContent(targetState = arrowDrop, label = "Arrow drop") {
+                    Icon(
+                        imageVector = it,
+                        contentDescription = null, // decorative
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
             },
         )
 

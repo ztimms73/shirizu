@@ -26,6 +26,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.core.components.Scaffold
+import org.xtimms.shirizu.core.model.parcelable.ParcelableManga
 import org.xtimms.shirizu.sections.details.DetailsScreen
 import org.xtimms.shirizu.utils.lang.Screen
 
@@ -75,7 +76,7 @@ data class MangaListScreen(private val source: MangaSource) : Screen() {
                 columns = screenModel.getColumnsPreference(LocalConfiguration.current.orientation),
                 snackbarHostState = snackbarHostState,
                 contentPadding = paddingValues,
-                onMangaClick = { navigator.push((DetailsScreen(it, true))) },
+                onMangaClick = { navigator.push((DetailsScreen(it.id, true))) },
                 onMangaLongClick = { manga -> },
             )
         }

@@ -2,6 +2,7 @@ package org.xtimms.shirizu.core.parser
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.util.Base64
 import android.webkit.WebView
 import androidx.annotation.MainThread
@@ -10,8 +11,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.asResponseBody
+import okio.Buffer
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
+import org.koitharu.kotatsu.parsers.bitmap.Bitmap
 import org.koitharu.kotatsu.parsers.config.MangaSourceConfig
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.network.UserAgents
@@ -20,6 +26,7 @@ import org.xtimms.shirizu.core.network.MangaHttpClient
 import org.xtimms.shirizu.core.network.cookies.MutableCookieJar
 import org.xtimms.shirizu.core.prefs.SourceSettings
 import org.xtimms.shirizu.utils.system.configureForParser
+import org.xtimms.shirizu.utils.system.requireBody
 import org.xtimms.shirizu.utils.system.sanitizeHeaderValue
 import org.xtimms.shirizu.utils.system.toList
 import java.lang.ref.WeakReference
@@ -70,6 +77,30 @@ class MangaLoaderContextImpl @Inject constructor(
 
     override fun getPreferredLocales(): List<Locale> {
         return LocaleListCompat.getAdjustedDefault().toList()
+    }
+
+    override fun createBitmap(width: Int, height: Int): Bitmap {
+        return BitmapWrapper.create(width, height)
+    }
+
+    override fun redrawImageResponse(
+        response: Response,
+        redraw: (image: Bitmap) -> Bitmap
+    ): Response {
+        val image = response.requireBody().byteStream()
+
+        val opts = BitmapFactory.Options()
+        opts.inMutable = true
+        val bitmap = BitmapFactory.decodeStream(image, null, opts) ?: error("Cannot decode bitmap")
+        val result = redraw(BitmapWrapper.create(bitmap)) as BitmapWrapper
+
+        val body = Buffer().also {
+            result.compressTo(it.outputStream())
+        }.asResponseBody("image/jpeg".toMediaType())
+
+        return response.newBuilder()
+            .body(body)
+            .build()
     }
 
     @MainThread

@@ -12,4 +12,7 @@ data class MangaSourceEntity(
     val source: String,
     @ColumnInfo(name = "enabled") val isEnabled: Boolean,
     @ColumnInfo(name = "sort_key", index = true) val sortKey: Int,
+    @ColumnInfo(name = "added_in") val addedIn: Int,
+    @ColumnInfo(name = "used_at") val lastUsedAt: Long,
+    @ColumnInfo(name = "pinned") val isPinned: Boolean,
 )

@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
 import org.koitharu.kotatsu.parsers.MangaParser
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.shirizu.core.model.parcelable.ParcelableManga
 import org.xtimms.shirizu.core.ui.screens.LoadingScreen
 import org.xtimms.shirizu.utils.lang.AssistContentScreen
 import org.xtimms.shirizu.utils.lang.Screen
@@ -26,13 +27,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 class DetailsScreen(
-    private val manga: Manga,
+    private val mangaId: Long,
     val fromSource: Boolean = false,
-) : Screen(), AssistContentScreen {
-
-    private var assistUrl: String? = null
-
-    override fun onProvideAssistUrl() = assistUrl
+) : Screen() {
 
     @Composable
     override fun Content() {
@@ -43,7 +40,7 @@ class DetailsScreen(
 
         val screenModel =
             getScreenModel<DetailsScreenModel, DetailsScreenModel.Factory> { factory ->
-                factory.create(context, manga, SnackbarHostState())
+                factory.create(context, mangaId, SnackbarHostState())
             }
 
         val state by screenModel.state.collectAsState()
@@ -54,13 +51,13 @@ class DetailsScreen(
         }
 
         val successState = state as DetailsScreenModel.State.Success
-        val isOnlineSource = remember { successState.source != MangaSource.DUMMY && successState.source != MangaSource.LOCAL }
 
         MangaScreen(
             state = successState,
             snackbarHostState = screenModel.snackbarHostState,
             isTabletUi = isTabletUi(),
             onBackClicked = navigator::pop,
+            onMangaClicked = {  },
             onWebViewClicked = {
 
             },
@@ -76,16 +73,5 @@ class DetailsScreen(
             onContinueReading = {  },
             onCoverClicked = {  },
         )
-    }
-
-    private suspend fun getMangaUrl(manga_: Manga?, parser_: MangaParser?): String? {
-        val manga = manga_ ?: return null
-        val source = parser_ ?: return null
-
-        return try {
-            source.getDetails(manga).publicUrl
-        } catch (e: Exception) {
-            null
-        }
     }
 }

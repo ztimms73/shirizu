@@ -18,7 +18,7 @@ object MangaTagParceler : Parceler<MangaTag> {
     override fun MangaTag.write(parcel: Parcel, flags: Int) {
         parcel.writeString(title)
         parcel.writeString(key)
-        parcel.writeSerializable(source)
+        parcel.writeString(source.name)
     }
 }
 

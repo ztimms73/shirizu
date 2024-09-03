@@ -86,6 +86,7 @@ import org.xtimms.shirizu.sections.feed.FeedScreen
 import org.xtimms.shirizu.sections.history.HistoryTab
 import org.xtimms.shirizu.sections.library.LibraryTab
 import org.xtimms.shirizu.sections.onboarding.OnboardingScreen
+import org.xtimms.shirizu.sections.profile.ProfileTab
 import org.xtimms.shirizu.sections.search.SearchTab
 import org.xtimms.shirizu.sections.settings.SettingsScreen
 import org.xtimms.shirizu.sections.shelf.ShelfTab
@@ -301,7 +302,6 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 object MainScreen : Screen() {
 
-    private val librarySearchEvent = Channel<String>()
     private val openTabEvent = Channel<Tab>()
     private val showBottomNavEvent = Channel<Boolean>()
 
@@ -312,7 +312,8 @@ object MainScreen : Screen() {
         // ShelfTab,
         // HistoryTab,
         ExploreTab(),
-        SearchTab
+        SearchTab,
+        // ProfileTab
     )
 
     @Composable
@@ -331,13 +332,6 @@ object MainScreen : Screen() {
                                 actions = {
                                     AppBarActions(
                                         persistentListOf(
-                                            AppBar.Action(
-                                                title = stringResource(R.string.suggestions),
-                                                icon = Icons.Outlined.Creation,
-                                                onClick = {
-                                                    navigator.push(SuggestionsScreen)
-                                                },
-                                            ),
                                             AppBar.Action(
                                                 title = stringResource(R.string.feed),
                                                 icon = Icons.Outlined.RssFeed,
@@ -425,6 +419,7 @@ object MainScreen : Screen() {
                             // is Tab.History -> HistoryTab
                             is Tab.Explore -> ExploreTab()
                             is Tab.Search -> SearchTab
+                            // is Tab.Profile -> ProfileTab
                         }
                     }
                 }
@@ -508,5 +503,6 @@ object MainScreen : Screen() {
         // data object History : Tab
         data object Explore : Tab
         data object Search : Tab
+        // data object Profile : Tab
     }
 }

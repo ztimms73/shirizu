@@ -2,6 +2,7 @@ package org.xtimms.shirizu.sections.search.global.model
 
 import org.koitharu.kotatsu.parsers.model.ContentType
 import org.koitharu.kotatsu.parsers.model.Manga
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.core.model.ListModel
 
@@ -44,7 +45,7 @@ sealed interface SearchSuggestionItem : ListModel {
     }
 
     data class Source(
-        val source: MangaSource,
+        val source: MangaParserSource,
         val isEnabled: Boolean,
     ) : SearchSuggestionItem {
 

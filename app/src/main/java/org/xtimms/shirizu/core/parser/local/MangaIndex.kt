@@ -5,6 +5,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
@@ -59,7 +60,7 @@ class MangaIndex(source: String?) {
     }
 
     fun getMangaInfo(): Manga? = if (json.length() == 0) null else runCatching {
-        val source = MangaSource.valueOf(json.getString("source"))
+        val source = MangaParserSource.valueOf(json.getString("source"))
         Manga(
             id = json.getLong("id"),
             title = json.getString("title"),

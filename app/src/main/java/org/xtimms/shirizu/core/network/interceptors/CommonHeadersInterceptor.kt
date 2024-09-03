@@ -12,7 +12,7 @@ import org.koitharu.kotatsu.parsers.util.mergeWith
 import org.xtimms.shirizu.BuildConfig
 import org.xtimms.shirizu.core.network.CommonHeaders
 import org.xtimms.shirizu.core.parser.MangaRepository
-import org.xtimms.shirizu.core.parser.RemoteMangaRepository
+import org.xtimms.shirizu.core.parser.ParserMangaRepository
 import java.net.IDN
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,7 +26,7 @@ class CommonHeadersInterceptor @Inject constructor(
         val request = chain.request()
         val source = request.tag(MangaSource::class.java)
         val repository = if (source != null) {
-            mangaRepositoryFactoryLazy.get().create(source) as? RemoteMangaRepository
+            mangaRepositoryFactoryLazy.get().create(source) as? ParserMangaRepository
         } else {
             if (BuildConfig.DEBUG) {
                 Log.w("Http", "Request without source tag: ${request.url}")

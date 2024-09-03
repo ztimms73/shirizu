@@ -24,7 +24,7 @@ data class ExploreTab(
         get() {
             val image = Icons.Outlined.Explore
             return TabOptions(
-                index = 3u,
+                index = 1u,
                 title = stringResource(R.string.nav_explore),
                 icon = rememberVectorPainter(image),
             )

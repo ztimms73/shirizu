@@ -1,6 +1,5 @@
 package org.xtimms.shirizu.di
 
-import android.app.Application
 import android.content.Context
 import android.text.Html
 import androidx.work.WorkManager
@@ -22,9 +21,6 @@ import okhttp3.OkHttpClient
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
 import org.xtimms.shirizu.BuildConfig
 import org.xtimms.shirizu.core.cache.CacheDir
-import org.xtimms.shirizu.core.cache.ContentCache
-import org.xtimms.shirizu.core.cache.MemoryContentCache
-import org.xtimms.shirizu.core.cache.StubContentCache
 import org.xtimms.shirizu.core.database.ShirizuDatabase
 import org.xtimms.shirizu.core.model.LocalManga
 import org.xtimms.shirizu.core.network.MangaHttpClient
@@ -38,6 +34,7 @@ import org.xtimms.shirizu.sections.reader.thumbnails.MangaPageFetcher
 import org.xtimms.shirizu.utils.CoilImageGetter
 import org.xtimms.shirizu.utils.system.connectivityManager
 import org.xtimms.shirizu.utils.system.isLowRamDevice
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -70,7 +67,7 @@ interface ShirizuModule {
         @Singleton
         fun provideCoil(
             @ApplicationContext context: Context,
-            @MangaHttpClient okHttpClient: OkHttpClient,
+            @MangaHttpClient okHttpClientProvider: Provider<OkHttpClient>,
             mangaRepositoryFactory: MangaRepository.Factory,
             imageProxyInterceptor: ImageProxyInterceptor,
             pageFetcherFactory: MangaPageFetcher.Factory,
@@ -81,35 +78,28 @@ interface ShirizuModule {
                     .directory(rootDir.resolve(CacheDir.THUMBS.dir))
                     .build()
             }
+            val okHttpClientLazy = lazy {
+                okHttpClientProvider.get().newBuilder().cache(null).build()
+            }
             return ImageLoader.Builder(context)
                 .crossfade(500)
-                .okHttpClient(okHttpClient.newBuilder().cache(null).build())
+                .okHttpClient { okHttpClientLazy.value }
                 .interceptorDispatcher(Dispatchers.Default)
                 .fetcherDispatcher(Dispatchers.IO)
                 .decoderDispatcher(Dispatchers.Default)
                 .transformationDispatcher(Dispatchers.Default)
                 .diskCache(diskCacheFactory)
+                .respectCacheHeaders(false)
+                .networkObserverEnabled(false)
                 .logger(if (BuildConfig.DEBUG) DebugLogger() else null)
                 .allowRgb565(context.isLowRamDevice())
                 .components(
                     ComponentRegistry.Builder()
-                        .add(FaviconFetcher.Factory(context, okHttpClient, mangaRepositoryFactory))
+                        .add(FaviconFetcher.Factory(context, okHttpClientLazy, mangaRepositoryFactory))
                         .add(pageFetcherFactory)
                         .add(imageProxyInterceptor)
                         .build(),
                 ).build()
-        }
-
-        @Provides
-        @Singleton
-        fun provideContentCache(
-            application: Application,
-        ): ContentCache {
-            return if (application.isLowRamDevice()) {
-                StubContentCache()
-            } else {
-                MemoryContentCache(application)
-            }
         }
 
         @Provides

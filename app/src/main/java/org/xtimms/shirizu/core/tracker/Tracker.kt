@@ -6,7 +6,7 @@ import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.xtimms.shirizu.core.model.getPreferredBranch
 import org.xtimms.shirizu.core.parser.MangaRepository
-import org.xtimms.shirizu.core.parser.RemoteMangaRepository
+import org.xtimms.shirizu.core.parser.ParserMangaRepository
 import org.xtimms.shirizu.core.tracker.model.MangaTracking
 import org.xtimms.shirizu.core.tracker.model.MangaUpdates
 import org.xtimms.shirizu.data.repository.HistoryRepository
@@ -51,7 +51,7 @@ class Tracker @Inject constructor(
     ): MangaUpdates = withMangaLock(track.manga.id) {
         val updates = runCatchingCancellable {
             val repo = mangaRepositoryFactory.create(track.manga.source)
-            require(repo is RemoteMangaRepository) { "Repository ${repo.javaClass.simpleName} is not supported" }
+            require(repo is ParserMangaRepository) { "Repository ${repo.javaClass.simpleName} is not supported" }
             val manga = repo.getDetails(track.manga, CachePolicy.WRITE_ONLY)
             compare(track, manga, getBranch(manga))
         }.getOrElse { error ->

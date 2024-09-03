@@ -30,7 +30,7 @@ data class ParcelableManga(
             parcel.writeParcelable(ParcelableMangaTags(tags), flags)
             parcel.writeSerializable(state)
             parcel.writeString(author)
-            parcel.writeSerializable(source)
+            parcel.writeString(source.name)
         }
 
         override fun create(parcel: Parcel) = ParcelableManga(

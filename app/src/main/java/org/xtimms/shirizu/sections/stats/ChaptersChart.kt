@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.parsers.model.MangaChapter
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.ui.theme.colorMax
 import org.xtimms.shirizu.ui.theme.colorMin
@@ -158,12 +159,12 @@ private fun PreviewChart() {
         ChaptersChart(
             modifier = Modifier.size(100.dp),
             chapters = listOf(
-                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY)
+                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY)
             ),
             chartPadding = PaddingValues(vertical = 16.dp)
         )

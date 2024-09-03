@@ -17,6 +17,7 @@ import org.xtimms.shirizu.App
 import org.xtimms.shirizu.ui.theme.SEED
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.network.doh.DoHProvider
+import org.xtimms.shirizu.sections.library.history.SortOption
 import org.xtimms.shirizu.ui.monet.PaletteStyle
 import org.xtimms.shirizu.utils.lang.processLifecycleScope
 import org.xtimms.shirizu.utils.system.LocaleLanguageCodeMap
@@ -36,6 +37,8 @@ const val CONFIGURE = "configure"
 const val NOTIFICATION = "notification"
 const val READING_TIME = "reading_time"
 const val GRID_COLUMNS = "grid_columns"
+const val SORT_OPTION = "sort_option"
+
 const val DOH = "doh"
 
 const val SYSTEM_DEFAULT = 0

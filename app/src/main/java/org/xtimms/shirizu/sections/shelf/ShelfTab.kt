@@ -25,6 +25,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.Scaffold
 import org.xtimms.shirizu.core.components.LibraryBottomActionMenu
+import org.xtimms.shirizu.core.model.parcelable.ParcelableManga
 import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.core.ui.screens.LoadingScreen
 import org.xtimms.shirizu.sections.details.DetailsScreen
@@ -85,7 +86,7 @@ object ShelfTab : Tab, NoLiftingAppBarScreen {
                         currentPage = { screenModel.activeCategoryIndex },
                         hasActiveFilters = state.hasActiveFilters,
                         onChangeCurrentPage = {  },
-                        onMangaClicked = { navigator.push(DetailsScreen(it)) },
+                        onMangaClicked = { navigator.push(DetailsScreen(it.id)) },
                         onToggleSelection = {  },
                         onToggleRangeSelection = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)

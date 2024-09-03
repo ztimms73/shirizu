@@ -2,6 +2,9 @@ package org.xtimms.shirizu.utils
 
 import androidx.collection.ArrayMap
 import kotlinx.coroutines.sync.Mutex
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 class MultiMutex<T : Any> : Set<T> {
 
@@ -38,6 +41,19 @@ class MultiMutex<T : Any> : Set<T> {
     fun unlock(element: T) {
         synchronized(delegates) {
             delegates.remove(element)?.unlock()
+        }
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    suspend inline fun <R> withLock(element: T, block: () -> R): R {
+        contract {
+            callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        }
+        return try {
+            lock(element)
+            block()
+        } finally {
+            unlock(element)
         }
     }
 }

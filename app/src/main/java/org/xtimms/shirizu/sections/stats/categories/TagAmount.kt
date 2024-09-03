@@ -49,7 +49,7 @@ fun TagAmount(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "56",
+                text = amount.toString(),
                 softWrap = false,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W900),
             )

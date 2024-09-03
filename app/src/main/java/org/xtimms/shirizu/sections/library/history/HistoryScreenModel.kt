@@ -73,12 +73,7 @@ class HistoryScreenModel @Inject constructor(
                 val searchQuery = query ?: ""
                 history.asSequence().map { it }
                     .filter { it.manga.isNsfw == nsfw }
-                    .sortedByDescending {
-                        when (sort) {
-                            SortOption.DATE_ADDED -> it.history.updatedAt
-                            SortOption.ALPHABETICAL -> it.manga.title.lowercase()
-                        }.toString()
-                    }
+                    .sortedWith(MangaComparator(sort))
                     .filter(queryFilter(searchQuery)).toList()
                     .toImmutableList()
             }.collectLatest {
@@ -222,10 +217,7 @@ class HistoryScreenModel @Inject constructor(
         val searchQuery: String? = null,
         val selection: PersistentList<Manga> = persistentListOf(),
         val showNsfw: Boolean = AppSettings.showNsfwInHistory(),
-        val availableSorts: List<SortOption> = listOf(
-            SortOption.DATE_ADDED,
-            SortOption.ALPHABETICAL
-        ),
+        val availableSorts: List<SortOption> = SortOption.entries,
         val sort: SortOption = SortOption.ALPHABETICAL,
         val list: PersistentList<HistoryItemModel> = persistentListOf(),
         val dialog: Dialog? = null,
@@ -264,4 +256,14 @@ class HistoryScreenModel @Inject constructor(
         data object HistoryCleared : Event
     }
 
+}
+
+private class MangaComparator(private val sort: SortOption) : Comparator<MangaWithHistory> {
+    override fun compare(o1: MangaWithHistory, o2: MangaWithHistory): Int {
+        return when (sort) {
+            SortOption.DATE_ADDED -> o2.history.updatedAt.compareTo(o1.history.updatedAt)
+            SortOption.ALPHABETICAL -> o1.manga.title.compareTo(o2.manga.title)
+            SortOption.PROGRESS -> o2.history.percent.compareTo(o1.history.percent)
+        }
+    }
 }

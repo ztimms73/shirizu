@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koitharu.kotatsu.parsers.model.Manga
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.core.parser.MangaRepository
 
@@ -25,7 +26,7 @@ class MangaListScreenModel @AssistedInject constructor(
     mangaRepositoryFactory: MangaRepository.Factory,
 ) : StateScreenModel<MangaListScreenModel.State>(State()) {
 
-    val source = MangaSource.valueOf(sourceName)
+    val source = MangaParserSource.valueOf(sourceName)
     private val repository = mangaRepositoryFactory.create(source)
     private val hasNextPage = MutableStateFlow(false)
     private val mangaList = MutableStateFlow<List<Manga>?>(null)

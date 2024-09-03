@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.AppBar
@@ -21,7 +22,7 @@ import org.xtimms.shirizu.core.components.SearchToolbar
 fun BrowseSourceToolbar(
     searchQuery: String?,
     onSearchQueryChange: (String?) -> Unit,
-    source: MangaSource?,
+    source: MangaParserSource?,
     navigateUp: () -> Unit,
     onWebViewClick: () -> Unit,
     onSearch: (String) -> Unit,

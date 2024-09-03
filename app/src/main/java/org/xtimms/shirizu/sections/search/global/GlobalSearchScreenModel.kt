@@ -81,11 +81,6 @@ class GlobalSearchScreenModel @Inject constructor(
         } else {
             null
         }
-        val sources = if (SearchSuggestionType.SOURCES in types) {
-            repository.getSourcesSuggestion(searchQuery, MAX_SOURCES_ITEMS)
-        } else {
-            null
-        }
 
         val tags = tagsDeferred?.await()
         val mangaList = mangaDeferred?.await()
@@ -93,11 +88,10 @@ class GlobalSearchScreenModel @Inject constructor(
         val hints = hintsDeferred?.await()
         val authors = authorsDeferred?.await()
 
-        buildList(queries.sizeOrZero() + sources.sizeOrZero() + authors.sizeOrZero() + hints.sizeOrZero() + 2) {
+        buildList(queries.sizeOrZero() + authors.sizeOrZero() + hints.sizeOrZero() + 2) {
             if (!mangaList.isNullOrEmpty()) {
                 add(SearchSuggestionItem.MangaList(mangaList))
             }
-            sources?.mapTo(this) { SearchSuggestionItem.Source(it, it in enabledSources) }
             queries?.mapTo(this) { SearchSuggestionItem.RecentQuery(it) }
             authors?.mapTo(this) { SearchSuggestionItem.Author(it) }
             hints?.mapTo(this) { SearchSuggestionItem.Hint(it) }

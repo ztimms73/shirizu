@@ -54,7 +54,7 @@ import java.time.Instant
 
 @Composable
 fun RowScope.ReadButton(
-    info: HistoryInfo,
+    info: HistoryInfo?,
     estimatedReadTime: String
 ) {
 
@@ -63,13 +63,13 @@ fun RowScope.ReadButton(
 
     val animatedCardContainerColor = animateColorAsState(
         label = "animatedCardContainerColor",
-        targetValue = if (info.totalChapters == 0) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+        targetValue = if (info?.totalChapters == 0) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
         animationSpec = TweenSpec(500)
     ).value
 
     val animatedCardContentColor = animateColorAsState(
         label = "animatedCardContentColor",
-        targetValue = if (info.totalChapters == 0) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+        targetValue = if (info?.totalChapters == 0) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
         animationSpec = TweenSpec(500)
     ).value
 
@@ -105,9 +105,9 @@ fun RowScope.ReadButton(
             contentAlignment = Alignment.CenterEnd,
         ) {
             BackgroundProgress(
-                if (info.totalChapters == 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                if (!info.isValid) 0.1f else 0.33f,
-                info.history?.percent?.coerceIn(0f, 1f) ?: 0f
+                if (info?.totalChapters == 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                if (info?.isValid == true) 0.1f else 0.33f,
+                info?.history?.percent?.coerceIn(0f, 1f) ?: 0f
             )
             Column(
                 modifier = Modifier
@@ -143,7 +143,8 @@ fun RowScope.ReadButton(
                     animationSpec = infiniteRepeatable(tween(15000), RepeatMode.Restart)
                 )
                 val chaptersSubtitle = when {
-                    !info.isValid -> stringResource(R.string.loading_)
+                    info == null -> "null"
+                    info.isValid -> stringResource(R.string.loading_)
                     info.currentChapter >= 0 -> when (infiniteTransition) {
                         1 -> stringResource(
                             R.string.chapter_d_of_d,
@@ -162,7 +163,7 @@ fun RowScope.ReadButton(
                     )
                 }
                 Text(
-                    text = if (info.history != null) {
+                    text = if (info?.history != null) {
                         stringResource(R.string.continue_reading)
                     } else {
                         stringResource(R.string.read)

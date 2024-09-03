@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import org.koitharu.kotatsu.parsers.model.ContentType
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.utils.LocaleHelper
@@ -21,14 +22,14 @@ import java.util.Locale
 
 @Composable
 fun BaseSourceItem(
-    source: MangaSource,
+    source: MangaParserSource,
     modifier: Modifier = Modifier,
     showTypeInContent: Boolean = true,
     onClickItem: () -> Unit = {},
     onLongClickItem: () -> Unit = {},
     icon: @Composable RowScope.(MangaSource) -> Unit = defaultIcon,
     action: @Composable RowScope.(MangaSource) -> Unit = {},
-    content: @Composable RowScope.(MangaSource, String?) -> Unit = defaultContent,
+    content: @Composable RowScope.(MangaParserSource, String?) -> Unit = defaultContent,
 ) {
     fun getPrettyContentTypeName(type: ContentType?, context: Context): String {
         if (type == null) {
@@ -60,7 +61,7 @@ private val defaultIcon: @Composable RowScope.(MangaSource) -> Unit = { source -
     SourceIcon(source = source)
 }
 
-private val defaultContent: @Composable RowScope.(MangaSource, String?) -> Unit = { source, sourceLangString ->
+private val defaultContent: @Composable RowScope.(MangaParserSource, String?) -> Unit = { source, sourceLangString ->
     Column(
         modifier = Modifier
             .padding(horizontal = 24.dp)

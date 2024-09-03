@@ -1,21 +1,28 @@
 package org.xtimms.shirizu.core.parser
 
+import android.content.Context
 import androidx.annotation.AnyThread
-import androidx.paging.PagingSource
+import androidx.collection.ArrayMap
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.koitharu.kotatsu.parsers.MangaLoaderContext
 import org.koitharu.kotatsu.parsers.model.ContentRating
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
 import org.koitharu.kotatsu.parsers.model.MangaListFilter
 import org.koitharu.kotatsu.parsers.model.MangaPage
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
-import org.xtimms.shirizu.core.cache.ContentCache
+import org.xtimms.shirizu.core.cache.MemoryContentCache
+import org.xtimms.shirizu.core.model.LocalMangaSource
+import org.xtimms.shirizu.core.model.MangaSourceInfo
+import org.xtimms.shirizu.core.model.UnknownMangaSource
+import org.xtimms.shirizu.core.parser.external.ExternalMangaRepository
+import org.xtimms.shirizu.core.parser.external.ExternalMangaSource
 import org.xtimms.shirizu.core.parser.local.LocalMangaRepository
 import java.lang.ref.WeakReference
-import java.util.EnumMap
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,6 +36,8 @@ interface MangaRepository {
     val states: Set<MangaState>
 
     val contentRatings: Set<ContentRating>
+
+    var defaultSortOrder: SortOrder
 
     val isMultipleTagsSupported: Boolean
 
@@ -50,30 +59,58 @@ interface MangaRepository {
 
     suspend fun getRelated(seed: Manga): List<Manga>
 
+    suspend fun find(manga: Manga): Manga? {
+        val list = getList(0, MangaListFilter.Search(manga.title))
+        return list.find { x -> x.id == manga.id }
+    }
+
     @Singleton
     class Factory @Inject constructor(
+        @ApplicationContext private val context: Context,
         private val localMangaRepository: LocalMangaRepository,
         private val loaderContext: MangaLoaderContext,
-        private val contentCache: ContentCache,
+        private val contentCache: MemoryContentCache,
     ) {
 
-        private val cache = EnumMap<MangaSource, WeakReference<RemoteMangaRepository>>(MangaSource::class.java)
+        private val cache = ArrayMap<MangaSource, WeakReference<MangaRepository>>()
 
         @AnyThread
         fun create(source: MangaSource): MangaRepository {
-            if (source == MangaSource.LOCAL) {
-                return localMangaRepository
+            when (source) {
+                is MangaSourceInfo -> return create(source.mangaSource)
+                LocalMangaSource -> return localMangaRepository
+                UnknownMangaSource -> return EmptyMangaRepository(source)
             }
             cache[source]?.get()?.let { return it }
             return synchronized(cache) {
                 cache[source]?.get()?.let { return it }
-                val repository = RemoteMangaRepository(
-                    parser = MangaParser(source, loaderContext),
+                val repository = createRepository(source)
+                if (repository != null) {
+                    cache[source] = WeakReference(repository)
+                    repository
+                } else {
+                    EmptyMangaRepository(source)
+                }
+            }
+        }
+
+        private fun createRepository(source: MangaSource): MangaRepository? = when (source) {
+            is MangaParserSource -> ParserMangaRepository(
+                parser = MangaParser(source, loaderContext),
+                cache = contentCache,
+            )
+
+            is ExternalMangaSource -> if (source.isAvailable(context)) {
+                ExternalMangaRepository(
+                    contentResolver = context.contentResolver,
+                    source = source,
                     cache = contentCache,
                 )
-                cache[source] = WeakReference(repository)
-                repository
+            } else {
+                EmptyMangaRepository(source)
             }
+
+            else -> null
         }
     }
 }

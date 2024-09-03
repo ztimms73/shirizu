@@ -1,8 +1,10 @@
 package org.xtimms.shirizu.sections.explore.sources
 
+import android.content.Context
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -13,12 +15,17 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.shirizu.core.model.MangaSourceInfo
+import org.xtimms.shirizu.core.model.getSummary
+import org.xtimms.shirizu.core.model.getTitle
 import org.xtimms.shirizu.data.repository.MangaSourcesRepository
 import org.xtimms.shirizu.utils.LocaleHelper
 import javax.inject.Inject
 
 class SourcesScreenModel @Inject constructor(
+    @ApplicationContext context: Context,
     private val mangaSourcesRepository: MangaSourcesRepository,
 ) : StateScreenModel<SourcesScreenModel.State>(State()) {
 
@@ -36,7 +43,7 @@ class SourcesScreenModel @Inject constructor(
         }
     }
 
-    private fun collectEnabledSources(sources: List<MangaSource>) {
+    private fun collectEnabledSources(sources: List<MangaParserSource>) {
         mutableState.update { state ->
             state.copy(
                 isLoading = false,

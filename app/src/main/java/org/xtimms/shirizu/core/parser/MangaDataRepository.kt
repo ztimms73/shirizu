@@ -13,6 +13,7 @@ import javax.inject.Provider
 @Reusable
 class MangaDataRepository @Inject constructor(
     private val db: ShirizuDatabase,
+    private val resolverProvider: Provider<MangaLinkResolver>,
 ) {
 
     suspend fun findMangaById(mangaId: Long): Manga? {
@@ -21,6 +22,13 @@ class MangaDataRepository @Inject constructor(
 
     suspend fun findMangaByPublicUrl(publicUrl: String): Manga? {
         return db.getMangaDao().findByPublicUrl(publicUrl)?.toManga()
+    }
+
+    suspend fun resolveIntent(intent: MangaIntent): Manga? = when {
+        intent.manga != null -> intent.manga
+        intent.mangaId != 0L -> findMangaById(intent.mangaId)
+        intent.uri != null -> resolverProvider.get().resolve(intent.uri)
+        else -> null
     }
 
     suspend fun storeManga(manga: Manga) {

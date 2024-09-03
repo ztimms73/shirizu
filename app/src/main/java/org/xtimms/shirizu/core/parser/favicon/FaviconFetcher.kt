@@ -1,13 +1,20 @@
 package org.xtimms.shirizu.core.parser.favicon
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
+import android.os.Build
 import android.webkit.MimeTypeMap
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.decode.DataSource
 import coil.decode.ImageSource
 import coil.disk.DiskCache
+import coil.fetch.DrawableResult
 import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.fetch.SourceResult
@@ -15,7 +22,9 @@ import coil.network.HttpException
 import coil.request.Options
 import coil.size.Size
 import coil.size.pxOrElse
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.runInterruptible
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -27,8 +36,10 @@ import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.util.await
 import org.xtimms.shirizu.core.cache.CacheDir
 import org.xtimms.shirizu.core.model.MangaSource
+import org.xtimms.shirizu.core.parser.EmptyMangaRepository
 import org.xtimms.shirizu.core.parser.MangaRepository
-import org.xtimms.shirizu.core.parser.RemoteMangaRepository
+import org.xtimms.shirizu.core.parser.ParserMangaRepository
+import org.xtimms.shirizu.core.parser.external.ExternalMangaRepository
 import org.xtimms.shirizu.utils.lang.writeAllCancellable
 import org.xtimms.shirizu.utils.withExtraCloseable
 import java.net.HttpURLConnection
@@ -46,14 +57,27 @@ class FaviconFetcher(
 ) : Fetcher {
 
     private val diskCacheKey
-        get() = options.diskCacheKey ?: "${mangaSource.name}[${mangaSource.ordinal}]x${options.size.toCacheKey()}"
+        get() = options.diskCacheKey ?: "${mangaSource.name}x${options.size.toCacheKey()}"
 
     private val fileSystem
         get() = checkNotNull(diskCache.value).fileSystem
 
     override suspend fun fetch(): FetchResult {
         getCached(options)?.let { return it }
-        val repo = mangaRepositoryFactory.create(mangaSource) as RemoteMangaRepository
+        return when (val repo = mangaRepositoryFactory.create(mangaSource)) {
+            is ParserMangaRepository -> fetchParserFavicon(repo)
+            is ExternalMangaRepository -> fetchPluginIcon(repo)
+            is EmptyMangaRepository -> DrawableResult(
+                drawable = ColorDrawable(Color.WHITE),
+                isSampled = false,
+                dataSource = DataSource.MEMORY,
+            )
+
+            else -> throw IllegalArgumentException("")
+        }
+    }
+
+    private suspend fun fetchParserFavicon(repo: ParserMangaRepository): FetchResult {
         val sizePx = maxOf(
             options.size.width.pxOrElse { FALLBACK_SIZE },
             options.size.height.pxOrElse { FALLBACK_SIZE },
@@ -81,6 +105,20 @@ class FaviconFetcher(
             )
         }
         throwNSEE(lastError)
+    }
+
+    private suspend fun fetchPluginIcon(repository: ExternalMangaRepository): FetchResult {
+        val source = repository.source
+        val pm = options.context.packageManager
+        val icon = runInterruptible(Dispatchers.IO) {
+            val provider = pm.resolveContentProvider(source.authority, 0)
+            provider?.loadIcon(pm) ?: pm.getApplicationIcon(source.packageName)
+        }
+        return DrawableResult(
+            drawable = icon.nonAdaptive(),
+            isSampled = false,
+            dataSource = DataSource.DISK,
+        )
     }
 
     private suspend fun loadIcon(url: String, source: MangaSource): Response {
@@ -167,12 +205,20 @@ class FaviconFetcher(
         }
     }
 
+    private fun Drawable.nonAdaptive() =
+        if (this is AdaptiveIconDrawable) {
+            LayerDrawable(arrayOf(background, foreground))
+        } else {
+            this
+        }
+
     class Factory(
         context: Context,
-        private val okHttpClient: OkHttpClient,
+        okHttpClientLazy: Lazy<OkHttpClient>,
         private val mangaRepositoryFactory: MangaRepository.Factory,
     ) : Fetcher.Factory<Uri> {
 
+        private val okHttpClient by okHttpClientLazy
         private val diskCache = lazy {
             val rootDir = context.externalCacheDir ?: context.cacheDir
             DiskCache.Builder()

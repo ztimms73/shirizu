@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "dbe1dcac0f49c5ae2ac88d88aa280081",
+    "identityHash": "90b73386d5c61c2ddf46d6354ca2f1b6",
     "entities": [
       {
         "tableName": "manga",
@@ -199,7 +199,7 @@
       },
       {
         "tableName": "sources",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`source` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `sort_key` INTEGER NOT NULL, PRIMARY KEY(`source`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`source` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `sort_key` INTEGER NOT NULL, `added_in` INTEGER NOT NULL, `used_at` INTEGER NOT NULL, `pinned` INTEGER NOT NULL, PRIMARY KEY(`source`))",
         "fields": [
           {
             "fieldPath": "source",
@@ -216,6 +216,24 @@
           {
             "fieldPath": "sortKey",
             "columnName": "sort_key",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedIn",
+            "columnName": "added_in",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUsedAt",
+            "columnName": "used_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPinned",
+            "columnName": "pinned",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -851,7 +869,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dbe1dcac0f49c5ae2ac88d88aa280081')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '90b73386d5c61c2ddf46d6354ca2f1b6')"
     ]
   }
 }

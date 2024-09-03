@@ -356,9 +356,16 @@
     <string name="shelves">Shelves</string>
     <string name="history_cleared">History cleared</string>
     <string name="search_by_reading_history">Search by reading history</string>
-    <string name="sort_alphabetically">A-Z</string>
+    <string name="sort_alphabetically">Name</string>
     <string name="sort_date_added">Date added</string>
     <string name="show_nsfw">Show NSFW</string>
     <string name="action_save">Save</string>
     <string name="action_mark_as_completed">Mark as completed</string>
+    <string name="sort_alphabetically_reversed">Z-A</string>
+    <string name="profile">Profile</string>
+    <string name="menu">Menu</string>
+    <string name="help_centre">Help centre</string>
+    <string name="source_summary_pattern">%1$s, %2$s</string>
+    <string name="external_source">External/plugin</string>
+    <string name="various_languages">Various languages</string>
 </resources>

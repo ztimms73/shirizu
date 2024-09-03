@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.core.parser.favicon.faviconUri
@@ -23,7 +24,7 @@ import org.xtimms.shirizu.ui.theme.ShirizuTheme
 
 @Composable
 fun SourceCatalogItem(
-    source: MangaSource,
+    source: MangaParserSource,
 ) {
 
     Row(
@@ -53,6 +54,6 @@ fun SourceCatalogItem(
 @Composable
 fun SourceCatalogItemPreview() {
     ShirizuTheme {
-        SourceCatalogItem(source = MangaSource.MANGADEX)
+        SourceCatalogItem(source = MangaParserSource.MANGADEX)
     }
 }

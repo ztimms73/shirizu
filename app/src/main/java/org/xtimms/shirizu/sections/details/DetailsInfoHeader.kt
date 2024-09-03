@@ -49,6 +49,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
@@ -82,6 +83,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.koitharu.kotatsu.parsers.model.MangaTag
@@ -108,7 +110,7 @@ fun MangaAndSourceTitlesLarge(
     title: String,
     altTitle: String,
     author: String,
-    source: MangaSource,
+    source: MangaParserSource,
     state: MangaState?,
     historyInfo: HistoryInfo,
     readingTime: ReadingTime?,
@@ -153,7 +155,7 @@ fun MangaAndSourceTitlesSmall(
     altTitle: String,
     author: String,
     state: MangaState?,
-    source: MangaSource,
+    source: MangaParserSource,
     historyInfo: HistoryInfo,
     readingTime: ReadingTime?,
     isInShelf: Boolean,
@@ -188,19 +190,16 @@ fun MangaAndSourceTitlesSmall(
     }
 }
 
-@OptIn(
-    ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailsContentInfo(
     favicon: Uri,
     title: String,
-    altTitle: String,
-    author: String,
+    altTitle: String?,
+    author: String?,
     state: MangaState?,
     source: String?,
-    historyInfo: HistoryInfo,
+    historyInfo: HistoryInfo?,
     readingTime: ReadingTime?,
     isInShelf: Boolean,
     onAddToShelfClicked: () -> Unit,
@@ -224,7 +223,7 @@ fun DetailsContentInfo(
                 maxLines = 3
             )
 
-            if (altTitle.isNotBlank()) {
+            if (!altTitle.isNullOrBlank()) {
                 Text(
                     text = altTitle,
                     style = MaterialTheme.typography.headlineSmall,
@@ -235,7 +234,7 @@ fun DetailsContentInfo(
                 Spacer(modifier = Modifier.height(4.dp))
             }
 
-            if (author.isNotEmpty()) {
+            if (!author.isNullOrBlank()) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -294,7 +293,7 @@ fun DetailsContentInfo(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
                     InputChip(
                         selected = false,
                         onClick = { onAddToShelfClicked() },
@@ -354,7 +353,7 @@ fun DetailsContentInfo(
                         modifier = Modifier
                             .height(32.dp)
                             .width(56.dp),
-                        onClick = { onAddToShelfClicked() /*TODO*/ },
+                        onClick = { /*TODO*/ },
                         shape = MaterialTheme.shapes.small,
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                     ) {
@@ -579,14 +578,13 @@ private fun MangaSummary(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TagsChip(
     tag: MangaTag,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
         SuggestionChip(
             modifier = modifier,
             onClick = onClick,

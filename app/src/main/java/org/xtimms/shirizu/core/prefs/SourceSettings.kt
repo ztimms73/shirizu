@@ -31,6 +31,7 @@ class SourceSettings(context: Context, source: MangaSource) : MangaSourceConfig 
             is ConfigKey.Domain -> prefs.getString(key.key, key.defaultValue).ifNullOrEmpty { key.defaultValue }
             is ConfigKey.ShowSuspiciousContent -> prefs.getBoolean(key.key, key.defaultValue)
             is ConfigKey.SplitByTranslations -> prefs.getBoolean(key.key, key.defaultValue)
+            is ConfigKey.PreferredImageServer -> prefs.getString(key.key, key.defaultValue)?.takeUnless(String::isEmpty)
         } as T
     }
 
@@ -40,6 +41,7 @@ class SourceSettings(context: Context, source: MangaSource) : MangaSourceConfig 
             is ConfigKey.ShowSuspiciousContent -> putBoolean(key.key, value as Boolean)
             is ConfigKey.UserAgent -> putString(key.key, value as String?)
             is ConfigKey.SplitByTranslations -> putBoolean(key.key, value as Boolean)
+            is ConfigKey.PreferredImageServer -> putString(key.key, value as String? ?: "")
         }
     }
 }

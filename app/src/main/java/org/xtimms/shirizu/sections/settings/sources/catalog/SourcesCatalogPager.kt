@@ -57,11 +57,11 @@ fun SourcesCatalogPager(
             items(
                 items = sources,
             ) { item ->
-                item.items.forEach { source ->
+                /*item.items.forEach { source ->
                     SourceCatalogItem(
                         source = source.source,
                     )
-                }
+                }*/
             }
         }
     }

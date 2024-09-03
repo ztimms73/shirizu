@@ -5,6 +5,7 @@ import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import okhttp3.ResponseBody
 import okhttp3.internal.closeQuietly
 import okio.IOException
 import org.json.JSONObject
@@ -72,3 +73,5 @@ private fun Char.isValidForHeaderValue(): Boolean {
     // from okhttp3.Headers$Companion.checkValue
     return this == '\t' || this in '\u0020'..'\u007e'
 }
+
+fun Response.requireBody(): ResponseBody = checkNotNull(body) { "Response body is null" }

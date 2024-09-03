@@ -16,11 +16,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.xtimms.shirizu.sections.shelf.ShelfCategory
+import java.math.RoundingMode
 
 @Composable
 fun DonutChart(
     modifier: Modifier = Modifier,
-    items: List<ShelfCategory>,
+    items: List<TagUsage>,
     chartPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val localDensity = LocalDensity.current
@@ -42,7 +43,7 @@ fun DonutChart(
         val heightWithPaddings = height - topOffset - bottomOffset
         val widthWithPaddings = width - startOffset - endOffset
 
-        val total = items.map { it.id }.reduce { acc, next -> acc + next }
+        val total = items.map { it.mangaCount }.reduce { acc, next -> acc + next }
         var offset = 0f
 
         val gap = 0f
@@ -52,11 +53,37 @@ fun DonutChart(
         val minSweepAngle = 28f
         val offsetAngle = -90f
 
+        var itemAngles = items.map {
+            it.mangaCount
+                .divide(total, 5, RoundingMode.HALF_DOWN)
+                .multiply(360.toBigDecimal())
+                .toFloat()
+        }
+
+        val shareAngle = itemAngles
+            .filter { it < minSweepAngle }
+            .map { minSweepAngle - it }
+            .fold(0f) { acc, next -> acc + next }
+        val splitItems = itemAngles.filter { it > minSweepAngle }.toMutableList()
+
+        itemAngles = itemAngles.map { angle ->
+            if (angle < minSweepAngle) {
+                return@map minSweepAngle
+            }
+
+            if (angle > minSweepAngle) {
+                return@map angle - shareAngle / splitItems.size
+            }
+
+            angle
+        }
+
         items.forEachIndexed { index, tag ->
+            val sweepAngle = itemAngles[index]
             drawArc(
-                Color.Black,
+                tag.color?.main ?: Color.Black,
                 startAngle = offset + halfGap + offsetAngle,
-                sweepAngle = 36 - gap,
+                sweepAngle = sweepAngle - gap,
                 useCenter = false,
                 topLeft = Offset(startOffset + halfStrokeWidth, topOffset + halfStrokeWidth),
                 size = Size(widthWithPaddings - strokeWidth, heightWithPaddings - strokeWidth),
@@ -66,7 +93,7 @@ fun DonutChart(
                 ),
             )
 
-            offset += 50
+            offset += sweepAngle
         }
     }
 }

@@ -5,6 +5,7 @@ import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.koitharu.kotatsu.parsers.util.json.getBooleanOrDefault
 import org.koitharu.kotatsu.parsers.util.json.getFloatOrDefault
 import org.koitharu.kotatsu.parsers.util.json.getIntOrDefault
+import org.koitharu.kotatsu.parsers.util.json.getLongOrDefault
 import org.koitharu.kotatsu.parsers.util.json.getStringOrNull
 import org.xtimms.shirizu.core.database.entity.BookmarkEntity
 import org.xtimms.shirizu.core.database.entity.FavouriteCategoryEntity
@@ -83,6 +84,9 @@ class JsonDeserializer(private val json: JSONObject) {
         source = json.getString("source"),
         isEnabled = json.getBoolean("enabled"),
         sortKey = json.getInt("sort_key"),
+        addedIn = json.getIntOrDefault("added_in", 0),
+        lastUsedAt = json.getLongOrDefault("used_at", 0L),
+        isPinned = json.getBooleanOrDefault("pinned", false),
     )
 
     fun toMap(): Map<String, Any?> {

@@ -3,6 +3,7 @@ package org.xtimms.shirizu.core.model
 import androidx.core.os.LocaleListCompat
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaChapter
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.utils.system.iterator
 import java.text.DecimalFormat
@@ -61,4 +62,4 @@ fun MangaChapter.formatNumber(): String? {
 }
 
 val Manga.isLocal: Boolean
-    get() = source == MangaSource.LOCAL
+    get() = source == LocalMangaSource

@@ -32,10 +32,9 @@ import org.xtimms.shirizu.core.network.CommonHeaders
 import org.xtimms.shirizu.core.network.MangaHttpClient
 import org.xtimms.shirizu.core.network.interceptors.ImageProxyInterceptor
 import org.xtimms.shirizu.core.parser.MangaRepository
-import org.xtimms.shirizu.core.parser.RemoteMangaRepository
+import org.xtimms.shirizu.core.parser.ParserMangaRepository
 import org.xtimms.shirizu.core.parser.local.isFileUri
 import org.xtimms.shirizu.core.parser.local.isZipUri
-import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.sections.reader.pager.ReaderPage
 import org.xtimms.shirizu.utils.FileSize
 import org.xtimms.shirizu.utils.RetainedLifecycleCoroutineScope
@@ -81,7 +80,7 @@ class PageLoader @Inject constructor(
     private var prefetchQueueLimit = PREFETCH_LIMIT_DEFAULT // TODO adaptive
 
     fun isPrefetchApplicable(): Boolean {
-        return repository is RemoteMangaRepository
+        return repository is ParserMangaRepository
                 // && settings.isPagesPreloadEnabled
                 && !context.isPowerSaveMode()
                 && !isLowRam()

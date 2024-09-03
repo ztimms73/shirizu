@@ -23,6 +23,7 @@ import org.koitharu.kotatsu.parsers.model.MangaTag
 import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.xtimms.shirizu.core.model.LocalManga
+import org.xtimms.shirizu.core.model.LocalMangaSource
 import org.xtimms.shirizu.core.model.isLocal
 import org.xtimms.shirizu.core.parser.MangaRepository
 import org.xtimms.shirizu.core.parser.local.input.LocalMangaInput
@@ -49,7 +50,7 @@ class LocalMangaRepository @Inject constructor(
     @LocalStorageChanges private val localStorageChanges: MutableSharedFlow<LocalManga?>,
 ) : MangaRepository {
 
-    override val source = MangaSource.LOCAL
+    override val source = LocalMangaSource
     private val locks = MultiMutex<Long>()
     private val localMappingCache = LocalMangaMappingCache()
 
@@ -59,6 +60,10 @@ class LocalMangaRepository @Inject constructor(
     override val sortOrders: Set<SortOrder> = EnumSet.of(SortOrder.ALPHABETICAL, SortOrder.RATING, SortOrder.NEWEST)
     override val states = emptySet<MangaState>()
     override val contentRatings = emptySet<ContentRating>()
+
+    override var defaultSortOrder: SortOrder
+        get() = SortOrder.NEWEST // TODO
+        set(value) {}
 
     override suspend fun getList(offset: Int, filter: MangaListFilter?): List<Manga> {
         if (offset > 0) {
@@ -94,7 +99,7 @@ class LocalMangaRepository @Inject constructor(
     }
 
     override suspend fun getDetails(manga: Manga): Manga = when {
-        manga.source != MangaSource.LOCAL -> requireNotNull(findSavedManga(manga)?.manga) {
+        manga.source != LocalMangaSource -> requireNotNull(findSavedManga(manga)?.manga) {
             "Manga is not local or saved"
         }
 

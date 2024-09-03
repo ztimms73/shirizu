@@ -1,11 +1,21 @@
 package org.xtimms.shirizu.utils.system
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.core.os.LocaleListCompat
+import org.koitharu.kotatsu.parsers.util.toTitleCase
 import org.xtimms.shirizu.R
 import java.util.Locale
+
+fun String.toLocale() = Locale(this)
+
+fun Locale?.getDisplayName(context: Context): String = when (this) {
+    null -> context.getString(R.string.multi_lang)
+    Locale.ROOT -> context.getString(R.string.various_languages)
+    else -> getDisplayLanguage(this).toTitleCase(this)
+}
 
 fun LocaleListCompat.toList(): List<Locale> = List(size()) { i -> getOrThrow(i) }
 

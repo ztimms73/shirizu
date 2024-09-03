@@ -36,6 +36,7 @@ import org.xtimms.shirizu.core.components.DialogCheckBoxItem
 import org.xtimms.shirizu.core.components.Scaffold
 import org.xtimms.shirizu.core.components.LibraryBottomActionMenu
 import org.xtimms.shirizu.core.components.ShirizuDialog
+import org.xtimms.shirizu.core.model.parcelable.ParcelableManga
 import org.xtimms.shirizu.core.ui.screens.TabContent
 import org.xtimms.shirizu.sections.details.DetailsScreen
 
@@ -80,7 +81,7 @@ fun Screen.historyTab(): TabContent {
                     onToggleEnableNsfw = { screenModel.filterNsfw(it) },
                     onFilterChanged = { screenModel.search(it) },
                     onSortSelected = { screenModel.sort(it) },
-                    onClick = { navigator.push(DetailsScreen(it.manga)) },
+                    onClick = { navigator.push(DetailsScreen(it.manga.id)) },
                     onHistorySelected = screenModel::toggleSelection
                 )
             }

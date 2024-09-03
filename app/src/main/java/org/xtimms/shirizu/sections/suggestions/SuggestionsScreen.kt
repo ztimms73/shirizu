@@ -41,6 +41,7 @@ import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.MangaGridItem
 import org.xtimms.shirizu.core.components.ScaffoldWithTopAppBar
 import org.xtimms.shirizu.core.components.icons.Creation
+import org.xtimms.shirizu.core.model.parcelable.ParcelableManga
 import org.xtimms.shirizu.core.ui.screens.EmptyScreen
 import org.xtimms.shirizu.core.ui.screens.LoadingScreen
 import org.xtimms.shirizu.sections.details.DetailsScreen
@@ -84,7 +85,7 @@ object SuggestionsScreen : Screen() {
                     SuggestionsScreenContent(
                         suggestions = it,
                         contentPadding = padding,
-                        onClick = { suggestion -> navigator.push(DetailsScreen(suggestion.manga)) }
+                        onClick = { suggestion -> navigator.push(DetailsScreen(suggestion.manga.id)) }
                     )
                 }
             }

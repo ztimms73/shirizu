@@ -6,13 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
 import org.koitharu.kotatsu.parsers.model.Manga
 import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.shirizu.core.model.LocalMangaSource
 
 class LocalMangaUtil(
     private val manga: Manga,
 ) {
 
     init {
-        require(manga.source == MangaSource.LOCAL) {
+        require(manga.source == LocalMangaSource) {
             "Expected LOCAL source but ${manga.source} found"
         }
     }

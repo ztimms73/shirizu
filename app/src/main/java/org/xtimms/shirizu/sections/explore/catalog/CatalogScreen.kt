@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.parsers.model.ContentType
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.FastScrollLazyColumn
@@ -234,7 +235,7 @@ fun CatalogScreen(
 
 @Composable
 fun SourceItem(
-    source: MangaSource,
+    source: MangaParserSource,
     onClickItem: (MangaSource) -> Unit,
     onLongClickItem: (MangaSource) -> Unit,
     onClickMenu: (MangaSource) -> Unit,

@@ -1,8 +1,6 @@
 package org.xtimms.shirizu.sections.search
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,6 +40,7 @@ import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.components.MangaCarouselWithHeader
 import org.xtimms.shirizu.core.components.Scaffold
 import org.xtimms.shirizu.core.components.icons.Dice
+import org.xtimms.shirizu.core.model.parcelable.ParcelableManga
 import org.xtimms.shirizu.sections.details.DetailsScreen
 import org.xtimms.shirizu.sections.search.global.GlobalSearchScreen
 import org.xtimms.shirizu.sections.suggestions.SuggestionsScreen
@@ -57,13 +56,13 @@ object SearchTab : Tab {
         get() {
             val image = Icons.Outlined.Search
             return TabOptions(
-                index = 4u,
+                index = 2u,
                 title = stringResource(R.string.search),
                 icon = rememberVectorPainter(image),
             )
         }
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -135,7 +134,7 @@ object SearchTab : Tab {
                     MangaCarouselWithHeader(
                         items = state.list,
                         title = stringResource(id = R.string.suggestions),
-                        onItemClick = { navigator.push(DetailsScreen(it)) },
+                        onItemClick = { navigator.push(DetailsScreen(it.id)) },
                         onMoreClick = { navigator.push(SuggestionsScreen) },
                         refreshing = state.isLoading,
                         modifier = Modifier.animateItem(),

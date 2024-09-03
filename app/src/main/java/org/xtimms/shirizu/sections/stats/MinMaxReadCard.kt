@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.koitharu.kotatsu.parsers.model.MangaChapter
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.xtimms.shirizu.ui.theme.colorMax
 import org.xtimms.shirizu.ui.theme.colorMin
@@ -98,12 +99,12 @@ fun MinMaxReadCard(
                     .fillMaxHeight()
                     .fillMaxWidth(),
                 chapters = listOf(
-                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY),
-                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaSource.DUMMY)
+                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY),
+                    MangaChapter(id = 1, name = "", number = 1, "", "", 0L, "", MangaParserSource.DUMMY)
                 )
             )
         }

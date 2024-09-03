@@ -32,11 +32,13 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import org.koitharu.kotatsu.parsers.model.Manga
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.model.MangaState
 import org.xtimms.shirizu.R
 import org.xtimms.shirizu.core.ShirizuAsyncImage
 import org.xtimms.shirizu.core.components.MangaCover
+import org.xtimms.shirizu.core.model.getTitle
 import org.xtimms.shirizu.sections.details.data.ReadingTime
 import org.xtimms.shirizu.sections.details.model.HistoryInfo
 
@@ -45,13 +47,13 @@ fun ClassicDetailsInfoBox(
     imageUrl: String,
     favicon: Uri,
     title: String,
-    altTitle: String,
-    author: String,
+    altTitle: String?,
+    author: String?,
     isNsfw: Boolean,
     state: MangaState?,
     source: MangaSource,
-    historyInfo: HistoryInfo,
-    readingTime: ReadingTime,
+    historyInfo: HistoryInfo?,
+    readingTime: ReadingTime?,
     isTabletUi: Boolean,
     appBarPadding: Dp,
     modifier: Modifier = Modifier,
@@ -133,8 +135,8 @@ fun MangaInfoLarge(
     imageUrl: String,
     favicon: Uri,
     title: String,
-    altTitle: String,
-    author: String,
+    altTitle: String?,
+    author: String?,
     source: MangaSource,
     state: MangaState?,
     historyInfo: HistoryInfo?,
@@ -168,7 +170,7 @@ fun MangaInfoLarge(
             altTitle = altTitle,
             author = author,
             state = state,
-            source = source.title,
+            source = source.name,
             isInShelf = isInShelf,
             onAddToShelfClicked = onAddToShelfClicked,
             onSourceClicked = onSourceClicked,
@@ -185,12 +187,12 @@ fun MangaInfoSmall(
     imageUrl: String,
     favicon: Uri,
     title: String,
-    altTitle: String,
-    author: String,
+    altTitle: String?,
+    author: String?,
     state: MangaState?,
     source: MangaSource,
-    historyInfo: HistoryInfo,
-    readingTime: ReadingTime,
+    historyInfo: HistoryInfo?,
+    readingTime: ReadingTime?,
     isInShelf: Boolean,
     onAddToShelfClicked: () -> Unit,
     onCoverClick: () -> Unit,
@@ -225,7 +227,7 @@ fun MangaInfoSmall(
             altTitle = altTitle,
             author = author,
             state = state,
-            source = source.title,
+            source = source.name,
             isInShelf = isInShelf,
             onAddToShelfClicked = onAddToShelfClicked,
             onSourceClicked = onSourceClicked,

@@ -2,10 +2,13 @@ package org.xtimms.shirizu.sections.reader.pager
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 import org.koitharu.kotatsu.parsers.model.MangaPage
 import org.koitharu.kotatsu.parsers.model.MangaSource
+import org.xtimms.shirizu.core.model.parcelable.MangaSourceParceler
 
 @Parcelize
+@TypeParceler<MangaSource, MangaSourceParceler>
 data class ReaderPage(
     val id: Long,
     val url: String,

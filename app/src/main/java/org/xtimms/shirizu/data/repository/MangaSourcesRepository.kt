@@ -1,23 +1,38 @@
 package org.xtimms.shirizu.data.repository
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat
 import dagger.Reusable
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import org.koitharu.kotatsu.parsers.model.ContentType
+import org.koitharu.kotatsu.parsers.model.MangaParserSource
 import org.koitharu.kotatsu.parsers.model.MangaSource
 import org.koitharu.kotatsu.parsers.util.mapToSet
+import org.xtimms.shirizu.BuildConfig
 import org.xtimms.shirizu.core.database.ShirizuDatabase
 import org.xtimms.shirizu.core.database.dao.MangaSourcesDao
 import org.xtimms.shirizu.core.database.entity.MangaSourceEntity
 import org.xtimms.shirizu.core.model.MangaSource
+import org.xtimms.shirizu.core.model.MangaSourceInfo
+import org.xtimms.shirizu.core.model.getTitle
 import org.xtimms.shirizu.core.model.isNsfw
+import org.xtimms.shirizu.core.parser.external.ExternalMangaSource
 import org.xtimms.shirizu.core.prefs.AppSettings
 import org.xtimms.shirizu.core.prefs.KotatsuAppSettings
 import org.xtimms.shirizu.core.prefs.observeAsFlow
@@ -25,24 +40,28 @@ import org.xtimms.shirizu.sections.explore.data.SourcesSortOrder
 import org.xtimms.shirizu.utils.ReversibleHandle
 import java.util.Collections
 import java.util.EnumSet
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@OptIn(ExperimentalCoroutinesApi::class)
-@Reusable
+@Singleton
 class MangaSourcesRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val db: ShirizuDatabase,
     private val settings: KotatsuAppSettings,
 ) {
 
+    private val isNewSourcesAssimilated = AtomicBoolean(false)
     private val dao: MangaSourcesDao
         get() = db.getSourcesDao()
 
-    private val remoteSources = EnumSet.allOf(MangaSource::class.java).apply {
-        remove(MangaSource.LOCAL)
-        remove(MangaSource.DUMMY)
+    private val remoteSources = EnumSet.allOf(MangaParserSource::class.java).apply {
+        if (!BuildConfig.DEBUG) {
+            remove(MangaParserSource.DUMMY)
+        }
     }
 
-    val allMangaSources: Set<MangaSource>
+    val allMangaSources: Set<MangaParserSource>
         get() = Collections.unmodifiableSet(remoteSources)
 
     suspend fun getEnabledSources(): List<MangaSource> {
@@ -54,7 +73,8 @@ class MangaSourcesRepository @Inject constructor(
         return dao.findAllDisabled().toSources(settings.isNsfwContentDisabled)
     }
 
-    fun observeDisabledSources(): Flow<List<MangaSource>> = combine(
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun observeDisabledSources(): Flow<List<MangaParserSource>> = combine(
         observeIsNsfwDisabled(),
         observeSortOrder(),
     ) { skipNsfw, _ ->
@@ -84,7 +104,7 @@ class MangaSourcesRepository @Inject constructor(
         }.distinctUntilChanged()
     }
 
-    fun observeEnabledSources(): Flow<List<MangaSource>> = combine(
+    fun observeEnabledSources(): Flow<List<MangaParserSource>> = combine(
         observeIsNsfwDisabled(),
         observeSortOrder(),
     ) { skipNsfw, order ->
@@ -120,10 +140,13 @@ class MangaSourcesRepository @Inject constructor(
         }
     }
 
-    suspend fun assimilateNewSources(): Set<MangaSource> {
+    suspend fun assimilateNewSources(): Boolean {
+        if (isNewSourcesAssimilated.getAndSet(true)) {
+            return false
+        }
         val new = getNewSources()
         if (new.isEmpty()) {
-            return emptySet()
+            return false
         }
         var maxSortKey = dao.getMaxSortKey()
         val entities = new.map { x ->
@@ -131,20 +154,20 @@ class MangaSourcesRepository @Inject constructor(
                 source = x.name,
                 isEnabled = false,
                 sortKey = ++maxSortKey,
+                addedIn = BuildConfig.VERSION_CODE,
+                lastUsedAt = 0,
+                isPinned = false,
             )
         }
         dao.insertIfAbsent(entities)
-        if (settings.isNsfwContentDisabled) {
-            new.removeAll { x -> x.isNsfw() }
-        }
-        return new
+        return true
     }
 
     suspend fun isSetupRequired(): Boolean {
         return dao.findAll().isEmpty()
     }
 
-    private suspend fun getNewSources(): MutableSet<MangaSource> {
+    private suspend fun getNewSources(): MutableSet<out MangaSource> {
         val entities = dao.findAll()
         val result = EnumSet.copyOf(remoteSources)
         for (e in entities) {
@@ -155,11 +178,11 @@ class MangaSourcesRepository @Inject constructor(
 
     private fun List<MangaSourceEntity>.toSources(
         skipNsfwSources: Boolean,
-    ): List<MangaSource> {
-        val result = ArrayList<MangaSource>(size)
+    ): List<MangaParserSource> {
+        val result = ArrayList<MangaParserSource>(size)
         for (entity in this) {
-            val source = MangaSource(entity.source)
-            if (skipNsfwSources && source.contentType == ContentType.HENTAI) {
+            val source = entity.source.toMangaSourceOrNull() ?: continue
+            if (skipNsfwSources && source.isNsfw()) {
                 continue
             }
             if (source in remoteSources) {
@@ -167,6 +190,41 @@ class MangaSourcesRepository @Inject constructor(
             }
         }
         return result
+    }
+
+    private fun observeExternalSources(): Flow<List<ExternalMangaSource>> {
+        val intent = Intent("app.kotatsu.parser.PROVIDE_MANGA")
+        val pm = context.packageManager
+        return callbackFlow {
+            val receiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    trySendBlocking(intent)
+                }
+            }
+            ContextCompat.registerReceiver(
+                context,
+                receiver,
+                IntentFilter().apply {
+                    addAction(Intent.ACTION_PACKAGE_ADDED)
+                    addAction(Intent.ACTION_PACKAGE_VERIFIED)
+                    addAction(Intent.ACTION_PACKAGE_REPLACED)
+                    addAction(Intent.ACTION_PACKAGE_REMOVED)
+                    addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED)
+                    addDataScheme("package")
+                },
+                ContextCompat.RECEIVER_EXPORTED,
+            )
+            awaitClose { context.unregisterReceiver(receiver) }
+        }.onStart {
+            emit(null)
+        }.map {
+            pm.queryIntentContentProviders(intent, 0).map { resolveInfo ->
+                ExternalMangaSource(
+                    packageName = resolveInfo.providerInfo.packageName,
+                    authority = resolveInfo.providerInfo.authority,
+                )
+            }
+        }.distinctUntilChanged()
     }
 
     private fun observeIsNsfwDisabled() = MutableStateFlow(AppSettings.isNSFWEnabled()).asStateFlow()
@@ -178,4 +236,6 @@ class MangaSourcesRepository @Inject constructor(
     private fun observeSortOrder() = settings.observeAsFlow(KotatsuAppSettings.KEY_SOURCES_ORDER) {
         sourcesSortOrder
     }
+
+    private fun String.toMangaSourceOrNull(): MangaParserSource? = MangaParserSource.entries.find { it.name == this }
 }

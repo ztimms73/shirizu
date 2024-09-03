@@ -1,7 +1,6 @@
 package org.xtimms.shirizu.core.parser
 
 import android.util.Log
-import coil.request.CachePolicy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,17 +26,17 @@ import org.koitharu.kotatsu.parsers.model.SortOrder
 import org.koitharu.kotatsu.parsers.util.domain
 import org.koitharu.kotatsu.parsers.util.runCatchingCancellable
 import org.xtimms.shirizu.BuildConfig
-import org.xtimms.shirizu.core.cache.ContentCache
+import org.xtimms.shirizu.core.cache.MemoryContentCache
 import org.xtimms.shirizu.core.cache.SafeDeferred
 import org.xtimms.shirizu.core.prefs.SourceSettings
 import org.xtimms.shirizu.utils.lang.processLifecycleScope
 import java.util.Locale
 
 @OptIn(InternalParsersApi::class)
-class RemoteMangaRepository(
+class ParserMangaRepository(
     private val parser: MangaParser,
-    private val cache: ContentCache,
-) : MangaRepository, Interceptor {
+    private val cache: MemoryContentCache,
+) : CachingMangaRepository(cache), Interceptor {
 
     override val source: MangaSource
         get() = parser.source
@@ -50,6 +49,12 @@ class RemoteMangaRepository(
 
     override val contentRatings: Set<ContentRating>
         get() = parser.availableContentRating
+
+    override var defaultSortOrder: SortOrder
+        get() = getConfig().defaultSortOrder ?: sortOrders.first()
+        set(value) {
+            getConfig().defaultSortOrder = value
+        }
 
     override val isMultipleTagsSupported: Boolean
         get() = parser.isMultipleTagsSupported
@@ -70,7 +75,7 @@ class RemoteMangaRepository(
         get() = parser.configKeyDomain.presetValues
 
     val headers: Headers
-        get() = parser.headers
+        get() = parser.getRequestHeaders()
 
     override fun intercept(chain: Interceptor.Chain): Response {
         return if (parser is Interceptor) {
@@ -84,16 +89,9 @@ class RemoteMangaRepository(
         return parser.getList(offset, filter)
     }
 
-    override suspend fun getDetails(manga: Manga): Manga = getDetails(manga, CachePolicy.ENABLED)
-
-    override suspend fun getPages(chapter: MangaChapter): List<MangaPage> {
-        cache.getPages(source, chapter.url)?.let { return it }
-        val pages = asyncSafe {
-            parser.getPages(chapter).distinctById()
-        }
-        cache.putPages(source, chapter.url, pages)
-        return pages.await()
-    }
+    override suspend fun getPagesImpl(
+        chapter: MangaChapter
+    ): List<MangaPage> = parser.getPages(chapter)
 
     override suspend fun getPageUrl(page: MangaPage): String = parser.getPageUrl(page)
 
@@ -105,59 +103,19 @@ class RemoteMangaRepository(
 
     suspend fun getFavicons(): Favicons = parser.getFavicons()
 
-    override suspend fun getRelated(seed: Manga): List<Manga> {
-        cache.getRelatedManga(source, seed.url)?.let { return it }
-        val related = asyncSafe {
-            parser.getRelatedManga(seed).filterNot { it.id == seed.id }
-        }
-        cache.putRelatedManga(source, seed.url, related)
-        return related.await()
+    override suspend fun getRelatedMangaImpl(seed: Manga): List<Manga> = parser.getRelatedManga(seed)
+
+    override suspend fun getDetailsImpl(manga: Manga): Manga = parser.getDetails(manga)
+
+    fun getAvailableMirrors(): List<String> {
+        return parser.configKeyDomain.presetValues.toList()
     }
 
-    suspend fun getDetails(manga: Manga, cachePolicy: CachePolicy): Manga {
-        if (cachePolicy.readEnabled) {
-            cache.getDetails(source, manga.url)?.let { return it }
-        }
-        val details = asyncSafe {
-            parser.getDetails(manga)
-        }
-        if (cachePolicy.writeEnabled) {
-            cache.putDetails(source, manga.url, details)
-        }
-        return details.await()
+    fun isSlowdownEnabled(): Boolean {
+        return getConfig().isSlowdownEnabled
     }
 
     private fun getConfig() = parser.config as SourceSettings
 
-    @OptIn(ExperimentalStdlibApi::class)
-    private suspend fun <T> asyncSafe(block: suspend CoroutineScope.() -> T): SafeDeferred<T> {
-        var dispatcher = currentCoroutineContext()[CoroutineDispatcher.Key]
-        if (dispatcher == null || dispatcher is MainCoroutineDispatcher) {
-            dispatcher = Dispatchers.Default
-        }
-        return SafeDeferred(
-            processLifecycleScope.async(dispatcher) {
-                runCatchingCancellable { block() }
-            },
-        )
-    }
-
-    private fun List<MangaPage>.distinctById(): List<MangaPage> {
-        if (isEmpty()) {
-            return emptyList()
-        }
-        val result = ArrayList<MangaPage>(size)
-        val set = HashSet<Long>(size)
-        for (page in this) {
-            if (set.add(page.id)) {
-                result.add(page)
-            } else if (BuildConfig.DEBUG) {
-                Log.w(null, "Duplicate page: $page")
-            }
-        }
-        return result
-    }
-
-    private fun Result<*>.isValidResult() = exceptionOrNull() !is ParseException
-            && (getOrNull() as? Collection<*>)?.isEmpty() != true
+    private fun Result<*>.isValidResult() = isSuccess && (getOrNull() as? Collection<*>)?.isEmpty() != true
 }
