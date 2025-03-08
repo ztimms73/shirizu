@@ -2,7 +2,6 @@ package org.xtimms.shirizu.data.repository
 
 import androidx.room.withTransaction
 import dagger.Reusable
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -17,12 +16,10 @@ import org.xtimms.shirizu.core.database.entity.toEntity
 import org.xtimms.shirizu.core.database.entity.toFavouriteCategory
 import org.xtimms.shirizu.core.database.entity.toManga
 import org.xtimms.shirizu.core.database.entity.toMangaList
-import org.xtimms.shirizu.core.database.entity.toShelfCategory
 import org.xtimms.shirizu.core.database.entity.toShelfManga
-import org.xtimms.shirizu.core.database.entity.toShelfMangaList
+import org.xtimms.shirizu.core.model.Cover
 import org.xtimms.shirizu.core.model.FavouriteCategory
 import org.xtimms.shirizu.core.model.ListSortOrder
-import org.xtimms.shirizu.sections.shelf.ShelfCategory
 import org.xtimms.shirizu.sections.shelf.ShelfManga
 import org.xtimms.shirizu.utils.ReversibleHandle
 import org.xtimms.shirizu.utils.lang.mapItems
@@ -85,6 +82,27 @@ class FavouritesRepository @Inject constructor(
         return db.getFavouriteCategoriesDao().observeAllForLibrary().mapItems {
             it.toFavouriteCategory()
         }.distinctUntilChanged()
+    }
+
+    fun observeCategoriesWithCovers(): Flow<Map<FavouriteCategory, List<Cover>>> {
+        return db.getFavouriteCategoriesDao().observeAll()
+            .map {
+                db.withTransaction {
+                    val res = LinkedHashMap<FavouriteCategory, List<Cover>>()
+                    for (entity in it) {
+                        val cat = entity.toFavouriteCategory()
+                        res[cat] = db.getFavouritesDao().findCovers(
+                            categoryId = cat.id,
+                            order = cat.order,
+                        )
+                    }
+                    res
+                }
+            }
+    }
+
+    suspend fun getAllFavoritesCovers(order: ListSortOrder, limit: Int): List<Cover> {
+        return db.getFavouritesDao().findCovers(order, limit)
     }
 
     fun observeCategory(id: Long): Flow<FavouriteCategory?> {

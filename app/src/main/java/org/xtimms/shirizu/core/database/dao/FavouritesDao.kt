@@ -14,6 +14,7 @@ import org.intellij.lang.annotations.Language
 import org.xtimms.shirizu.core.database.entity.FavouriteCategoryEntity
 import org.xtimms.shirizu.core.database.entity.FavouriteEntity
 import org.xtimms.shirizu.core.database.entity.MangaEntity
+import org.xtimms.shirizu.core.model.Cover
 import org.xtimms.shirizu.core.model.ListSortOrder
 import org.xtimms.shirizu.sections.shelf.FavouriteManga
 
@@ -117,6 +118,34 @@ abstract class FavouritesDao {
     @Query("SELECT DISTINCT favourite_categories.category_id FROM favourites LEFT JOIN favourite_categories ON favourites.category_id = favourite_categories.category_id WHERE manga_id = :mangaId AND favourites.deleted_at = 0 AND favourite_categories.deleted_at = 0 AND favourite_categories.track = 1")
     abstract suspend fun findCategoriesIdsWithTrack(mangaId: Long): List<Long>
 
+    suspend fun findCovers(categoryId: Long, order: ListSortOrder): List<Cover> {
+        val orderBy = getOrderBy(order)
+
+        @Language("RoomSql")
+        val query = SimpleSQLiteQuery(
+            "SELECT manga.cover_url AS url, manga.source AS source FROM favourites " +
+                    "LEFT JOIN manga ON favourites.manga_id = manga.manga_id " +
+                    "WHERE favourites.category_id = ? AND deleted_at = 0 ORDER BY $orderBy",
+            arrayOf<Any>(categoryId),
+        )
+        return findCoversImpl(query)
+    }
+
+    suspend fun findCovers(order: ListSortOrder, limit: Int): List<Cover> {
+        val orderBy = getOrderBy(order)
+
+        @Language("RoomSql")
+        val query = SimpleSQLiteQuery(
+            "SELECT manga.cover_url AS url, manga.source AS source FROM favourites " +
+                    "LEFT JOIN manga ON favourites.manga_id = manga.manga_id " +
+                    "WHERE deleted_at = 0 AND " +
+                    "(SELECT show_in_lib FROM favourite_categories WHERE favourite_categories.category_id = favourites.category_id) = 1 " +
+                    "GROUP BY manga.manga_id ORDER BY $orderBy LIMIT ?",
+            arrayOf<Any>(limit),
+        )
+        return findCoversImpl(query)
+    }
+
     /** INSERT **/
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -177,4 +206,7 @@ abstract class FavouritesDao {
         ListSortOrder.ALPHABETIC -> "manga.title ASC"
         ListSortOrder.PROGRESS -> "IFNULL((SELECT percent FROM history WHERE history.manga_id = manga.manga_id), 0) DESC"
     }
+
+    @RawQuery
+    protected abstract suspend fun findCoversImpl(query: SupportSQLiteQuery): List<Cover>
 }
